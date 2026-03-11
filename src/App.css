@@ -1,0 +1,281 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+/* Custom Styles */
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Brand Highlight Animations */
+@keyframes brandFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes brandGlowPulse {
+  0%, 100% { text-shadow: 0 0 0 rgba(139, 0, 0, 0.35); }
+  50% { text-shadow: 0 0 8px rgba(139, 0, 0, 0.45); }
+}
+
+/* Brand Highlight Utility */
+.brand-highlight {
+  color: #8B0000; /* deep, elegant */
+  font-weight: 700; /* slightly heavier */
+  animation: brandFadeIn 0.6s ease-out both;
+}
+
+.brand-highlight:hover {
+  animation: brandFadeIn 0.6s ease-out both, brandGlowPulse 1.6s ease-in-out infinite;
+}
+
+/* Custom Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Custom Utility Classes */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.animate-fade-in-left {
+  animation: fadeInLeft 0.6s ease-out;
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight 0.6s ease-out;
+}
+
+/* Glassmorphism Effects */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #b8a68c;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9a8b73;
+}
+
+/* Line Clamp Utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom Button Styles */
+.btn-primary {
+  @apply bg-warm-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-warm-800 transition-colors duration-200;
+}
+
+.btn-secondary {
+  @apply bg-white text-warm-700 px-6 py-3 rounded-lg font-semibold border-2 border-warm-700 hover:bg-warm-50 transition-colors duration-200;
+}
+
+.btn-outline {
+  @apply border-2 border-warm-700 text-warm-700 px-6 py-3 rounded-lg font-semibold hover:bg-warm-700 hover:text-white transition-colors duration-200;
+}
+
+/* Custom Card Styles */
+.card {
+  @apply bg-white rounded-xl shadow-sm border border-warm-200 overflow-hidden hover:shadow-lg transition-shadow duration-300;
+}
+
+.card-hover {
+  @apply transform hover:-translate-y-1 transition-transform duration-300;
+}
+
+/* Custom Input Styles */
+.input-primary {
+  @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-warm-600 focus:border-transparent transition-colors duration-200;
+}
+
+/* Custom Badge Styles */
+.badge-primary {
+  @apply bg-warm-700 text-white text-xs font-semibold px-2 py-1 rounded-full;
+}
+
+.badge-secondary {
+  @apply bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded-full;
+}
+
+/* Custom Gradient Backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, #b8a68c 0%, #9a8b73 100%);
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, #fefdfb 0%, #fdfaf5 100%);
+}
+
+.gradient-hero {
+  background: linear-gradient(135deg, #b8a68c 0%, #9a8b73 50%, #d4c0a8 100%);
+}
+
+/* Custom Shadows */
+.shadow-soft {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-medium {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-large {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Responsive Design Utilities */
+@media (max-width: 640px) {
+  .container-mobile {
+    @apply px-4;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .container-tablet {
+    @apply px-6;
+  }
+}
+
+@media (min-width: 1025px) {
+  .container-desktop {
+    @apply px-8;
+  }
+}
+
+/* Loading States */
+.loading-skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
+}
+
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-gray-300 border-t-warm-700;
+}
+
+/* Focus States */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-warm-600 focus:ring-offset-2;
+}
+
+/* Hover Effects */
+.hover-lift {
+  @apply transition-transform duration-200 hover:-translate-y-1;
+}
+
+.hover-scale {
+  @apply transition-transform duration-200 hover:scale-105;
+}
+
+/* Text Gradients */
+.text-gradient-primary {
+  background: linear-gradient(135deg, #b8a68c 0%, #9a8b73 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-secondary {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom Transitions */
+.transition-smooth {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.transition-fast {
+  @apply transition-all duration-150 ease-in-out;
+}
+
+.transition-slow {
+  @apply transition-all duration-500 ease-in-out;
+}

@@ -2,7 +2,6 @@
   "name": "maysecret",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://nakulk195.github.io/maysecret-website",
   "dependencies": {
     "@supabase/supabase-js": "^2.99.1",
     "@testing-library/dom": "^10.4.1",

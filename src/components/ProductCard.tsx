@@ -71,7 +71,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
       onMouseLeave={() => setIsHovered(false)}
     >
       <Link to={`/product/${product.id}`} onClick={handleProductClick} className="block">
-        <div className="relative overflow-hidden aspect-square w-full">
+        <div className="relative overflow-hidden h-40 md:h-48 lg:h-56 w-full">
           {/* Loading placeholder */}
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-br from-warm-50 to-warm-100 animate-pulse" />

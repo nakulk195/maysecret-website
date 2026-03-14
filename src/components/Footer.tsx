@@ -5,15 +5,15 @@ import { BRAND_NAME } from '../config/brand';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-900 text-white pt-16 pb-10">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-5 gap-12">
+    <footer className="bg-gray-900 text-white pt-12 md:pt-16 pb-8 md:pb-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-12">
           
           {/* Brand Section */}
-          <div className="md:col-span-1">
+          <div className="lg:col-span-1 text-center md:text-left">
             <img
               src="/images/maysecret-logo.jpg"
               alt={BRAND_NAME}
-              className="h-14 mb-4"
+              className="h-10 md:h-12 lg:h-14 mb-4 mx-auto md:mx-0"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = '/placeholder.svg';
@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Shop Links */}
-          <div>
+          <div className="text-center md:text-left">
             <h3 className="font-semibold mb-4 text-lg">Shop</h3>
             <ul className="space-y-2 text-gray-400 text-sm">
               <li>

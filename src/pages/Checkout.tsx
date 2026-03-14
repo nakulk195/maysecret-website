@@ -312,7 +312,7 @@ const Checkout: React.FC = () => {
                         name="name"
                         value={newAddress.name}
                         onChange={handleAddressChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        className="w-full py-3 px-4 border border-gray-300 rounded-md"
                         required
                       />
                     </div>
@@ -323,7 +323,7 @@ const Checkout: React.FC = () => {
                         name="phone"
                         value={newAddress.phone}
                         onChange={handleAddressChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        className="w-full py-3 px-4 border border-gray-300 rounded-md"
                         required
                       />
                     </div>
@@ -336,7 +336,7 @@ const Checkout: React.FC = () => {
                       name="street"
                       value={newAddress.street}
                       onChange={handleAddressChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full py-3 px-4 border border-gray-300 rounded-md"
                       required
                     />
                   </div>
@@ -349,7 +349,7 @@ const Checkout: React.FC = () => {
                         name="city"
                         value={newAddress.city}
                         onChange={handleAddressChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        className="w-full py-3 px-4 border border-gray-300 rounded-md"
                         required
                       />
                     </div>
@@ -360,7 +360,7 @@ const Checkout: React.FC = () => {
                         name="state"
                         value={newAddress.state}
                         onChange={handleAddressChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        className="w-full py-3 px-4 border border-gray-300 rounded-md"
                         required
                       />
                     </div>
@@ -371,7 +371,7 @@ const Checkout: React.FC = () => {
                         name="pincode"
                         value={newAddress.pincode}
                         onChange={handleAddressChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        className="w-full py-3 px-4 border border-gray-300 rounded-md"
                         required
                       />
                     </div>
@@ -419,18 +419,18 @@ const Checkout: React.FC = () => {
                       <input
                         type="text"
                         placeholder="Card Number"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        className="w-full py-3 px-4 border border-gray-300 rounded-md"
                       />
                       <div className="grid grid-cols-2 gap-3">
                         <input
                           type="text"
                           placeholder="MM/YY"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                          className="w-full py-3 px-4 border border-gray-300 rounded-md"
                         />
                         <input
                           type="text"
                           placeholder="CVV"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                          className="w-full py-3 px-4 border border-gray-300 rounded-md"
                         />
                       </div>
                     </div>
@@ -455,7 +455,7 @@ const Checkout: React.FC = () => {
                         type="text"
                         value={upiId}
                         onChange={(e) => setUpiId(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        className="w-full py-3 px-4 border border-gray-300 rounded-md"
                       />
                       <div className="flex space-x-3 mt-3">
                         <button className="px-3 py-2 bg-blue-50 text-blue-600 rounded-md text-sm">

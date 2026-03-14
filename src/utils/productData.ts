@@ -63,6 +63,11 @@ export const products: Product[] = [
     ],
     description: "Introducing our new sunscreen spray, fortified with advanced sun protection technology. Formulated with Suncat DE, Uvinul A Plus, and other powerful sunscreen agents, it provides broad-spectrum protection against both UVA and UVB rays. With its lightweight and non-greasy formula, it is perfect for daily use, keeping your skin safe and healthy under the sun.",
     benefits: [
+      "UVA UVB RAYS PROTECTION",
+      "SPRAY SLAY GLOW BEYOND THE SUN",
+      "QUICK APPLICATION",
+      "NO WHITE CAST",
+      "WATER RESISTANT",
       "SPF 50 PA+++",
       "Broad Spectrum UVA/UVB Protection",
       "Lightweight Non-Greasy Formula",
@@ -131,6 +136,11 @@ export const products: Product[] = [
     ],
     description: "A powerful brightening serum enriched with Rice Extract, Niacinamide and Sepiwhite designed to improve skin tone, reduce pigmentation and give a radiant glass glow skin effect.",
     benefits: [
+      "RICE EXTRACT BRIGHTENING SERUM",
+      "NATURAL BOOST GLOW",
+      "IMPROVES SKIN TEXTURE",
+      "DEEP HYDRATION",
+      "LIGHTWEIGHT & NON GREASY",
       "Brightens Skin Tone",
       "Reduces Pigmentation",
       "Hydrates & Repairs Skin",

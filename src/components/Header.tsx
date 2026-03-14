@@ -80,8 +80,8 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="bg-white shadow-sm sticky top-0 z-50 py-2 flex items-center">
-      <div className="max-w-7xl mx-auto px-6 py-2">
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <div className="flex items-center justify-between">
           {/* Left Section - Logo */}
           <div className="flex-shrink-0">
@@ -89,13 +89,13 @@ const Header: React.FC = () => {
               <img
                 src="/images/maysecret-logo.jpg"
                 alt={`${BRAND_NAME} Logo`}
-                className="h-14 md:h-16 lg:h-20 w-auto object-contain"
+                className="h-7 md:h-10 lg:h-12 w-auto object-contain"
               />
             </Link>
           </div>
 
           {/* Center Section - Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8 mx-8">
+          <nav className="hidden lg:flex items-center space-x-8 mx-8">
             {navItems.map((item) => (
               <Link 
                 key={item.to} 
@@ -109,9 +109,9 @@ const Header: React.FC = () => {
           </nav>
 
           {/* Right Section - Icons and Actions */}
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Search Icon - Desktop */}
-            <div className="hidden md:flex items-center mr-4">
+            <div className="hidden lg:flex items-center">
               <button
                 onClick={toggleSearch}
                 className="p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -121,10 +121,10 @@ const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* Wishlist */}
+            {/* Wishlist - Desktop */}
             <Link 
               to="/wishlist" 
-              className="hidden md:block p-2 rounded-full hover:bg-gray-100"
+              className="hidden lg:block p-2 rounded-full hover:bg-gray-100"
               onClick={closeMenu}
             >
               <Heart className="h-5 w-5 text-gray-700" />
@@ -143,10 +143,21 @@ const Header: React.FC = () => {
                 </span>
               )}
             </Link>
+
+            {/* Mobile menu button */}
+            <div className="lg:hidden">
+              <button
+                onClick={toggleMenu}
+                className="text-gray-700 hover:text-warm-600 p-2 rounded-md focus:outline-none"
+                aria-expanded="false"
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+            </div>
             
-            {/* User Menu or Login Button */}
+            {/* User Menu or Login Button - Desktop */}
             {user ? (
-              <div className="hidden md:flex items-center space-x-4">
+              <div className="hidden lg:flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 rounded-full bg-warm-100 flex items-center justify-center">
                     <User className="w-4 h-4 text-warm-700" />
@@ -164,28 +175,12 @@ const Header: React.FC = () => {
             ) : (
               <Link
                 to="/login"
-                className="hidden md:block text-sm font-semibold text-warm-700 hover:text-gray-900 transition-colors"
+                className="hidden lg:block text-sm font-semibold text-warm-700 hover:text-gray-900 transition-colors"
                 onClick={closeMenu}
               >
                 Login
               </Link>
             )}
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={toggleMenu}
-                className="text-gray-700 hover:text-warm-600 p-2 rounded-md focus:outline-none"
-                aria-expanded="false"
-              >
-                <span className="sr-only">Open main menu</span>
-                {isMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </button>
-            </div>
           </div>
         </div>
 

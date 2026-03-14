@@ -57,15 +57,15 @@ const CustomerReviews: React.FC = () => {
   };
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6 text-center">
+    <section className="py-12 md:py-20 bg-gray-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl font-bold mb-12 text-gray-900">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8 md:mb-12 text-gray-900">
             Love From Our Community
           </h2>
         </motion.div>
@@ -74,18 +74,18 @@ const CustomerReviews: React.FC = () => {
           {/* Navigation Arrows */}
           <button
             onClick={prevReview}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 bg-white shadow rounded-full w-10 h-10 flex items-center justify-center hover:shadow-xl transition duration-300"
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 bg-white shadow rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:shadow-xl transition duration-300"
             aria-label="Previous review"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
           </button>
           
           <button
             onClick={nextReview}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 bg-white shadow rounded-full w-10 h-10 flex items-center justify-center hover:shadow-xl transition duration-300"
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 bg-white shadow rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center hover:shadow-xl transition duration-300"
             aria-label="Next review"
           >
-            <ChevronRight className="w-5 h-5 text-gray-600" />
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
           </button>
 
           {/* Review Cards Container */}
@@ -99,9 +99,9 @@ const CustomerReviews: React.FC = () => {
                 transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="flex justify-center"
               >
-                <div className="bg-white rounded-2xl shadow-lg p-10 max-w-3xl mx-auto relative hover:shadow-xl transition duration-300">
+                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 lg:p-10 w-[85%] sm:w-[70%] md:w-[45%] lg:w-[30%] mx-auto relative hover:shadow-xl transition duration-300">
                   {/* Quote Icon */}
-                  <div className="text-green-500 text-6xl absolute top-6 right-8">
+                  <div className="text-green-500 text-4xl md:text-6xl absolute top-4 right-6 md:top-6 md:right-8">
                     "
                   </div>
 
@@ -109,7 +109,7 @@ const CustomerReviews: React.FC = () => {
                   <img
                     src={reviews[currentIndex].image}
                     alt={reviews[currentIndex].name}
-                    className="w-16 h-16 rounded-full mx-auto mb-4 object-cover"
+                    className="w-12 h-12 md:w-16 md:h-16 rounded-full mx-auto mb-3 md:mb-4 object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = '/placeholder.svg';
@@ -117,7 +117,7 @@ const CustomerReviews: React.FC = () => {
                   />
 
                   {/* Customer Name */}
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900">
+                  <h3 className="font-semibold text-base md:text-lg mb-2 text-gray-900">
                     {reviews[currentIndex].name}
                   </h3>
 
@@ -127,7 +127,7 @@ const CustomerReviews: React.FC = () => {
                   </div>
 
                   {/* Review Text */}
-                  <p className="text-gray-600 leading-relaxed text-lg">
+                  <p className="text-gray-600 leading-relaxed text-sm md:text-base lg:text-lg">
                     {reviews[currentIndex].text}
                   </p>
                 </div>

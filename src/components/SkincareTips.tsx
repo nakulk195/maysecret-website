@@ -26,7 +26,7 @@ const SkincareTips: React.FC = () => {
   };
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-white to-pink-50">
+    <section className="py-12 md:py-20 px-4 bg-gradient-to-br from-white to-pink-50">
       <div className="max-w-7xl mx-auto">
         {/* Section Title */}
         <motion.div 
@@ -34,12 +34,12 @@ const SkincareTips: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-8 md:mb-12"
         >
-          <h2 className="text-4xl font-bold text-center mb-4 text-gray-900">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-4 text-gray-900">
             Skincare Tips
           </h2>
-          <p className="text-center text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-center text-gray-600 max-w-2xl mx-auto">
             Expert skincare advice to help you achieve glowing healthy skin
           </p>
         </motion.div>
@@ -50,7 +50,7 @@ const SkincareTips: React.FC = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12"
         >
           {featuredTips.map((tip) => (
             <motion.div
@@ -77,7 +77,7 @@ const SkincareTips: React.FC = () => {
               </div>
               
               {/* Content */}
-              <div className="p-5">
+              <div className="p-4 md:p-6">
                 {/* Category */}
                 <span className="text-xs font-semibold text-pink-600 uppercase tracking-wide">
                   {tip.category}

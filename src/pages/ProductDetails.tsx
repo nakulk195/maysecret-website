@@ -25,6 +25,7 @@ import { getProductById } from '../utils/productData';
 import { addToWishlist, removeFromWishlist, isInWishlist, addToRecentlyViewed } from '../utils/storage';
 import { useCart } from '../contexts/CartContext';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
+import { BRAND_NAME } from '../config/brand';
 
 const ProductDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,6 +35,7 @@ const ProductDetails: React.FC = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
   const [expandedSections, setExpandedSections] = useState<{[key: string]: boolean}>({});
+  const [showInfo, setShowInfo] = useState(false);
   const { addToCart } = useCart();
 
   const product = getProductById(Number(id));
@@ -429,8 +431,7 @@ const ProductDetails: React.FC = () => {
                 { id: 'benefits', label: 'Benefits', icon: Award },
                 { id: 'ingredients', label: 'Ingredients', icon: Droplets },
                 { id: 'how-to-use', label: 'How To Use', icon: Check },
-                { id: 'storage', label: 'Storage', icon: Shield },
-                { id: 'manufacturer', label: 'Manufacturer Info', icon: ChevronDown }
+                { id: 'storage', label: 'Storage', icon: Shield }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -467,18 +468,20 @@ const ProductDetails: React.FC = () => {
                   
                   {/* Quick Benefits */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                    <h4 className="text-lg font-medium text-gray-900 mb-4">Key Benefits</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {product.benefits.slice(0, 4).map((benefit, index) => (
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 tracking-wide">Key Benefits</h4>
+                    <div className="space-y-3">
+                      {product.benefits.slice(0, 5).map((benefit, index) => (
                         <motion.div
                           key={index}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className="flex items-center space-x-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100"
+                          className="flex items-center space-x-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100 hover:shadow-md transition-shadow duration-300"
                         >
-                          <Check size={18} className="text-green-600 flex-shrink-0" />
-                          <span className="text-gray-700 font-medium">{benefit}</span>
+                          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Check size={16} className="text-white" />
+                          </div>
+                          <span className="font-semibold text-gray-900 tracking-wide">{benefit}</span>
                         </motion.div>
                       ))}
                     </div>
@@ -499,17 +502,19 @@ const ProductDetails: React.FC = () => {
                       <Award className="text-rose-500" />
                       Complete Benefits
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
                       {product.benefits.map((benefit, index) => (
                         <motion.div
                           key={index}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="flex items-start space-x-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100"
+                          transition={{ delay: index * 0.05 }}
+                          className="flex items-center space-x-3 p-3 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300"
                         >
-                          <Check size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-700 font-medium">{benefit}</span>
+                          <div className="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Check size={16} className="text-white" />
+                          </div>
+                          <span className="font-semibold text-gray-900 tracking-wide">{benefit}</span>
                         </motion.div>
                       ))}
                     </div>
@@ -620,49 +625,61 @@ const ProductDetails: React.FC = () => {
                 </motion.div>
               )}
 
-              {activeTab === 'manufacturer' && (
-                <motion.div
-                  key="manufacturer"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="space-y-6"
-                >
-                  {product.manufacturer && (
-                    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-8">
-                      <h3 className="text-2xl font-light text-gray-900 mb-6 flex items-center gap-3">
-                        <ChevronDown className="text-indigo-500" />
-                        Manufacturer Information
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                          <h4 className="font-semibold text-gray-900 mb-3 text-lg">Marketed By</h4>
-                          <div className="space-y-2">
-                            <p className="text-gray-700 font-medium">{product.manufacturer.marketedBy.name}</p>
-                            <p className="text-gray-600 text-sm">{product.manufacturer.marketedBy.address}</p>
-                            <a 
-                              href={`mailto:${product.manufacturer.marketedBy.email}`}
-                              className="text-rose-600 hover:text-rose-700 text-sm font-medium inline-flex items-center gap-1"
-                            >
-                              {product.manufacturer.marketedBy.email}
-                            </a>
-                          </div>
-                        </div>
-                        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                          <h4 className="font-semibold text-gray-900 mb-3 text-lg">Manufactured By</h4>
-                          <div className="space-y-2">
-                            <p className="text-gray-700 font-medium">{product.manufacturer.manufacturedBy.name}</p>
-                            <p className="text-gray-600 text-sm">{product.manufacturer.manufacturedBy.address}</p>
-                            <p className="text-gray-600 text-sm">Mfg Lic No: {product.manufacturer.manufacturedBy.licenseNo}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+              </AnimatePresence>
           </div>
+
+          {/* Product Information Accordion */}
+          {product.manufacturer && (
+            <div className="mt-10 border-t pt-6">
+              <button
+                onClick={() => setShowInfo(!showInfo)}
+                className="flex justify-between w-full text-left font-semibold text-lg hover:text-gray-700 transition-colors duration-200"
+              >
+                Product Information
+                <span className="text-2xl font-light">{showInfo ? "−" : "+"}</span>
+              </button>
+              
+              {showInfo && (
+                <div className="mt-4 text-gray-600 text-sm leading-relaxed">
+                  <p>
+                    <strong>Marketed By:</strong><br/>
+                    {BRAND_NAME || 'MΛY SΞCRΞT'} Skin & Beauty<br/>
+                    Shop No.2, Park Plaza<br/>
+                    Opp. Kamla Nehru Park<br/>
+                    Prabhat Road, Pune 411004
+                  </p>
+                  
+                  <br/>
+                  
+                  <p>
+                    <strong>Manufactured By:</strong><br/>
+                    {product.manufacturer?.manufacturedBy?.name || 'MAXNOVA HEALTHCARE'}<br/>
+                    {product.manufacturer?.manufacturedBy?.address?.split(',').map((part, index) => (
+                      <span key={index}>
+                        {part}
+                        {index < (product.manufacturer?.manufacturedBy?.address?.split(',').length || 0) - 1 && <br/>}
+                      </span>
+                    )) || 'Plot No 5, 6 & 7<br/>Davni Industrial Area<br/>PO Gurumajra, Baddi<br/>Distt Solan, Himachal Pradesh 174101'}
+                  </p>
+                  
+                  <br/>
+                  
+                  <p>
+                    <strong>Manufacturing License:</strong> {product.manufacturer?.manufacturedBy?.licenseNo || 'HIM/COS/L/24/370'}
+                  </p>
+                  
+                  <p>
+                    <strong>Net Quantity:</strong> {product.size || '100 ml'}
+                  </p>
+                  
+                  <p>
+                    <strong>Batch No / Mfg Date / Expiry Date:</strong><br/>
+                    Refer Product Packaging
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </motion.div>
       </div>
     </div>

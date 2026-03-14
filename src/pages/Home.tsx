@@ -10,6 +10,8 @@ import FloatingSocialButtons from '../components/FloatingSocialButtons';
 import BenefitsSection from '../components/BenefitsSection';
 import Heroimg1 from '../assets/images/Heroimg1.png';
 import Heroimg2 from '../assets/images/Heroimg2.png';
+import Display1 from '../assets/images/Display1.jpg';
+import Display2 from '../assets/images/Display2.jpg';
 import RotatingTagline from '../components/RotatingTagline';
 import SkincareTips from '../components/SkincareTips';
 import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
@@ -52,7 +54,7 @@ const Home: React.FC = () => {
   };
 
   // Rotating banner setup
-  const bannerImages = [Maysecret_cover, Heroimg2, Heroimg1 ];
+  const bannerImages = [Maysecret_cover, Heroimg2, Heroimg1, Display2, Display1];
   const [bannerIndex, setBannerIndex] = useState(0);
   useEffect(() => {
     const id = setInterval(() => {
@@ -127,7 +129,7 @@ const Home: React.FC = () => {
 
       {/* Rotating Banner (below header) */}
       <section className="relative w-full overflow-hidden">
-        <div className="relative w-full h-48 sm:h-64 md:h-80 lg:h-[28rem]">
+        <div className="relative w-full h-[280px] md:h-[450px]">
           <div className="absolute inset-0">
             <AnimatePresence mode="wait">
               <motion.img
@@ -193,7 +195,7 @@ const Home: React.FC = () => {
           />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 lg:py-32">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -211,7 +213,7 @@ const Home: React.FC = () => {
                 initial={{ opacity: 0, letterSpacing: "0.5em" }}
                 animate={{ opacity: 1, letterSpacing: "0.1em" }}
                 transition={{ duration: 1.2, delay: 0.4 }}
-                className="text-6xl md:text-8xl font-bold mb-4 text-black leading-tight tracking-wide"
+                className="text-2xl md:text-4xl lg:text-6xl font-bold mb-4 text-black leading-tight tracking-wide text-center px-4"
               >
                 <span className="tracking-widest font-bold">{BRAND_NAME}</span>
               </motion.h1>
@@ -219,7 +221,7 @@ const Home: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
-                className="text-2xl md:text-3xl font-medium text-pink-600 mb-6"
+                className="text-xl md:text-2xl lg:text-3xl font-medium text-pink-600 mb-6"
               >
                 메이시크릿
               </motion.div>
@@ -242,7 +244,7 @@ const Home: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
-              className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto text-gray-600 leading-relaxed"
+              className="text-sm md:text-base lg:text-xl mb-10 max-w-3xl mx-auto text-gray-600 leading-relaxed text-center px-4"
             >
               Premium skincare products crafted with nature's finest ingredients, 
               designed to reveal your skin's natural radiance and vitality.
@@ -276,14 +278,14 @@ const Home: React.FC = () => {
       </section>
 
       {/* Featured Products */}
-      <section className="py-12 px-4 bg-gradient-to-br from-pink-50 to-white">
+      <section className="py-8 md:py-12 px-4 bg-gradient-to-br from-pink-50 to-white">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
@@ -299,12 +301,12 @@ const Home: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, ease: "easeOut" }}
-              className="text-4xl md:text-5xl font-bold text-gray-800 mb-6"
+              className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-6"
             >
               <span className="inline-block">Featured Products</span>
-              <span className="inline-block ml-3 text-3xl md:text-4xl font-medium text-pink-600" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>미래 제품</span>
+              <span className="inline-block ml-3 text-xl md:text-2xl lg:text-3xl font-medium text-pink-600" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>미래 제품</span>
             </motion.h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-sm md:text-base lg:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Discover our most popular and effective skincare products
             </p>
           </motion.div>
@@ -314,7 +316,7 @@ const Home: React.FC = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
           >
             {products.slice(0, 6).map((product: any, index: number) => (
               <motion.div

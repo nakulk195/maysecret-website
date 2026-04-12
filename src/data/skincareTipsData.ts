@@ -75,7 +75,7 @@ export const skincareTips: SkincareTip[] = [
     title: "The Secret To Bright And Even Skin Tone",
     shortDescription: "Bright skin is the result of consistent care and the right ingredients.",
     fullDescription: "Ingredients that improve skin brightness include: • Niacinamide • Vitamin C • Rice Extract • Alpha Arbutin. These ingredients help reduce pigmentation and enhance skin glow.",
-    image: "/images/bright-skin-glow.png",
+    image: "/images/bright-skin-glow.jpg",
     slug: "secret-bright-even-skin-tone",
     featured: false,
     category: "Glow Tip"
@@ -85,7 +85,7 @@ export const skincareTips: SkincareTip[] = [
     title: "Hydration Is The Key To Healthy Skin",
     shortDescription: "Hydrated skin looks smoother, brighter, and more youthful.",
     fullDescription: "To maintain hydration: • Drink enough water • Use hydrating skincare products • Avoid harsh cleansers • Apply serums that lock moisture into the skin. Healthy hydration improves skin elasticity and glow.",
-    image: "/images/skin-hydration.png",
+    image: "/images/skin-hydration.jpg",
     slug: "hydration-key-healthy-skin",
     featured: false,
     category: "Hydration"

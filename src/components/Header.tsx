@@ -5,7 +5,6 @@ import {
   ShoppingBag, 
   Heart, 
   Menu, 
-  X,
   Search,
   Home as HomeIcon,
   Gift,
@@ -69,13 +68,13 @@ const Header: React.FC = () => {
 
   // Navigation items
   const navItems = [
-    { to: '/', label: 'Home', icon: <HomeIcon className="w-5 h-5 mr-3" /> },
-    { to: '/shop', label: 'Shop', icon: <ShoppingBag className="w-5 h-5 mr-3" /> },
-    { to: '/orders', label: 'Orders', icon: <Package className="w-5 h-5 mr-3" /> },
-    { to: '/offer', label: 'Offers', icon: <Percent className="w-5 h-5 mr-3" /> },
-    { to: '/giftkit', label: 'Gift Kit', icon: <Gift className="w-5 h-5 mr-3" /> },
-    { to: '/quiz', label: 'Quiz', icon: <HelpCircle className="w-5 h-5 mr-3" /> },
-    { to: '/contact', label: 'Contact', icon: <Phone className="w-5 h-5 mr-3" /> },
+    { to: '/', label: 'Home', icon: <HomeIcon className="w-5 h-5 md:w-6 md:h-6 mr-3" /> },
+    { to: '/shop', label: 'Shop', icon: <ShoppingBag className="w-5 h-5 md:w-6 md:h-6 mr-3" /> },
+    { to: '/orders', label: 'Orders', icon: <Package className="w-5 h-5 md:w-6 md:h-6 mr-3" /> },
+    { to: '/offer', label: 'Offers', icon: <Percent className="w-5 h-5 md:w-6 md:h-6 mr-3" /> },
+    { to: '/giftkit', label: 'Gift Kit', icon: <Gift className="w-5 h-5 md:w-6 md:h-6 mr-3" /> },
+    { to: '/quiz', label: 'Quiz', icon: <HelpCircle className="w-5 h-5 md:w-6 md:h-6 mr-3" /> },
+    { to: '/contact', label: 'Contact', icon: <Phone className="w-5 h-5 md:w-6 md:h-6 mr-3" /> },
   ];
 
   return (
@@ -85,11 +84,11 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Left Section - Logo */}
           <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center">
+            <Link to="/" className="flex items-center gap-3">
               <img
-                src="/images/maysecret-logo.jpg"
-                alt={`${BRAND_NAME} Logo`}
-                className="h-7 md:h-10 lg:h-12 w-auto object-contain"
+                src="/images/Maysecret_logo.svg"
+                alt="MΛY SΞCRΞT"
+                className="h-12 sm:h-14 md:h-16 lg:h-20 w-auto object-contain flex-shrink-0 max-h-[80px] md:max-h-none hover:scale-105 transition-transform duration-300"
               />
             </Link>
           </div>
@@ -100,7 +99,7 @@ const Header: React.FC = () => {
               <Link 
                 key={item.to} 
                 to={item.to} 
-                className="text-gray-700 hover:text-warm-600 text-sm font-medium transition-colors"
+                className="text-gray-700 hover:text-warm-600 text-sm font-medium transition-colors min-h-[44px] px-3 py-2 flex items-center"
                 onClick={closeMenu}
               >
                 {item.label}
@@ -198,12 +197,14 @@ const Header: React.FC = () => {
               </div>
               <div className="border-t border-gray-200 pt-4 pb-3">
                 {/* Mobile Logo Section */}
-                <div className="flex items-center justify-center py-3 border-b border-gray-200">
-                  <img
-                    src="/images/maysecret-logo.jpg"
-                    alt={`${BRAND_NAME} Logo`}
-                    className="h-10 w-auto object-contain"
-                  />
+                <div className="flex justify-center items-center border-b border-gray-200 mb-4 py-4">
+                  <Link to="/" className="flex justify-center items-center">
+                    <img
+                      src="/images/Maysecret_logo.svg"
+                      alt="MΛY SΞCRΞT"
+                      className="h-14 sm:h-16 max-w-[220px] object-contain transition-transform duration-300 active:scale-95"
+                    />
+                  </Link>
                 </div>
                 
                 <div className="space-y-1">

@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
 import AnnouncementBar from './components/AnnouncementBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import MobileBottomNav from './components/MobileBottomNav';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Shop from './pages/Shop';
@@ -25,7 +26,7 @@ function App() {
   return (
     <CartProvider>
         <Router>
-          <div className="App">
+          <div className="App pb-16 md:pb-0">
             <AnnouncementBar />
             <Header />
             <main>
@@ -49,6 +50,7 @@ function App() {
               </Routes>
             </main>
             <Footer />
+            <MobileBottomNav />
           </div>
         </Router>
       </CartProvider>

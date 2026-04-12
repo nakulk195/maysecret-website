@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
 import { PaymentMethod, PaymentDetails } from '../../types/checkout';
 
 interface PaymentMethodsProps {
@@ -15,8 +14,6 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
   paymentDetails,
   onDetailsChange,
 }) => {
-  const [showUpiInput, setShowUpiInput] = useState(false);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     onDetailsChange({
@@ -59,14 +56,6 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
   const isUpiValid = () => {
     return paymentDetails.upiId && paymentDetails.upiId.includes('@');
   };
-
-  useEffect(() => {
-    if (selectedMethod === 'upi' && !paymentDetails.upiId) {
-      setShowUpiInput(true);
-    } else {
-      setShowUpiInput(false);
-    }
-  }, [selectedMethod, paymentDetails.upiId]);
 
   return (
     <div className="space-y-6">

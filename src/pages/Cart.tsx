@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import CartItemCard from '../components/CartItemCard';
@@ -80,18 +80,6 @@ const Cart: React.FC = () => {
       </div>
     );
   }
-
-  // Calculate total items and subtotal
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = cart.reduce(
-    (sum, item) => {
-      const price = typeof item.cartProduct.price === 'string' 
-        ? parseFloat(item.cartProduct.price)
-        : item.cartProduct.price as number;
-      return sum + (price * item.quantity);
-    },
-    0
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-warm-50 via-white to-warm-100">

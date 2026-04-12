@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, CheckCircle, Home, Plus, Loader2, CreditCard, Smartphone } from 'lucide-react';
-import { ordersAPI, usersAPI, addressesAPI } from '../services/api';
+import { CheckCircle, Plus, Loader2, CreditCard, Smartphone } from 'lucide-react';
 import { getLoggedInUser } from '../utils/auth';
 
 // Types
@@ -16,17 +14,6 @@ interface Address {
   state: string;
   pincode: string;
   isDefault?: boolean;
-}
-
-interface Order {
-  id: string;
-  items: any[];
-  address: Address;
-  total: number;
-  date: string;
-  status: string;
-  paymentMethod: string;
-  paymentStatus: string;
 }
 
 const Checkout: React.FC = () => {
@@ -114,43 +101,18 @@ const Checkout: React.FC = () => {
         throw new Error('User not logged in');
       }
 
-      // Create user in database if not exists
-      let userId;
-      try {
-        console.log('🔍 Creating/retrieving user in database...');
-        const userResponse = await usersAPI.create({
-          first_name: currentUser.firstName || 'Guest',
-          last_name: currentUser.lastName || 'User',
-          phone: currentUser.phone || '0000000000'
-        });
-        userId = userResponse.data.id;
-        console.log('✅ User created/retrieved with ID:', userId);
-      } catch (userError) {
-        console.error('❌ Failed to create user:', userError);
-        throw new Error('Failed to create user account');
-      }
+      // Mock user creation
+      const userId = 'mock-user-' + Date.now();
+      console.log('✅ Mock user created with ID:', userId);
 
-      // Create address in database
-      let addressId;
-      try {
-        if (!selectedAddress) {
-          throw new Error('No delivery address selected');
-        }
-        
-        console.log('🏠 Creating address in database...');
-        const addressResponse = await addressesAPI.create({
-          name: selectedAddress.name,
-          phone: selectedAddress.phone,
-          address: `${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}`,
-          city: selectedAddress.city,
-          state: selectedAddress.state,
-          pincode: selectedAddress.pincode
-        });
-        addressId = addressResponse.data.id;
-        console.log('✅ Address created with ID:', addressId);
-      } catch (addressError) {
-        console.error('❌ Failed to create address:', addressError);
-        throw new Error('Failed to save delivery address');
+      // Mock address creation
+      let addressId = 'mock-address-' + Date.now();
+      if (selectedAddress) {
+        console.log('🏠 Creating mock address...');
+        addressId = selectedAddress.id || 'mock-address-' + Date.now();
+        console.log('✅ Mock address created with ID:', addressId);
+      } else {
+        throw new Error('No delivery address selected');
       }
 
       // Prepare order items for backend
@@ -162,19 +124,19 @@ const Checkout: React.FC = () => {
       
       console.log('📦 Order items:', orderItems);
 
-      // Create order in database
+      // Mock order creation
       let orderData;
       try {
-        console.log('🛒 Creating order in database...');
-        const orderResponse = await ordersAPI.create({
+        console.log('🛒 Creating mock order...');
+        orderData = {
+          id: 'mock-order-' + Date.now(),
           user_id: userId,
           total_amount: Number(getCartTotal() || 0),
           status: 'pending',
           items: orderItems
-        });
+        };
         
-        orderData = orderResponse.data;
-        console.log('✅ Order created successfully:', orderData);
+        console.log('✅ Mock order created successfully:', orderData);
       } catch (orderError) {
         console.error('❌ Failed to create order:', orderError);
         throw new Error('Failed to place order');

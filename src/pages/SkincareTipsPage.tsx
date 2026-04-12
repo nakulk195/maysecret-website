@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Clock, User } from 'lucide-react';
-import { skincareTips, SkincareTip } from '../data/skincareTipsData';
+import { skincareTips } from '../data/skincareTipsData';
 
 const SkincareTipsPage: React.FC = () => {
-  const [selectedTip, setSelectedTip] = useState<SkincareTip | null>(null);
-
   useEffect(() => {
     const hash = window.location.hash.replace('#', '');
     if (hash) {
       const tip = skincareTips.find(t => t.slug === hash);
       if (tip) {
-        setSelectedTip(tip);
         setTimeout(() => {
           const element = document.getElementById(hash);
           if (element) {

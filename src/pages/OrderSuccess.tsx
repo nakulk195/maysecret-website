@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, Package, Truck, Home, ShoppingBag, Heart } from 'lucide-react';
+import { CheckCircle, Package, Truck, Heart } from 'lucide-react';
 
 interface OrderItem {
   id: number;

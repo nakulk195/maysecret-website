@@ -51,27 +51,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
-  // Format price with 2 decimal places
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(price);
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
-      className={`relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group ${className}`}
+      className={`relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group p-3 md:p-4 flex flex-col justify-between h-full ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <Link to={`/product/${product.id}`} onClick={handleProductClick} className="block">
-        <div className="relative overflow-hidden h-40 md:h-48 lg:h-56 w-full">
+        <div className="relative overflow-hidden h-40 md:h-52 w-full">
           {/* Loading placeholder */}
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-br from-warm-50 to-warm-100 animate-pulse" />
@@ -104,24 +95,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={handleWishlistToggle}
-              className={`p-2 rounded-full shadow-lg transition-colors ${
+              className={`p-3 md:p-2 rounded-full shadow-lg transition-colors min-h-[44px] ${
                 isWishlisted 
                   ? 'bg-warm-700 text-white' 
                   : 'bg-white text-warm-700 hover:bg-warm-50'
               }`}
               aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
             >
-              <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
+              <Heart className="h-5 w-5 md:h-4 md:w-4" />
             </motion.button>
             
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={handleAddToCart}
-              className="p-2 bg-white text-warm-700 rounded-full shadow-lg hover:bg-warm-50 transition-colors"
+              className="p-3 md:p-2 bg-white text-warm-700 rounded-full shadow-lg hover:bg-warm-50 transition-colors min-h-[44px]"
               aria-label="Add to cart"
             >
-              <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
+              <ShoppingCart className="h-5 w-5 md:h-4 md:w-4" />
             </motion.button>
             
             <Link 

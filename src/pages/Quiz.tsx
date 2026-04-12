@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { quizQuestions, QuizAnswers } from '../data/quizData';
-import { ArrowLeft, CheckCircle, Sparkles } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { quizQuestions } from '../data/quizData';
+import { ArrowLeft, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { BRAND_NAME } from '../config/brand';
 
 const Quiz: React.FC = () => {
@@ -11,7 +11,6 @@ const Quiz: React.FC = () => {
   const [showResult, setShowResult] = useState(false);
   const [glassScore, setGlassScore] = useState(0);
   const [recommendedProduct, setRecommendedProduct] = useState('');
-  const navigate = useNavigate();
 
   const questions = quizQuestions;
 

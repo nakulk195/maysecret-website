@@ -80,10 +80,6 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
         ? parseFloat(item.cartProduct.originalPrice)
         : item.cartProduct.originalPrice)
     : undefined;
-    
-  const discountPercentage = originalPrice 
-    ? Math.round(((originalPrice - price) / originalPrice) * 100)
-    : 0;
 
   return (
     <motion.div

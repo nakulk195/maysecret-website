@@ -44,9 +44,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onClose }) => {
   };
 
   return (
-    <div className="relative flex items-center">
+    <div className="relative flex items-center flex-1 md:flex-initial">
       <button
-        className="p-2 rounded-full hover:bg-cream-200 transition"
+        className="p-3 md:p-2 rounded-full hover:bg-cream-200 transition min-h-[44px]"
         onClick={() => {
           if (expanded && query.trim()) {
             runSearch(query);
@@ -56,16 +56,16 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onClose }) => {
         }}
         aria-label="Search"
       >
-        <Search size={22} />
+        <Search size={20} className="md:size-5" />
       </button>
       <AnimatePresence>
         {expanded && (
           <motion.form
             initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 200, opacity: 1 }}
+            animate={{ width: '100%', opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="absolute left-10 top-0 bg-white rounded-full shadow px-4 py-1 flex items-center border border-cream-300"
+            className="absolute left-0 top-0 md:left-10 bg-white rounded-full shadow-lg px-4 py-2 md:px-4 md:py-1 flex items-center border border-cream-300 md:border md:rounded-full w-full md:w-auto"
             onSubmit={handleSubmit}
           >
             <input
@@ -73,7 +73,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onClose }) => {
               value={query}
               onChange={handleInput}
               placeholder="Search products..."
-              className="outline-none bg-transparent w-full font-poppins text-sm"
+              className="outline-none bg-transparent w-full md:w-48 font-poppins text-sm md:text-base"
               autoFocus
             />
           </motion.form>

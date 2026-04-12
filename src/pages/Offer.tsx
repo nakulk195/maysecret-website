@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star, Percent, Gift, Clock, ArrowRight } from 'lucide-react';
+import { Star, Gift, Clock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { products } from '../utils/productData';
 

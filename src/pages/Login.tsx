@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, Smartphone, User, CheckCircle } from 'lucide-react';
+import { ArrowRight, Smartphone, CheckCircle } from 'lucide-react';
 import { setUserSession } from '../utils/auth';
 
 interface FormData {
@@ -18,14 +18,8 @@ const Login: React.FC = () => {
   });
   const [checked, setChecked] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setIsMounted(true);
-    return () => setIsMounted(false);
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

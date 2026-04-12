@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShoppingBag, ArrowLeft, Package, Clock, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, Package, CheckCircle2 } from 'lucide-react';
 
 interface OrderItem {
   id: string;

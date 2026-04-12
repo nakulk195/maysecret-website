@@ -15,8 +15,6 @@ import {
   Sun,
   Droplets,
   Award,
-  ChevronDown,
-  ChevronUp,
   Zap,
   Leaf,
   ShieldCheck
@@ -34,7 +32,6 @@ const ProductDetails: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
-  const [expandedSections, setExpandedSections] = useState<{[key: string]: boolean}>({});
   const [showInfo, setShowInfo] = useState(false);
   const { addToCart } = useCart();
 
@@ -46,13 +43,6 @@ const ProductDetails: React.FC = () => {
       setIsWishlisted(isInWishlist(product.id));
     }
   }, [product]);
-
-  const toggleSection = (section: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  };
 
   if (!product) {
     return (

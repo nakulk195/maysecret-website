@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { BRAND_NAME } from '../config/brand';
@@ -33,9 +33,9 @@ const CustomerReviews: React.FC = () => {
     }
   ];
 
-  const nextReview = () => {
+  const nextReview = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % reviews.length);
-  };
+  }, [reviews.length]);
 
   const prevReview = () => {
     setCurrentIndex((prev) => (prev === 0 ? reviews.length - 1 : prev - 1));
@@ -48,7 +48,7 @@ const CustomerReviews: React.FC = () => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [nextReview]);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: rating }, (_, index) => (

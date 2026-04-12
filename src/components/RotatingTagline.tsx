@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Star, Heart, Sun, Droplets } from 'lucide-react';
+import { Sparkles, Star, Heart, Sun } from 'lucide-react';
 
 const RotatingTagline: React.FC = () => {
   const taglines = [

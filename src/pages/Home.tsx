@@ -53,7 +53,7 @@ const Home: React.FC = () => {
   };
 
   // Rotating banner setup
-  const heroImages = [heroimg1, Heroimg2, Heroimg3, Heroimg4, Heroimg5];
+  const heroImages = [heroimg1, heroimg2, heroimg3, heroimg4, heroimg5];
   const [currentIndex, setCurrentIndex] = useState(0);
   useEffect(() => {
     const id = setInterval(() => {

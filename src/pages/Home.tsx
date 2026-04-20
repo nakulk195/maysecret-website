@@ -70,16 +70,18 @@ const Home: React.FC = () => {
       {/* Rotating Banner (below header) */}
       <section className="relative w-full overflow-hidden">
         <div className="relative w-full flex items-center justify-center bg-black overflow-hidden h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px]">
-          {heroImages.map((img, index) => (
-            <img
-              key={index}
-              src={img}
-              alt="Hero"
-              className={`absolute top-0 left-0 w-full h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px] object-contain bg-black transition-opacity duration-700 ${
-                index === currentIndex ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          ))}
+          {heroImages.map((img, index) =>
+            img ? (
+              <img
+                key={index}
+                src={img}
+                alt="Hero"
+                className={`absolute top-0 left-0 w-full h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px] object-contain bg-black transition-opacity duration-700 ${
+                  index === currentIndex ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            ) : null
+          )}
           
           {/* Dots Indicator */}
           <div className="absolute bottom-4 w-full flex justify-center gap-2">

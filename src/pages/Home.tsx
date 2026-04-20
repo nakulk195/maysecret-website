@@ -6,11 +6,11 @@ import { useCart } from '../contexts/CartContext';
 import ProductCard from '../components/ProductCard';
 import comingSoonImg from '../assets/images/coming-soon.png';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
-import HEROIMG1 from '../assets/images/HEROIMG1.png';
-import HEROIMG2 from '../assets/images/HEROIMG2.png';
-import HEROIMG3 from '../assets/images/HEROIMG3.png';
-import HEROIMG4 from '../assets/images/HEROIMG4.png';
-import HEROIMG5 from '../assets/images/HEROIMG5.png';
+import Heroimg1 from '../assets/images/HEROIMG1.png';
+import Heroimg2 from '../assets/images/HEROIMG2.png';
+import Heroimg3 from '../assets/images/HEROIMG3.png';
+import Heroimg4 from '../assets/images/HEROIMG4.png';
+import Heroimg5 from '../assets/images/HEROIMG5.png';
 import RotatingTagline from '../components/RotatingTagline';
 import SkincareTips from '../components/SkincareTips';
 import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
@@ -53,7 +53,7 @@ const Home: React.FC = () => {
   };
 
   // Rotating banner setup
-  const heroImages = [HEROIMG1, HEROIMG2, HEROIMG3, HEROIMG4, HEROIMG5];
+  const heroImages = [Heroimg1, Heroimg2, Heroimg3, Heroimg4, Heroimg5];
   const [currentIndex, setCurrentIndex] = useState(0);
   useEffect(() => {
     const id = setInterval(() => {

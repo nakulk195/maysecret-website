@@ -6,7 +6,7 @@ import { useCart } from '../contexts/CartContext';
 import ProductCard from '../components/ProductCard';
 import comingSoonImg from '../assets/images/coming-soon.png';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
-import Heroimg1 from '../assets/images/HEROIMG1.png';
+import heroimg1 from '../assets/images/heroimg1.png';
 import Heroimg2 from '../assets/images/HEROIMG2.png';
 import Heroimg3 from '../assets/images/HEROIMG3.png';
 import Heroimg4 from '../assets/images/HEROIMG4.png';
@@ -53,7 +53,7 @@ const Home: React.FC = () => {
   };
 
   // Rotating banner setup
-  const heroImages = [Heroimg1, Heroimg2, Heroimg3, Heroimg4, Heroimg5];
+  const heroImages = [heroimg1, Heroimg2, Heroimg3, Heroimg4, Heroimg5];
   const [currentIndex, setCurrentIndex] = useState(0);
   useEffect(() => {
     const id = setInterval(() => {

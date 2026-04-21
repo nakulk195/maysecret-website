@@ -80,7 +80,54 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="bg-white shadow-sm sticky top-0 z-50">
+      {/* Mobile Header - Only shows on small screens */}
+      <header className="flex md:hidden justify-between items-center px-4 py-3 bg-white shadow-sm sticky top-0 z-50">
+        {/* Hamburger Menu */}
+        <button
+          onClick={toggleMenu}
+          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="Toggle menu"
+        >
+          <Menu className="w-6 h-6 text-gray-700" />
+        </button>
+
+        {/* Centered Logo */}
+        <div className="absolute left-1/2 transform -translate-x-1/2">
+          <Link to="/" className="flex items-center">
+            <img
+              src="/images/Maysecret_logo.svg"
+              alt="MAY SECRET"
+              className="h-10 w-auto object-contain"
+            />
+          </Link>
+        </div>
+
+        {/* Cart Icon with Badge */}
+        <Link to="/cart" className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors" onClick={closeMenu}>
+          <ShoppingBag className="w-6 h-6 text-gray-700" />
+          {getCartCount() > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+              {getCartCount()}
+            </span>
+          )}
+        </Link>
+      </header>
+
+      {/* Search Bar - Mobile only */}
+      <div className="flex md:hidden px-4 pb-3 bg-white border-b border-gray-100">
+        <div className="relative w-full">
+          <input
+            type="text"
+            placeholder="Search products..."
+            className="w-full px-4 py-2 pl-10 pr-4 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+            onFocus={toggleSearch}
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+        </div>
+      </div>
+
+      {/* Desktop Header - Keep unchanged */}
+      <header className="hidden md:block bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <div className="flex items-center justify-between">
           {/* Left Section - Logo */}

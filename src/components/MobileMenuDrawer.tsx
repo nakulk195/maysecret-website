@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, ShoppingBag, Package, Heart, Brain, Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { X, Home, ShoppingBag, Package, Heart, Brain, Mail, Phone, MapPin, Clock, User, LogIn } from 'lucide-react';
+import { getLoggedInUser } from '../utils/auth';
 
 interface MobileMenuDrawerProps {
   isOpen: boolean;
@@ -11,6 +12,17 @@ interface MobileMenuDrawerProps {
 const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [user, setUser] = useState<{ firstName: string } | null>(null);
+
+  // Get logged in user
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setUser(getLoggedInUser());
+    };
+    handleStorageChange();
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -39,7 +51,8 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ isOpen, onClose }) 
     { name: "Orders", icon: Package, path: "/orders" },
     { name: "Wishlist", icon: Heart, path: "/wishlist" },
     { name: "Quiz", icon: Brain, path: "/quiz" },
-    { name: "Contact", icon: Mail, path: "/contact" }
+    { name: "Contact", icon: Mail, path: "/contact" },
+    { name: "Login", icon: LogIn, path: "/login" }
   ];
 
   const handleItemClick = (path: string) => {
@@ -80,6 +93,20 @@ const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({ isOpen, onClose }) 
                 <X className="w-5 h-5 text-gray-600" />
               </button>
             </div>
+
+            {/* User Info */}
+            {user && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mb-4 px-5 pt-2"
+              >
+                <div className="text-lg font-semibold text-gray-800">
+                  Hello, {user.firstName}! <span className="text-xl">{"\ud83d\udc4b"}</span>
+                </div>
+              </motion.div>
+            )}
 
             {/* Menu Items */}
             <nav className="py-4 px-5">

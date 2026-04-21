@@ -12,7 +12,7 @@ const MobileBottomNav = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 w-full sm:max-w-md sm:mx-auto sm:left-1/2 sm:transform sm:-translate-x-1/2 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl rounded-t-3xl md:hidden z-40 pb-safe overflow-hidden">
+    <div className="fixed bottom-0 left-0 right-0 w-full sm:max-w-md sm:mx-auto sm:left-1/2 sm:transform sm:-translate-x-1/2 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl rounded-t-3xl md:hidden z-30 pb-safe overflow-hidden">
       <div className="flex justify-between items-center py-2 px-2">
         {navItems.map((item, index) => {
           const Icon = item.icon;

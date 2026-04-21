@@ -19,7 +19,7 @@ import {
 import { getLoggedInUser, removeUserSession } from '../utils/auth';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
-import MobileMenuDrawer from './MobileMenuDrawer';
+import MobileSidebar from './MobileSidebar';
 import { BRAND_NAME } from '../config/brand';
 
 const Header: React.FC = () => {
@@ -81,15 +81,19 @@ const Header: React.FC = () => {
   return (
     <>
       {/* Mobile Header - Only shows on small screens */}
-      <header className="flex md:hidden justify-between items-center px-4 py-3 bg-white shadow-sm sticky top-0 z-50">
-        {/* Hamburger Menu */}
-        <button
-          onClick={toggleMenu}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          aria-label="Toggle menu"
-        >
-          <Menu className="w-6 h-6 text-gray-700" />
-        </button>
+      <div className="md:hidden relative z-50">
+        <header className="flex justify-between items-center px-4 py-3 bg-white shadow-sm sticky top-0">
+          {/* Hamburger Menu */}
+          <button
+            onClick={() => {
+              console.log("MENU CLICKED");
+              setIsMenuOpen(true);
+            }}
+            className="p-2 bg-gray-100 rounded-lg z-50 relative"
+            aria-label="Toggle menu"
+          >
+            <Menu className="w-6 h-6 text-gray-700" />
+          </button>
 
         {/* Centered Logo */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
@@ -124,6 +128,7 @@ const Header: React.FC = () => {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
         </div>
+      </div>
       </div>
 
       {/* Desktop Header - Keep unchanged */}
@@ -231,8 +236,12 @@ const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Menu Drawer */}
-        <MobileMenuDrawer isOpen={isMenuOpen} onClose={closeMenu} />
+        {/* Mobile Sidebar */}
+        <MobileSidebar
+          isOpen={isMenuOpen}
+          setIsOpen={setIsMenuOpen}
+          user={user}
+        />
       </div>
     </header>
 

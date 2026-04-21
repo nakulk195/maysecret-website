@@ -16,7 +16,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
   const [isWishlisted, setIsWishlisted] = useState(isInWishlist(product.id));
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const { addToCart } = useCart();
+  
+  // Add null safety check for CartContext
+  let addToCart: (product: any, quantity?: number) => Promise<void>;
+  try {
+    const cartContext = useCart();
+    addToCart = cartContext.addToCart;
+  } catch (error) {
+    console.error('ProductCard: CartContext not available:', error);
+    addToCart = async () => {
+      console.warn('ProductCard: CartContext not available - addToCart disabled');
+    };
+  }
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();

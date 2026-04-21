@@ -20,7 +20,17 @@ import GlassSkinRoutine from '../components/GlassSkinRoutine';
 import { BRAND_NAME } from '../config/brand';
 
 const Home: React.FC = () => {
-  const { addToCart } = useCart();
+  // Add null safety check for CartContext
+  let addToCart: (product: any, quantity?: number) => Promise<void>;
+  try {
+    const cartContext = useCart();
+    addToCart = cartContext.addToCart;
+  } catch (error) {
+    console.error('Home: CartContext not available:', error);
+    addToCart = async () => {
+      console.warn('Home: CartContext not available - addToCart disabled');
+    };
+  }
 
   const handleAddToCart = async (product: any) => {
     try {
@@ -268,7 +278,7 @@ const Home: React.FC = () => {
             viewport={{ once: true }}
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-stretch"
           >
-            {products.slice(0, 6).map((product: any, index: number) => (
+            {products && products.length > 0 && products.slice(0, 6).map((product: any, index: number) => (
               <motion.div
                 key={product.id}
                 variants={itemVariants}
@@ -305,7 +315,7 @@ const Home: React.FC = () => {
             </motion.div>
           </motion.div>
 
-          {products.length > 6 && (
+          {products && products.length > 6 && (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

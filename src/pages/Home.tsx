@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Star } from 'lucide-react';
 import { products } from '../utils/productData';
 import { useCart } from '../contexts/CartContext';
 import ProductCard from '../components/ProductCard';
@@ -276,7 +276,10 @@ const Home: React.FC = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-stretch"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-5"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))'
+            }}
           >
             {products && products.length > 0 && products.slice(0, 6).map((product: any, index: number) => (
               <motion.div
@@ -303,13 +306,64 @@ const Home: React.FC = () => {
                 y: -3,
                 transition: { duration: 0.2 }
               }}
-              className="relative h-full"
+              className="relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full min-h-[500px]"
             >
-              <div className="bg-gray-100 rounded-xl shadow-md p-3 md:p-4 flex flex-col justify-center items-center h-full">
-                <div className="w-full h-40 md:h-52 flex items-center justify-center bg-gray-200 rounded-lg">
-                  <span className="text-gray-500 text-sm font-semibold">
+              {/* Image Area */}
+              <div className="relative overflow-hidden h-40 md:h-52 w-full">
+                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-4xl mb-2">🚀</div>
+                    <span className="text-gray-600 text-sm font-semibold">
+                      Coming Soon
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Info Area - Matching other cards */}
+              <div className="p-4 sm:p-5 flex-1 flex flex-col">
+                <div className="flex-1">
+                  {/* Product Name */}
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2">
+                    New Products
+                  </h3>
+                  
+                  {/* Rating Placeholder */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center bg-amber-50 rounded-full px-2 py-1">
+                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                      <span className="text-xs text-gray-700 ml-1 font-medium">
+                        Soon
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-500 whitespace-nowrap">
+                      (Be the first!)
+                    </span>
+                  </div>
+                  
+                  {/* Price Placeholder */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-lg font-bold text-gray-400">
+                        ₹???
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">Coming soon</div>
+                  </div>
+                </div>
+                
+                {/* Stock Status and Button - Always at bottom */}
+                <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
+                  <span className="text-xs px-3 py-1.5 rounded-full font-medium whitespace-nowrap bg-orange-100 text-orange-700">
                     Coming Soon
                   </span>
+                  
+                  {/* Notify Button */}
+                  <button
+                    className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  >
+                    Notify Me
+                  </button>
                 </div>
               </div>
             </motion.div>

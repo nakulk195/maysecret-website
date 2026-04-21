@@ -68,7 +68,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
-      className={`relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group p-3 md:p-4 flex flex-col justify-between h-full ${className}`}
+      className={`relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 group flex flex-col h-full min-h-[500px] ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -88,6 +88,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
             } ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             onLoad={() => setImageLoaded(true)}
             loading="lazy"
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
           />
           
           {/* Discount Badge */}
@@ -138,44 +139,52 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
       </Link>
 
       {/* Product Info */}
-      <div className="p-3 sm:p-4">
-        <div className="flex justify-between items-start">
-          <h3 className="text-sm sm:text-base font-medium text-gray-900 line-clamp-2 h-10 sm:h-12 leading-tight">
+      <div className="p-4 sm:p-5 flex-1 flex flex-col">
+        <div className="flex-1">
+          {/* Product Name with ellipsis */}
+          <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2 line-clamp-2 overflow-hidden" 
+              style={{ 
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden'
+              }}>
             {product.name}
           </h3>
-          <div className="flex items-center bg-warm-100 rounded-full px-2 py-1 ml-2 flex-shrink-0">
-            <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 fill-current" />
-            <span className="text-xs text-gray-700 ml-1 font-medium">
-              {product.rating}
+          
+          {/* Rating and Reviews */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center bg-amber-50 rounded-full px-2 py-1">
+              <Star className="h-4 w-4 text-yellow-400 fill-current" />
+              <span className="text-xs text-gray-700 ml-1 font-medium">
+                {product.rating}
+              </span>
+            </div>
+            <span className="text-xs text-gray-500 whitespace-nowrap">
+              ({product.reviews} reviews)
             </span>
           </div>
-          <span className="text-xs text-gray-500 ml-2">
-            ({product.reviews} reviews)
-          </span>
           
           {/* Price */}
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-warm-700">
-                  ₹{product.price.toLocaleString()}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-lg font-bold text-gray-900">
+                ₹{product.price.toLocaleString()}
+              </span>
+              {product.originalPrice && (
+                <span className="text-sm text-gray-500 line-through">
+                  ₹{product.originalPrice.toLocaleString()}
                 </span>
-                {product.originalPrice && (
-                  <span className="text-sm text-gray-500 line-through">
-                    ₹{product.originalPrice.toLocaleString()}
-                  </span>
-                )}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">(Inclusive of all taxes)</div>
+              )}
             </div>
-            
-            </div>
-          
+            <div className="text-xs text-gray-500 mt-1">Inclusive of all taxes</div>
+          </div>
         </div>
         
-        {/* Stock Status and Add to Cart */}
-        <div className="mt-3 flex justify-between items-center">
-          <span className={`text-xs px-2 py-1 rounded-full ${
+        {/* Stock Status and Add to Cart - Always at bottom */}
+        <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
+          <span className={`text-xs px-3 py-1.5 rounded-full font-medium whitespace-nowrap ${
             product.inStock 
               ? 'bg-green-100 text-green-700' 
               : 'bg-red-100 text-red-700'
@@ -187,9 +196,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
           <button
             onClick={handleAddToCart}
             disabled={!product.inStock}
-            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
               product.inStock 
-                ? 'bg-warm-700 text-white hover:bg-warm-800' 
+                ? 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-lg' 
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
             }`}
           >

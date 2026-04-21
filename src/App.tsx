@@ -5,6 +5,7 @@ import AnnouncementBar from './components/AnnouncementBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import MobileBottomNav from './components/MobileBottomNav';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Shop from './pages/Shop';
@@ -26,6 +27,7 @@ function App() {
   return (
     <CartProvider>
         <Router>
+          <ScrollToTop />
           <div className="App pb-16 md:pb-0">
             <AnnouncementBar />
             <Header />

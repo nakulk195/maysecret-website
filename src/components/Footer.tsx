@@ -11,13 +11,9 @@ const Footer: React.FC = () => {
           {/* Brand Section */}
           <div className="lg:col-span-1 text-center md:text-left">
             <img
-              src="/images/maysecret-logo.jpg"
+              src="/images/Maysecret_logo.svg"
               alt={BRAND_NAME}
               className="h-10 md:h-12 lg:h-14 mb-4 mx-auto md:mx-0"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = '/placeholder.svg';
-              }}
             />
             <p className="text-gray-400 text-sm leading-relaxed">
               {BRAND_NAME} combines Korean beauty science with powerful ingredients like Niacinamide, Rice Extract and UV protection technology to create glowing healthy skin.
@@ -118,18 +114,14 @@ const Footer: React.FC = () => {
                 <Mail className="w-4 h-4" />
                 <span>maysecretskinandbeauty@gmail.com</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Smartphone className="w-4 h-4" />
-                <span>+91 98765 43210</span>
-              </div>
-              <p className="mt-2">
+                            <p className="mt-2">
                 Pune, Maharashtra, India
               </p>
             </div>
 
             <div className="flex space-x-4">
               <a 
-                href="https://instagram.com/maysecret" 
+                href="https://www.instagram.com/maysecretskinandbeauty?igsh=MThqeHI2bTJ5ZmFkNw==" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hover:text-pink-400 transition duration-200"
@@ -138,7 +130,7 @@ const Footer: React.FC = () => {
                 <Instagram className="w-5 h-5" />
               </a>
               <a 
-                href="https://wa.me/919876543210" 
+                href="https://wa.me/919056555555" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hover:text-green-400 transition duration-200"

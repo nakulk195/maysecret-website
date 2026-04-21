@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, Eye } from 'lucide-react';
 import { Product } from '../utils/productData';
@@ -16,6 +16,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
   const [isWishlisted, setIsWishlisted] = useState(isInWishlist(product.id));
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
   
   // Add null safety check for CartContext
   let addToCart: (product: any, quantity?: number) => Promise<void>;
@@ -127,13 +128,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
               <ShoppingCart className="h-5 w-5 md:h-4 md:w-4" />
             </motion.button>
             
-            <Link 
-              to={`/product/${product.id}`}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/product/${product.id}`);
+              }}
               className="p-2 bg-white text-warm-700 rounded-full shadow-lg hover:bg-warm-50 transition-colors flex items-center justify-center"
               aria-label="View details"
             >
               <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Link>
+            </button>
           </div>
         </div>
       </Link>

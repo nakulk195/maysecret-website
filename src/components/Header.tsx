@@ -19,6 +19,7 @@ import {
 import { getLoggedInUser, removeUserSession } from '../utils/auth';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
+import MobileMenuDrawer from './MobileMenuDrawer';
 import { BRAND_NAME } from '../config/brand';
 
 const Header: React.FC = () => {
@@ -183,85 +184,8 @@ const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Search Bar - Only visible when toggled */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div 
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden overflow-hidden"
-            >
-              <div className="py-3">
-                <SearchBar />
-              </div>
-              <div className="border-t border-gray-200 pt-4 pb-3">
-                {/* Mobile Logo Section */}
-                <div className="flex justify-center items-center border-b border-gray-200 mb-4 py-4">
-                  <Link to="/" className="flex justify-center items-center">
-                    <img
-                      src="/images/Maysecret_logo.svg"
-                      alt="MΛY SΞCRΞT"
-                      className="h-14 sm:h-16 max-w-[220px] object-contain transition-transform duration-300 active:scale-95"
-                    />
-                  </Link>
-                </div>
-                
-                <div className="space-y-1">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      className="group flex items-center px-2 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                      onClick={closeMenu}
-                    >
-                      {item.icon}
-                      {item.label}
-                      <ChevronRight className="ml-auto h-5 w-5 text-gray-400 group-hover:text-gray-500" />
-                    </Link>
-                  ))}
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-200 space-y-1">
-                  <Link
-                    to="/wishlist"
-                    className="group flex items-center px-2 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                    onClick={closeMenu}
-                  >
-                    <Heart className="w-5 h-5 mr-3" />
-                    Wishlist
-                    <ChevronRight className="ml-auto h-5 w-5 text-gray-400 group-hover:text-gray-500" />
-                  </Link>
-                  {user ? (
-                    <>
-                      <div className="flex items-center px-4 py-2 text-gray-700">
-                        <User className="w-5 h-5 mr-2 text-warm-600" />
-                        <span>Hi, {user.firstName}</span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          closeMenu();
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                      >
-                        <LogOut className="w-5 h-5 mr-2 text-warm-600" />
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                    <Link 
-                      to="/login" 
-                      className="block px-4 py-2 text-lg font-semibold text-warm-700 hover:bg-gray-100 rounded-md transition-colors mt-2"
-                      onClick={closeMenu}
-                    >
-                      Login
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Mobile Menu Drawer */}
+        <MobileMenuDrawer isOpen={isMenuOpen} onClose={closeMenu} />
       </div>
     </header>
 

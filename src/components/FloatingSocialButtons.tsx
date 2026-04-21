@@ -4,16 +4,15 @@ import { MessageCircle, Instagram } from 'lucide-react';
 
 const FloatingSocialButtons: React.FC = () => {
   const handleWhatsAppClick = () => {
-    const whatsappNumber = '9579365540';
-    window.open(`https://wa.me/${whatsappNumber}`, '_blank');
+    window.open('https://wa.me/919056555555', '_blank');
   };
 
   const handleInstagramClick = () => {
-    window.open('https://www.instagram.com/khandelwal_nakul98?utm_source=qr&igsh=MTZxdzRqcGlnNTdtZQ==', '_blank');
+    window.open('https://www.instagram.com/maysecretskinandbeauty?igsh=MThqeHI2bTJ5ZmFkNw==', '_blank');
   };
 
   return (
-    <div className="fixed bottom-6 left-6 flex flex-col gap-3 z-50">
+    <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 flex flex-col gap-3 z-50">
       {/* WhatsApp Floating Button */}
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}

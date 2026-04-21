@@ -147,7 +147,6 @@ const OrderSuccess: React.FC = () => {
                 </p>
                 <div className="text-sm text-blue-600">
                   <p>Email: support@maysecret.com</p>
-                  <p>Phone: +91 9579365540</p>
                 </div>
               </div>
             </div>

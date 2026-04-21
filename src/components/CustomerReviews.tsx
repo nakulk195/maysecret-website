@@ -112,7 +112,10 @@ const CustomerReviews: React.FC = () => {
                     className="w-12 h-12 md:w-16 md:h-16 rounded-full mx-auto mb-3 md:mb-4 object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = '/placeholder.svg';
+                      if (!target.dataset.errorHandled) {
+                        target.dataset.errorHandled = 'true';
+                        target.src = '/placeholder.svg';
+                      }
                     }}
                   />
 

@@ -79,14 +79,14 @@ const Home: React.FC = () => {
 
       {/* Rotating Banner (below header) */}
       <section className="relative w-full overflow-hidden">
-        <div className="relative w-full flex items-center justify-center bg-black overflow-hidden h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px]">
+        <div className="relative w-full flex items-center justify-center bg-black overflow-hidden h-[220px] sm:h-[280px] md:h-[450px] lg:h-[550px]">
           {heroImages.map((img, index) =>
             img ? (
               <img
                 key={index}
                 src={img}
                 alt="Hero"
-                className={`absolute top-0 left-0 w-full h-[300px] sm:h-[350px] md:h-[450px] lg:h-[550px] object-contain bg-black transition-opacity duration-700 ${
+                className={`absolute top-0 left-0 w-full h-[220px] sm:h-[280px] md:h-[450px] lg:h-[550px] object-cover bg-black transition-opacity duration-700 ${
                   index === currentIndex ? "opacity-100" : "opacity-0"
                 }`}
               />
@@ -427,8 +427,7 @@ const Home: React.FC = () => {
               </button>
               <button 
                 onClick={() => {
-                  const whatsappNumber = '9579365540';
-                  window.open(`https://wa.me/${whatsappNumber}`, '_blank');
+                  window.open('https://wa.me/919056555555', '_blank');
                 }}
                 className="bg-[#25D366] hover:bg-[#20ba5a] text-white px-10 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >

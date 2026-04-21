@@ -28,31 +28,33 @@ function App() {
     <CartProvider>
         <Router>
           <ScrollToTop />
-          <div className="App pb-16 md:pb-0">
-            <AnnouncementBar />
-            <Header />
-            <main>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/giftkit" element={<GiftKit />} />
-                <Route path="/product/:id" element={<ProductDetails />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/order-success" element={<OrderSuccess />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/offer" element={<Offer />} />
-                <Route path="/recently-viewed" element={<RecentlyViewed />} />
-                <Route path="/quiz" element={<Quiz />} />
-                <Route path="/skincare-tips" element={<SkincareTipsPage />} />
-                {/* Add protected routes here if needed */}
-              </Routes>
-            </main>
-            <Footer />
-            <MobileBottomNav />
+          <div className="max-w-md mx-auto overflow-x-hidden">
+            <div className="App pb-16 md:pb-0">
+              <AnnouncementBar />
+              <Header />
+              <main>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/giftkit" element={<GiftKit />} />
+                  <Route path="/product/:id" element={<ProductDetails />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/order-success" element={<OrderSuccess />} />
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/offer" element={<Offer />} />
+                  <Route path="/recently-viewed" element={<RecentlyViewed />} />
+                  <Route path="/quiz" element={<Quiz />} />
+                  <Route path="/skincare-tips" element={<SkincareTipsPage />} />
+                  {/* Add protected routes here if needed */}
+                </Routes>
+              </main>
+              <Footer />
+              <MobileBottomNav />
+            </div>
           </div>
         </Router>
       </CartProvider>

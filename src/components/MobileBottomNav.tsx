@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, ShoppingCart, User, Menu } from "lucide-react";
+import { Home, ShoppingCart, User, Brain } from "lucide-react";
 
 const MobileBottomNav = () => {
   const location = useLocation();
@@ -8,13 +8,13 @@ const MobileBottomNav = () => {
     { name: "Home", icon: Home, path: "/" },
     { name: "Cart", icon: ShoppingCart, path: "/cart" },
     { name: "Orders", icon: User, path: "/orders" },
-    { name: "Menu", icon: Menu, path: "/menu" }
+    { name: "Quiz", icon: Brain, path: "/quiz" }
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md md:hidden z-50">
-      <div className="flex justify-around items-center py-2">
-        {navItems.map((item) => {
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl rounded-t-3xl md:hidden z-40 pb-safe overflow-hidden">
+      <div className="flex justify-between items-center py-2 px-2">
+        {navItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
 
@@ -22,12 +22,17 @@ const MobileBottomNav = () => {
             <Link
               key={item.name}
               to={item.path}
-              className={`flex flex-col items-center text-xs min-h-[44px] justify-center px-3 py-2 rounded-lg transition-colors ${
-                isActive ? "text-pink-600" : "text-gray-500"
+              className={`flex flex-1 items-center justify-center text-center py-2 rounded-xl transition-all duration-300 transform ${
+                isActive 
+                  ? "text-pink-500 scale-110 bg-pink-50" 
+                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-50 hover:scale-105"
               }`}
+              style={{
+                animationDelay: `${index * 50}ms`
+              }}
             >
               <Icon className="w-5 h-5 mb-1" />
-              {item.name}
+              <span className="text-xs font-medium">{item.name}</span>
             </Link>
           );
         })}

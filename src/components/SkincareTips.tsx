@@ -71,7 +71,10 @@ const SkincareTips: React.FC = () => {
                   className="w-full h-56 object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = '/placeholder.svg';
+                    if (!target.dataset.errorHandled) {
+                      target.dataset.errorHandled = 'true';
+                      target.src = '/placeholder.svg';
+                    }
                   }}
                 />
               </div>

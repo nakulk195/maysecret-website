@@ -33,12 +33,6 @@ const Contact: React.FC = () => {
       description: "Send us an email anytime"
     },
     {
-              icon: <Phone size={24} className="text-warm-700" />,
-      title: "Phone",
-      details: "+91 98765 43210",
-      description: "Mon-Sat 9AM-6PM"
-    },
-    {
               icon: <MapPin size={24} className="text-warm-700" />,
       title: "Address",
       details: "123 Beauty Street, Mumbai, Maharashtra 400001",

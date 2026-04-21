@@ -98,7 +98,10 @@ const SkincareTipsPage: React.FC = () => {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = '/placeholder.svg';
+                    if (!target.dataset.errorHandled) {
+                      target.dataset.errorHandled = 'true';
+                      target.src = '/placeholder.svg';
+                    }
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
@@ -188,8 +191,7 @@ const SkincareTipsPage: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  const whatsappNumber = '9579365540';
-                  window.open(`https://wa.me/${whatsappNumber}`, '_blank');
+                  window.open('https://wa.me/919056555555', '_blank');
                 }}
                 className="bg-[#25D366] hover:bg-[#20ba5a] text-white px-10 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >

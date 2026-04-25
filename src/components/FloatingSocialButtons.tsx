@@ -4,7 +4,7 @@ import { MessageCircle, Instagram } from 'lucide-react';
 
 const FloatingSocialButtons: React.FC = () => {
   const handleWhatsAppClick = () => {
-    window.open('https://wa.me/919056555555', '_blank');
+    window.open('https://wa.me/919075849555', '_blank');
   };
 
   const handleInstagramClick = () => {

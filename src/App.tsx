@@ -18,6 +18,7 @@ import Orders from './pages/Orders';
 import Wishlist from './pages/Wishlist';
 import Contact from './pages/Contact';
 import Offer from './pages/Offer';
+import Search from './pages/Search';
 import RecentlyViewed from './pages/RecentlyViewed';
 import Quiz from './pages/Quiz';
 import GiftKit from './pages/GiftKit';
@@ -49,6 +50,7 @@ function App() {
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/offer" element={<Offer />} />
+                <Route path="/search" element={<Search />} />
                 <Route path="/recently-viewed" element={<RecentlyViewed />} />
                 <Route path="/quiz" element={<Quiz />} />
                 <Route path="/skincare-tips" element={<SkincareTipsPage />} />

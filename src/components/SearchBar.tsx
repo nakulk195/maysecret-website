@@ -70,6 +70,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onClose }) => {
           >
             <input
               type="text"
+              id="searchbar-input"
+              name="search"
               value={query}
               onChange={handleInput}
               placeholder="Search products..."

@@ -130,7 +130,7 @@ const Footer: React.FC = () => {
                 <Instagram className="w-5 h-5" />
               </a>
               <a 
-                href="https://wa.me/919056555555" 
+                href="https://wa.me/919075849555" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hover:text-green-400 transition duration-200"

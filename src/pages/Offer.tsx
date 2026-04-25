@@ -180,6 +180,8 @@ const Offer: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <input
               type="email"
+              id="newsletter-email"
+              name="email"
               placeholder="Enter your email"
               className="flex-1 px-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-white"
             />

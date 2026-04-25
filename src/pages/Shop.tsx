@@ -125,6 +125,8 @@ const Shop: React.FC = () => {
             </div>
             <input
               type="text"
+              id="shop-search"
+              name="search"
               placeholder="Search products..."
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
               value={searchQuery}
@@ -241,6 +243,8 @@ const Shop: React.FC = () => {
                     <div className="space-y-2">
                       <input
                         type="range"
+                        id="price-min"
+                        name="price-min"
                         min="0"
                         max="10000"
                         step="100"
@@ -250,6 +254,8 @@ const Shop: React.FC = () => {
                       />
                       <input
                         type="range"
+                        id="price-max"
+                        name="price-max"
                         min="0"
                         max="10000"
                         step="100"

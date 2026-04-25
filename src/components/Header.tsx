@@ -29,6 +29,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, user, setUser }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { getCartCount } = useCart();
   const navigate = useNavigate();
 
@@ -58,6 +59,12 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, user, setUse
     setIsSearchOpen(false);
   };
 
+  const handleSearch = (query: string) => {
+    if (!query.trim()) return;
+    
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+  };
+
   return (
     <>
       {/* Mobile Header - Only shows on small screens */}
@@ -84,6 +91,15 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, user, setUse
             />
           </Link>
 
+          {/* Search Icon */}
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Search"
+          >
+            <Search className="w-6 h-6 text-gray-700" />
+          </button>
+
           {/* Cart Icon with Badge */}
           <Link to="/cart" className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors" onClick={closeMenu}>
             <ShoppingBag className="w-6 h-6 text-gray-700" />
@@ -100,9 +116,17 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, user, setUse
           <div className="relative w-full">
             <input
               type="text"
+              id="mobile-search"
+              name="search"
               placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch(searchQuery);
+                }
+              }}
               className="w-full px-4 py-2 pl-10 pr-4 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
-              onFocus={toggleSearch}
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           </div>

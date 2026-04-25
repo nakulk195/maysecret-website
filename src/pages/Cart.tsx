@@ -138,7 +138,7 @@ const Cart: React.FC = () => {
                       }
                       return (
                         <CartItemCard
-                          key={`${item.id}-${item.quantity}`}
+                          key={item.id}
                           item={item}
                           onQuantityChange={handleQuantityChange}
                           onRemove={handleRemoveItem}
@@ -151,7 +151,7 @@ const Cart: React.FC = () => {
                   <div className="text-center py-12">
                     <ShoppingBag size={48} className="mx-auto text-gray-400 mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Your cart is empty</h3>
-                    <p className="text-gray-500 mb-6">Looks like you haven't added any items to your cart yet.</p>
+                    <p className="text-sm text-gray-500 mb-6">Looks like you haven't added any items to your cart yet.</p>
                     <Link
                       to="/shop"
                       className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-warm-600 hover:bg-warm-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-warm-500"

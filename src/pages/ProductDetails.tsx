@@ -644,9 +644,9 @@ const ProductDetails: React.FC = () => {
                   <p>
                     <strong>Manufactured By:</strong><br/>
                     {product.manufacturer?.manufacturedBy?.name || 'MAXNOVA HEALTHCARE'}<br/>
-                    {product.manufacturer?.manufacturedBy?.address?.split(',').map((part, index) => (
+                    {product.manufacturer?.manufacturedBy?.address?.split(',').map((addressPart, index) => (
                       <span key={index}>
-                        {part}
+                        {addressPart}
                         {index < (product.manufacturer?.manufacturedBy?.address?.split(',').length || 0) - 1 && <br/>}
                       </span>
                     )) || 'Plot No 5, 6 & 7<br/>Davni Industrial Area<br/>PO Gurumajra, Baddi<br/>Distt Solan, Himachal Pradesh 174101'}

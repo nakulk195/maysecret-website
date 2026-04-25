@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
 import AnnouncementBar from './components/AnnouncementBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import MobileBottomNav from './components/MobileBottomNav';
+import MobileSidebarClean from './components/MobileSidebarClean';
 import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -24,13 +25,16 @@ import SkincareTipsPage from './pages/SkincareTipsPage';
 import './App.css';
 
 function App() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<{ firstName: string } | null>(null);
+
   return (
     <CartProvider>
         <Router>
           <ScrollToTop />
+          <AnnouncementBar />
+          <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} user={user} setUser={setUser} />
           <div className="App pb-16 md:pb-0 w-full overflow-x-hidden">
-            <AnnouncementBar />
-            <Header />
             <main>
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -54,6 +58,7 @@ function App() {
             <Footer />
             <MobileBottomNav />
           </div>
+          <MobileSidebarClean isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} user={user} />
         </Router>
       </CartProvider>
   );

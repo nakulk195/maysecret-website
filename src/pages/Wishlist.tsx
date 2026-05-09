@@ -64,7 +64,7 @@ const Wishlist: React.FC = () => {
         >
           {wishlist.map((product, index) => (
             <motion.div
-              key={product.id}
+              key={`wishlist-${product.id}-${index}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8 }}

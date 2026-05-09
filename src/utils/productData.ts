@@ -1,3 +1,6 @@
+import { ProductService } from '../services/productService';
+import { Product as SupabaseProduct } from '../lib/supabase';
+
 import brighteningSerumImg from "../assets/images/brightening-serum.png";
 import sunscreenSprayImg from "../assets/images/sunscreen-spray.png";
 import comboImg from "../assets/images/combo.png";
@@ -14,6 +17,7 @@ export const categories: Category[] = [
   { id: 'combo', name: 'Combo Pack' }
 ];
 
+// Legacy Product interface for backward compatibility
 export interface Product {
   id: number;
   name: string;
@@ -266,4 +270,112 @@ export const searchProducts = (query: string): Product[] => {
     product.description.toLowerCase().includes(lowercaseQuery) ||
     product.benefits.some(benefit => benefit.toLowerCase().includes(lowercaseQuery))
   );
-}; 
+};
+
+// New Supabase-integrated functions
+export const getProductsFromSupabase = async (): Promise<Product[]> => {
+  try {
+    const supabaseProducts = await ProductService.getAllProducts();
+    
+    // Convert Supabase products to legacy Product format
+    return supabaseProducts.map(sp => ({
+      id: parseInt(sp.id),
+      name: sp.name,
+      price: sp.price,
+      originalPrice: sp.original_price,
+      image: sp.image,
+      images: [sp.image], // For now, single image
+      description: sp.description,
+      benefits: [], // Will need to add benefits field to Supabase
+      category: sp.category,
+      inStock: sp.in_stock,
+      rating: sp.rating,
+      reviews: sp.reviews,
+      createdAt: sp.created_at,
+      isFeatured: sp.is_featured
+    }));
+  } catch (error) {
+    console.error('Error fetching products from Supabase:', error);
+    return products; // Fallback to legacy products
+  }
+};
+
+export const getProductsByCategoryFromSupabase = async (category: string): Promise<Product[]> => {
+  try {
+    const supabaseProducts = await ProductService.getProductsByCategory(category);
+    
+    return supabaseProducts.map(sp => ({
+      id: parseInt(sp.id),
+      name: sp.name,
+      price: sp.price,
+      originalPrice: sp.original_price,
+      image: sp.image,
+      images: [sp.image],
+      description: sp.description,
+      benefits: [],
+      category: sp.category,
+      inStock: sp.in_stock,
+      rating: sp.rating,
+      reviews: sp.reviews,
+      createdAt: sp.created_at,
+      isFeatured: sp.is_featured
+    }));
+  } catch (error) {
+    console.error('Error fetching products by category from Supabase:', error);
+    return getProductsByCategory(category); // Fallback to legacy
+  }
+};
+
+export const searchProductsFromSupabase = async (query: string): Promise<Product[]> => {
+  try {
+    const supabaseProducts = await ProductService.searchProducts(query);
+    
+    return supabaseProducts.map(sp => ({
+      id: parseInt(sp.id),
+      name: sp.name,
+      price: sp.price,
+      originalPrice: sp.original_price,
+      image: sp.image,
+      images: [sp.image],
+      description: sp.description,
+      benefits: [],
+      category: sp.category,
+      inStock: sp.in_stock,
+      rating: sp.rating,
+      reviews: sp.reviews,
+      createdAt: sp.created_at,
+      isFeatured: sp.is_featured
+    }));
+  } catch (error) {
+    console.error('Error searching products from Supabase:', error);
+    return searchProducts(query); // Fallback to legacy
+  }
+};
+
+// Hybrid functions that try Supabase first, fallback to legacy
+export const getProductsHybrid = async (): Promise<Product[]> => {
+  try {
+    return await getProductsFromSupabase();
+  } catch (error) {
+    console.warn('Supabase failed, using legacy products:', error);
+    return products;
+  }
+};
+
+export const getProductsByCategoryHybrid = async (category: string): Promise<Product[]> => {
+  try {
+    return await getProductsByCategoryFromSupabase(category);
+  } catch (error) {
+    console.warn('Supabase failed, using legacy products:', error);
+    return getProductsByCategory(category);
+  }
+};
+
+export const searchProductsHybrid = async (query: string): Promise<Product[]> => {
+  try {
+    return await searchProductsFromSupabase(query);
+  } catch (error) {
+    console.warn('Supabase failed, using legacy products:', error);
+    return searchProducts(query);
+  }
+};

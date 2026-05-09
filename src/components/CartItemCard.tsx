@@ -40,11 +40,11 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
 
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity < 1) return;
-    onQuantityChange(String(item.id), newQuantity);
+    onQuantityChange(String(item.productId), newQuantity);
   };
 
   const handleRemove = () => {
-    onRemove(String(item.id));
+    onRemove(String(item.productId));
   };
 
   if (!item.cartProduct) {

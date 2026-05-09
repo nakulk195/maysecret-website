@@ -102,8 +102,8 @@ const OrderSuccess: React.FC = () => {
             <div className="border-t border-gray-200 pt-8">
               <h2 className="text-lg font-medium text-gray-900 mb-6">Order Summary</h2>
               <div className="space-y-6">
-                {order.items.map((item) => (
-                  <div key={item.id} className="flex items-center">
+                {order.items.map((item, index) => (
+                  <div key={`order-success-${item.id}-${index}`} className="flex items-center">
                     <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-md overflow-hidden">
                       <img
                         src={item.cartProduct.image}

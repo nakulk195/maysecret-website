@@ -427,7 +427,7 @@ const Home: React.FC = () => {
               </button>
               <button 
                 onClick={() => {
-                  window.open('https://wa.me/919075849555', '_blank');
+                  window.open('https://wa.me/919056555555', '_blank');
                 }}
                 className="bg-[#25D366] hover:bg-[#20ba5a] text-white px-10 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >

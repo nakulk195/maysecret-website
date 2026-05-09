@@ -1,25 +1,33 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Smartphone, CheckCircle } from 'lucide-react';
-import { setUserSession } from '../utils/auth';
+import { ArrowRight, Mail, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface FormData {
   firstName: string;
   lastName: string;
+  email: string;
   phone: string;
+  password: string;
 }
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
-    phone: ''
+    email: '',
+    phone: '',
+    password: ''
   });
   const [checked, setChecked] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
+  const [isLoginMode, setIsLoginMode] = useState<boolean>(true);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
+  const { signUp, signIn } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,51 +42,93 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     
-    if (!formData.phone || formData.phone.length !== 10) {
-      alert('Please enter a valid 10-digit phone number');
-      return;
-    }
-    
-    if (!formData.firstName.trim() || !formData.lastName.trim()) {
-      alert('Please enter your full name');
-      return;
-    }
-    
-    if (!checked) {
-      alert('Please accept the Privacy Policy & T&Cs');
-      return;
+    if (isLoginMode) {
+      // Login validation
+      if (!formData.email || !formData.password) {
+        setError('Please enter email and password');
+        return;
+      }
+    } else {
+      // Signup validation
+      if (!formData.email || !formData.password) {
+        setError('Please enter email and password');
+        return;
+      }
+      
+      if (!formData.firstName.trim() || !formData.lastName.trim()) {
+        setError('Please enter your full name');
+        return;
+      }
+      
+      if (!formData.phone || formData.phone.length !== 10) {
+        setError('Please enter a valid 10-digit phone number');
+        return;
+      }
+      
+      if (!checked) {
+        setError('Please accept the Privacy Policy & T&Cs');
+        return;
+      }
     }
     
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      // Save user session
-      setUserSession({
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        phone: formData.phone
-      });
-      
-      // Show success message
-      setShowSuccess(true);
+    try {
+      if (isLoginMode) {
+        // Login with Supabase
+        const { error } = await signIn(formData.email, formData.password);
+        if (error) {
+          setError(error.message);
+        } else {
+          setShowSuccess(true);
+          setTimeout(() => {
+            // Check for redirect path after login
+            const redirectPath = localStorage.getItem('redirect_after_login');
+            if (redirectPath) {
+              localStorage.removeItem('redirect_after_login');
+              navigate(redirectPath);
+            } else {
+              navigate('/');
+            }
+          }, 2000);
+        }
+      } else {
+        // Signup with Supabase
+        const { error } = await signUp(
+          formData.email,
+          formData.password,
+          formData.firstName.trim(),
+          formData.lastName.trim(),
+          formData.phone
+        );
+        if (error) {
+          setError(error.message);
+        } else {
+          setShowSuccess(true);
+          setTimeout(() => {
+            navigate('/');
+          }, 2000);
+        }
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
+    } finally {
       setIsSubmitting(false);
-      
-      // Auto close and redirect
-      setTimeout(() => {
-        setShowSuccess(false);
-        navigate('/');
-      }, 1500);
-    }, 1000);
+    }
   };
 
-  const isFormValid = formData.firstName.trim() !== '' && 
-                     formData.lastName.trim() !== '' && 
-                     formData.phone.length === 10 && 
-                     checked;
+  const isFormValid = isLoginMode 
+    ? formData.email !== '' && formData.password !== ''
+    : formData.firstName.trim() !== '' && 
+      formData.lastName.trim() !== '' && 
+      formData.email !== '' &&
+      formData.password !== '' &&
+      formData.phone.length === 10 && 
+      checked;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4 sm:p-6">
@@ -106,29 +156,127 @@ const Login: React.FC = () => {
             </motion.div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Mode Toggle */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  type="button"
+                  onClick={() => setIsLoginMode(true)}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                    isLoginMode 
+                      ? 'bg-white text-indigo-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsLoginMode(false)}
+                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                    !isLoginMode 
+                      ? 'bg-white text-indigo-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Sign Up
+                </button>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
+                >
+                  {error}
+                </motion.div>
+              )}
+
               <AnimatePresence>
+                {/* Email Field (always visible) */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
+                  transition={{ delay: 0.2 }}
                   className="space-y-1"
                 >
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                    First Name
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email Address
                   </label>
                   <div className="relative">
                     <input
-                      id="firstName"
-                      name="firstName"
-                      type="text"
+                      id="email"
+                      name="email"
+                      type="email"
                       required
-                      value={formData.firstName}
+                      value={formData.email}
                       onChange={handleInputChange}
                       className="block w-full px-4 py-3 border-0 bg-gray-50/50 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all duration-200 text-sm"
-                      placeholder="Enter your first name"
+                      placeholder="Enter your email"
                     />
                   </div>
                 </motion.div>
+
+                {/* Password Field (always visible) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="space-y-1"
+                >
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="block w-full px-4 py-3 pr-12 border-0 bg-gray-50/50 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all duration-200 text-sm"
+                      placeholder="Enter your password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-3 flex items-center"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+
+                {/* Signup-only fields */}
+                {!isLoginMode && (
+                  <>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="space-y-1"
+                    >
+                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                        First Name
+                      </label>
+                      <div className="relative">
+                        <input
+                          id="firstName"
+                          name="firstName"
+                          type="text"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          className="block w-full px-4 py-3 border-0 bg-gray-50/50 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all duration-200 text-sm"
+                          placeholder="Enter your first name"
+                        />
+                      </div>
+                    </motion.div>
 
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -180,10 +328,12 @@ const Login: React.FC = () => {
                       placeholder="Enter mobile number"
                     />
                     <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                      <Smartphone className="h-4 w-4 text-gray-400" />
+                      <Mail className="h-4 w-4 text-gray-400" />
                     </div>
                   </div>
                 </motion.div>
+                  </>
+                )}
               </AnimatePresence>
 
               <motion.div 

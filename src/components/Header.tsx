@@ -15,7 +15,7 @@ import {
   User,
   LogOut
 } from 'lucide-react';
-import { getLoggedInUser, removeUserSession } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
 import { BRAND_NAME } from '../config/brand';
@@ -23,29 +23,16 @@ import { BRAND_NAME } from '../config/brand';
 interface HeaderProps {
   isMenuOpen: boolean;
   setIsMenuOpen: (open: boolean) => void;
-  user: { firstName: string } | null;
-  setUser: (user: { firstName: string } | null) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, user, setUser }) => {
+const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
+  const { user, signOut } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { getCartCount } = useCart();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check for logged in user on mount and when storage changes
-    const handleStorageChange = () => {
-      setUser(getLoggedInUser());
-    };
-
-    // Initial check
-    handleStorageChange();
-
-    // Listen for storage events (for cross-tab updates)
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  // Auth state is now handled by AuthContext
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -100,15 +87,48 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, user, setUse
             <Search className="w-6 h-6 text-gray-700" />
           </button>
 
-          {/* Cart Icon with Badge */}
-          <Link to="/cart" className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors" onClick={closeMenu}>
-            <ShoppingBag className="w-6 h-6 text-gray-700" />
-            {getCartCount() > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                {getCartCount()}
-              </span>
-            )}
-          </Link>
+          {/* Profile/Login Icon */}
+          {user ? (
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="User menu"
+            >
+              <User className="w-6 h-6 text-gray-700" />
+            </button>
+          ) : (
+            <Link to="/login" className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors" onClick={closeMenu}>
+              <User className="w-6 h-6 text-gray-700" />
+            </Link>
+          )}
+
+        {/* Mobile Profile Dropdown */}
+        {user && isMenuOpen && (
+          <div className="absolute right-4 top-16 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 md:hidden">
+            <div className="px-4 py-2 border-b border-gray-100">
+              <p className="text-sm font-medium text-gray-900">
+                Hello, {user?.user_metadata?.first_name || 'User'} 👋
+              </p>
+            </div>
+            <Link
+              to="/user-info"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              onClick={closeMenu}
+            >
+              User Info
+            </Link>
+            <button
+              onClick={async () => {
+                await signOut();
+                closeMenu();
+                window.location.href = '/login';
+              }}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        )}
         </header>
 
         {/* Search Bar - Mobile only */}
@@ -156,6 +176,8 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, user, setUse
                 { name: 'Offers', path: '/offers', icon: Percent },
                 { name: 'Gift Kit', path: '/giftkit', icon: Gift },
                 { name: 'Help', path: '/contact', icon: HelpCircle },
+                { name: 'Cart', path: '/cart', icon: ShoppingBag },
+                { name: 'Wishlist', path: '/wishlist', icon: Heart },
                 { name: 'Orders', path: '/orders', icon: Package },
               ].map((item, index) => {
                 const Icon = item.icon;
@@ -206,26 +228,24 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, user, setUse
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                     {user ? (
                       <>
+                        <div className="px-4 py-2 border-b border-gray-100">
+                          <p className="text-sm font-medium text-gray-900">
+                            Hello, {user?.user_metadata?.first_name || 'User'} 👋
+                          </p>
+                        </div>
                         <Link
-                          to="/orders"
+                          to="/user-info"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                           onClick={closeMenu}
                         >
-                          Orders
-                        </Link>
-                        <Link
-                          to="/wishlist"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                          onClick={closeMenu}
-                        >
-                          Wishlist
+                          User Info
                         </Link>
                         <button
-                          onClick={() => {
-                            removeUserSession();
-                            setUser(null);
+                          onClick={async () => {
+                            await signOut();
                             closeMenu();
-                            navigate('/');
+                            // Force a small delay to ensure auth state updates
+                            setTimeout(() => navigate('/'), 100);
                           }}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                         >

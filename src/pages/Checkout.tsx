@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { CheckCircle, Plus, Loader2, CreditCard, Smartphone } from 'lucide-react';
 import { getLoggedInUser } from '../utils/auth';
+import { OrderService } from '../services/orderService';
 
 // Types
 interface Address {
@@ -101,50 +102,45 @@ const Checkout: React.FC = () => {
         throw new Error('User not logged in');
       }
 
-      // Mock user creation
-      const userId = 'mock-user-' + Date.now();
-      console.log('✅ Mock user created with ID:', userId);
-
-      // Mock address creation
-      let addressId = 'mock-address-' + Date.now();
-      if (selectedAddress) {
-        console.log('🏠 Creating mock address...');
-        addressId = selectedAddress.id || 'mock-address-' + Date.now();
-        console.log('✅ Mock address created with ID:', addressId);
-      } else {
+      // Validate address
+      if (!selectedAddress) {
         throw new Error('No delivery address selected');
       }
 
-      // Prepare order items for backend
+      // Prepare order data for Supabase
+      const orderData = {
+        user_id: (currentUser as any)?.id || 'guest-' + Date.now(),
+        total_amount: Number(getCartTotal() || 0),
+        shipping_address: {
+          name: selectedAddress.name,
+          phone: selectedAddress.phone,
+          street: selectedAddress.street,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          pincode: selectedAddress.pincode
+        },
+        payment_id: paymentMethod === 'upi' ? upiId : 'card-' + Date.now()
+      };
+
+      // Prepare order items for Supabase
       const orderItems = cart.map(item => ({
         product_id: item.cartProduct?.id || item.id,
+        product_name: item.cartProduct?.name || 'Product',
         quantity: item.quantity,
         price: Number(item.cartProduct?.price || 0)
       }));
       
       console.log('📦 Order items:', orderItems);
+      console.log('🛒 Creating order in Supabase...');
 
-      // Mock order creation
-      let orderData;
-      try {
-        console.log('🛒 Creating mock order...');
-        orderData = {
-          id: 'mock-order-' + Date.now(),
-          user_id: userId,
-          total_amount: Number(getCartTotal() || 0),
-          status: 'pending',
-          items: orderItems
-        };
-        
-        console.log('✅ Mock order created successfully:', orderData);
-      } catch (orderError) {
-        console.error('❌ Failed to create order:', orderError);
-        throw new Error('Failed to place order');
-      }
-
+      // Create order in Supabase using OrderService
+      const createdOrder = await OrderService.createOrder(orderData, cart);
+      
+      console.log('✅ Order created successfully:', createdOrder);
+      
       // Create order object for frontend display
-      const order = {
-        id: orderData.id.toString(),
+      const frontendOrder = {
+        id: createdOrder.id,
         items: cart.map(item => ({
           ...item,
           cartProduct: item.cartProduct || item,
@@ -157,24 +153,12 @@ const Checkout: React.FC = () => {
         createdAt: new Date().toISOString()
       };
 
-      // Save order ID for success page
-      localStorage.setItem('recentOrderId', order.id);
-      
-      // Also save a copy in localStorage for backup (but not as primary storage)
-      try {
-        const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-        localStorage.setItem('orders', JSON.stringify([order, ...existingOrders]));
-        console.log('💾 Order backup saved to localStorage');
-      } catch (backupError) {
-        console.warn('⚠️ Could not save backup to localStorage:', backupError);
-      }
-
       console.log('🎉 Order processed successfully!');
-      console.log('📤 Order details:', order);
+      console.log('📤 Order details:', frontendOrder);
 
       // Clear cart and show success
       clearCart();
-      setOrderId(order.id);
+      setOrderId(frontendOrder.id);
       setStep(3);
       setIsProcessing(false);
       
@@ -501,8 +485,8 @@ const Checkout: React.FC = () => {
           <div className="mt-8 bg-white rounded-lg shadow-md p-6">
             <h3 className="text-lg font-medium mb-4">Order Summary</h3>
             <div className="space-y-4">
-              {cart.map((item) => (
-                <div key={item.id} className="flex justify-between">
+              {cart.map((item, index) => (
+                <div key={`checkout-${item.id}-${index}`} className="flex justify-between">
                   <div className="flex items-center">
                     <div className="w-16 h-16 bg-gray-100 rounded-md mr-4 overflow-hidden">
                       <img

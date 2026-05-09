@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import CartItemCard from '../components/CartItemCard';
 
 const Cart: React.FC = () => {
   const { cart, loading, updateQuantity, removeFromCart, getCartTotal, getCartCount } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [updatingItem, setUpdatingItem] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -31,8 +33,16 @@ const Cart: React.FC = () => {
     
     setIsCheckingOut(true);
     try {
-      // You can add any pre-checkout logic here, like validating the cart
-      navigate('/checkout');
+      // Check if user is authenticated
+      if (!user) {
+        // Store redirect path for after login
+        localStorage.setItem('redirect_after_login', '/address');
+        navigate('/login');
+        return;
+      }
+      
+      // User is authenticated, proceed to address page
+      navigate('/address');
     } catch (error) {
       console.error('Error during checkout:', error);
     } finally {
@@ -125,11 +135,11 @@ const Cart: React.FC = () => {
                       if (!item.cartProduct) {
                         console.warn('Cart item missing cartProduct:', item);
                         return (
-                          <div key={item.id} className="p-4 bg-red-50 border border-red-200 rounded-lg mb-4">
+                          <div key={`cart-${item.id}`} className="p-4 bg-red-50 border border-red-200 rounded-lg mb-4">
                             <p className="text-red-600">⚠️ Product details unavailable (ID: {item.id})</p>
                             <button 
-                              onClick={() => handleRemoveItem(String(item.id))}
-                              className="mt-2 text-sm text-red-600 hover:text-red-800"
+                              onClick={() => handleRemoveItem(String(item.productId))}
+                              className="mt-2 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
                             >
                               Remove from cart
                             </button>
@@ -138,7 +148,7 @@ const Cart: React.FC = () => {
                       }
                       return (
                         <CartItemCard
-                          key={item.id}
+                          key={`cart-item-${item.id}`}
                           item={item}
                           onQuantityChange={handleQuantityChange}
                           onRemove={handleRemoveItem}

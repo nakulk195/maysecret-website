@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, ShoppingBag, Heart } from "lucide-react";
+import { useAuth } from '../contexts/AuthContext';
 
 interface MobileSidebarProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  user: { firstName: string } | null;
 }
 
-export default function MobileSidebarClean({ isOpen, setIsOpen, user }: MobileSidebarProps) {
+export default function MobileSidebarClean({ isOpen, setIsOpen }: MobileSidebarProps) {
+  const { user, signOut } = useAuth();
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
   }, [isOpen]);
@@ -49,7 +50,7 @@ export default function MobileSidebarClean({ isOpen, setIsOpen, user }: MobileSi
             <div className="p-4">
               <p className="text-sm text-gray-500">Welcome</p>
               <h3 className="text-lg font-semibold text-pink-600">
-                Hello {user?.firstName || "Guest"} 👋
+                Hello {user?.user_metadata?.first_name || "Guest"} 👋
               </h3>
             </div>
 
@@ -58,22 +59,54 @@ export default function MobileSidebarClean({ isOpen, setIsOpen, user }: MobileSi
               {[
                 { name: "Home", path: "/" },
                 { name: "Shop", path: "/shop" },
+                { name: "Cart", path: "/cart" },
+                { name: "Wishlist", path: "/wishlist" },
                 { name: "Orders", path: "/orders" },
                 { name: "Offers", path: "/offers" },
                 { name: "Gift Kit", path: "/giftkit" },
                 { name: "Quiz", path: "/quiz" },
                 { name: "Contact", path: "/contact" },
-                { name: "Login", path: "/login" },
-              ].map((item, index) => (
-                <Link
-                  key={item.name + index}
-                  to={item.path}
-                  onClick={() => setIsOpen(false)}
-                  className="block text-lg font-medium text-gray-700 hover:text-pink-600 transition-all"
-                >
-                  {item.name}
-                </Link>
-              ))}
+                ...(user ? [
+                  { name: "User Info", path: "/user-info" },
+                  { name: "Logout", path: "#", isLogout: true }
+                ] : [
+                  { name: "Login", path: "/login" }
+                ]),
+              ].map((item, index) => {
+                if (item.isLogout) {
+                  return (
+                    <button
+                      key={item.name + index}
+                      onClick={async () => {
+                        await signOut();
+                        setIsOpen(false);
+                        // Redirect to login page after logout
+                        window.location.href = '/login';
+                      }}
+                      className="block w-full text-lg font-medium text-gray-700 hover:text-pink-600 transition-all text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{item.name}</span>
+                      </div>
+                    </button>
+                  );
+                } else {
+                  return (
+                    <Link
+                      key={item.name + index}
+                      to={item.path}
+                      onClick={() => setIsOpen(false)}
+                      className="block text-lg font-medium text-gray-700 hover:text-pink-600 transition-all"
+                    >
+                      <div className="flex items-center gap-2">
+                        {item.name === "Cart" && <ShoppingBag className="w-5 h-5" />}
+                        {item.name === "Wishlist" && <Heart className="w-5 h-5" />}
+                        <span>{item.name}</span>
+                      </div>
+                    </Link>
+                  );
+                }
+              })}
             </nav>
           </motion.div>
         </>

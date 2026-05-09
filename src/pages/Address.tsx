@@ -1,0 +1,574 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowRight, MapPin, Phone, Mail, User } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
+
+// Indian states data
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
+  'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
+  'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh',
+  'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 'Chandigarh',
+  'Dadra and Nagar Haveli', 'Daman and Diu', 'Delhi', 'Jammu and Kashmir',
+  'Ladakh', 'Lakshadweep', 'Puducherry'
+];
+
+// Major Indian cities
+const INDIAN_CITIES = [
+  'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune', 'Ahmedabad',
+  'Jaipur', 'Surat', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane', 'Bhopal',
+  'Visakhapatnam', 'Pimpri-Chinchwad', 'Patna', 'Vadodara', 'Ghaziabad', 'Ludhiana',
+  'Agra', 'Nashik', 'Faridabad', 'Meerut', 'Rajkot', 'Kalyan-Dombivali', 'Vasai-Virar',
+  'Varanasi', 'Srinagar', 'Dhanbad', 'Jodhpur', 'Amritsar', 'Raipur', 'Allahabad',
+  'Coimbatore', 'Jabalpur', 'Gwalior', 'Vijayawada', 'Jodhpur', 'Madurai', 'Guwahati',
+  'Chandigarh', 'Hubli-Dharwad', 'Mysore', 'Tiruchirappalli', 'Bareilly', 'Aligarh',
+  'Tiruppur', 'Gurgaon', 'Kochi', 'Kozhikode', 'Thiruvananthapuram', 'Rourkela',
+  'Bhilai', 'Saharanpur', 'Gulbarga', 'Dehradun', 'Bikaner', 'Warangal', 'Mangalore',
+  'Noida', 'Bhubaneswar', 'Raigarh', 'Kota', 'Amravati', 'Allahabad', 'Shimla',
+  'Ranchi', 'Cuttack', 'Firozabad', 'Kochi', 'Nanded', 'Kolhapur', 'Ajmer',
+  'Guntur', 'Ujjain', 'Jammu', 'Salem', 'Solapur', 'Bhiwandi', 'Tirupati',
+  'Malegaon', 'Gwalior', 'Jalgaon', 'Thrissur', 'Kurnool', 'Nellore', 'Bhilwara',
+  'Bikaner', 'Erode', 'Belagavi', 'Ambarnath', 'Ahmednagar', 'Cuddalore', 'Kharagpur',
+  'Bharatpur', 'Bhilai', 'Kochi', 'Nizamabad', 'Bhopal', 'Rajahmundry', 'Mathura',
+  'Kannauj', 'Khammam', 'Udaipur', 'Secunderabad', 'Tirunelveli', 'Kota', 'Rourkela',
+  'Bhilai', 'Saharanpur', 'Gulbarga', 'Dehradun', 'Bikaner', 'Warangal', 'Mangalore'
+];
+
+interface AddressFormData {
+  fullName: string;
+  mobileNumber: string;
+  emailAddress: string;
+  houseNo: string;
+  apartment: string;
+  area: string;
+  landmark: string;
+  pincode: string;
+  city: string;
+  state: string;
+  country: string;
+}
+
+const Address: React.FC = () => {
+  const { user } = useAuth();
+  const { cart, getCartTotal } = useCart();
+  const navigate = useNavigate();
+  
+  const [formData, setFormData] = useState<AddressFormData>({
+    fullName: '',
+    mobileNumber: '',
+    emailAddress: '',
+    houseNo: '',
+    apartment: '',
+    area: '',
+    landmark: '',
+    pincode: '',
+    city: '',
+    state: '',
+    country: 'India'
+  });
+
+  const [errors, setErrors] = useState<Partial<AddressFormData>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [citySearch, setCitySearch] = useState('');
+  const [filteredCities, setFilteredCities] = useState(INDIAN_CITIES);
+
+  // Auth protection
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  // City search functionality
+  useEffect(() => {
+    const filtered = INDIAN_CITIES.filter(city =>
+      city.toLowerCase().includes(citySearch.toLowerCase())
+    );
+    setFilteredCities(filtered);
+  }, [citySearch]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear error when user starts typing
+    if (errors[name as keyof AddressFormData]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Partial<AddressFormData> = {};
+
+    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.mobileNumber.trim()) newErrors.mobileNumber = 'Mobile number is required';
+    if (!/^[6-9]\d{9}$/.test(formData.mobileNumber)) {
+      newErrors.mobileNumber = 'Please enter a valid 10-digit mobile number';
+    }
+    if (!formData.emailAddress.trim()) newErrors.emailAddress = 'Email is required';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.emailAddress)) {
+      newErrors.emailAddress = 'Please enter a valid email address';
+    }
+    if (!formData.houseNo.trim()) newErrors.houseNo = 'House number is required';
+    if (!formData.area.trim()) newErrors.area = 'Area/Street is required';
+    if (!formData.pincode.trim()) newErrors.pincode = 'Pincode is required';
+    if (!/^[1-9][0-9]{5}$/.test(formData.pincode)) {
+      newErrors.pincode = 'Please enter a valid 6-digit pincode';
+    }
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.state.trim()) newErrors.state = 'State is required';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    try {
+      // Save address to localStorage for use in payment page
+      localStorage.setItem('shipping_address', JSON.stringify(formData));
+      
+      // Redirect to payment page
+      navigate('/payment');
+    } catch (error) {
+      console.error('Error saving address:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!user) {
+    return null; // Will redirect via useEffect
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-warm-50 via-white to-warm-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <Link
+            to="/cart"
+            className="inline-flex items-center text-warm-600 hover:text-warm-700 mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back to Cart
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Delivery Address
+          </h1>
+          <p className="text-gray-600">
+            Enter your delivery address for shipping
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Side - Address Form */}
+          <div className="lg:col-span-2">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-white rounded-2xl shadow-lg p-8"
+            >
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Name and Contact */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Full Name <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${
+                          errors.fullName ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="John Doe"
+                      />
+                    </div>
+                    {errors.fullName && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm mt-1"
+                      >
+                        {errors.fullName}
+                      </motion.p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Mobile Number <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="tel"
+                        name="mobileNumber"
+                        value={formData.mobileNumber}
+                        onChange={handleInputChange}
+                        maxLength={10}
+                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${
+                          errors.mobileNumber ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="9876543210"
+                      />
+                    </div>
+                    {errors.mobileNumber && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm mt-1"
+                      >
+                        {errors.mobileNumber}
+                      </motion.p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="email"
+                      name="emailAddress"
+                      value={formData.emailAddress}
+                      onChange={handleInputChange}
+                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${
+                        errors.emailAddress ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                  {errors.emailAddress && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-red-500 text-sm mt-1"
+                    >
+                      {errors.emailAddress}
+                    </motion.p>
+                    )}
+                </div>
+
+                {/* Address */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      House No / Flat No <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="houseNo"
+                      value={formData.houseNo}
+                      onChange={handleInputChange}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${
+                        errors.houseNo ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="123, A-101"
+                    />
+                    {errors.houseNo && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm mt-1"
+                      >
+                        {errors.houseNo}
+                      </motion.p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Apartment / Building
+                    </label>
+                    <input
+                      type="text"
+                      name="apartment"
+                      value={formData.apartment}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all"
+                      placeholder="Apartment name, floor, etc."
+                    />
+                  </div>
+                </div>
+
+                {/* Area and Landmark */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Area / Street / Locality <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="text"
+                        name="area"
+                        value={formData.area}
+                        onChange={handleInputChange}
+                        className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${
+                          errors.area ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Main Street, Colony name"
+                      />
+                    </div>
+                    {errors.area && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm mt-1"
+                      >
+                        {errors.area}
+                      </motion.p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Landmark / Nearby Place
+                    </label>
+                    <input
+                      type="text"
+                      name="landmark"
+                      value={formData.landmark}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all"
+                      placeholder="Near school, temple, etc."
+                    />
+                  </div>
+                </div>
+
+                {/* Pincode */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Pincode <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="pincode"
+                    value={formData.pincode}
+                    onChange={handleInputChange}
+                    maxLength={6}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${
+                      errors.pincode ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="110001"
+                  />
+                  {errors.pincode && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-red-500 text-sm mt-1"
+                    >
+                      {errors.pincode}
+                    </motion.p>
+                    )}
+                </div>
+
+                {/* City and State */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      City <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={(e) => {
+                          handleInputChange(e);
+                          setCitySearch(e.target.value);
+                        }}
+                        onFocus={() => setCitySearch(formData.city)}
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${
+                          errors.city ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Start typing city name..."
+                      />
+                      {citySearch && filteredCities.length > 0 && (
+                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                          {filteredCities.slice(0, 5).map((city, index) => (
+                            <div
+                              key={`city-${city}-${index}`}
+                              onClick={() => {
+                                setFormData(prev => ({ ...prev, city }));
+                                setCitySearch('');
+                                setFilteredCities(INDIAN_CITIES);
+                              }}
+                              className="px-4 py-2 hover:bg-warm-50 cursor-pointer transition-colors"
+                            >
+                              {city}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {errors.city && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm mt-1"
+                      >
+                        {errors.city}
+                      </motion.p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      State <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="state"
+                      value={formData.state}
+                      onChange={handleInputChange}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${
+                        errors.state ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    >
+                      <option value="">Select State</option>
+                      {INDIAN_STATES.map((state, index) => (
+                        <option key={`state-${state}-${index}`} value={state}>
+                          {state}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.state && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm mt-1"
+                      >
+                        {errors.state}
+                      </motion.p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Country */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Country <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all"
+                    disabled
+                  >
+                    <option value="India">India</option>
+                  </select>
+                </div>
+
+                {/* Submit Button */}
+                <div className="pt-6">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-warm-600 text-white py-4 rounded-lg font-semibold hover:bg-warm-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  >
+                    {isSubmitting ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                    ) : (
+                      <>
+                        Continue To Payment
+                        <ArrowRight className="ml-2 w-5 h-5" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+
+          {/* Right Side - Order Summary */}
+          <div className="lg:col-span-1">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-white rounded-2xl shadow-lg p-6 sticky top-8"
+            >
+              <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                Order Summary
+              </h2>
+              
+              <div className="space-y-4">
+                {cart.map((item, index) => (
+                  <div key={`summary-${item.id}-${index}`} className="flex items-center space-x-4 pb-4 border-b border-gray-100 last:border-0">
+                    {/* Product Image */}
+                    <div className="flex-shrink-0">
+                      <img
+                        src={item.cartProduct?.image || '/placeholder-product.jpg'}
+                        alt={item.cartProduct?.name || 'Product'}
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                    </div>
+                    
+                    {/* Product Details */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-medium text-gray-800 truncate">
+                        {item.cartProduct?.name || 'Product'}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Qty: {item.quantity}
+                      </p>
+                    </div>
+                    
+                    {/* Price */}
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-warm-700">
+                        ₹{typeof item.cartProduct?.price === 'string' 
+                          ? (parseFloat(item.cartProduct.price) * item.quantity).toLocaleString()
+                          : ((item.cartProduct?.price || 0) * item.quantity).toLocaleString()
+                        }
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Totals */}
+              <div className="border-t border-gray-200 pt-4 space-y-2">
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Subtotal</span>
+                  <span>₹{getCartTotal().toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Shipping</span>
+                  <span>FREE</span>
+                </div>
+                <div className="flex justify-between text-lg font-semibold text-gray-800 pt-2 border-t border-gray-200">
+                  <span>Total</span>
+                  <span className="text-warm-700">₹{getCartTotal().toLocaleString()}</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Address;

@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
+import { useAuth } from './AuthContext';
 
 export interface CartProduct {
   id: number;
@@ -48,21 +50,52 @@ interface CartProviderProps {
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const loadCart = useCallback(async () => {
     setLoading(true);
     try {
-      // Always load from localStorage for guest users
-      const raw = localStorage.getItem('guest_cart');
-      const parsed: CartItem[] = raw ? JSON.parse(raw) : [];
-      setCart(parsed);
+      if (user) {
+        // Load from Supabase for logged-in users
+        const { data, error } = await supabase
+          .from('cart')
+          .select('*')
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+
+        const cartItems: CartItem[] = (data || []).map(item => ({
+          id: item.id,
+          cartId: item.id,
+          productId: parseInt(item.product_id),
+          quantity: item.quantity,
+          cartProduct: {
+            id: parseInt(item.product_id),
+            name: item.product_name,
+            price: item.product_price.toString(),
+            image: item.product_image,
+            inStock: true,
+            description: '',
+            rating: 4.5,
+            reviews: 0,
+            originalPrice: ''
+          }
+        }));
+
+        setCart(cartItems);
+      } else {
+        // Load from localStorage for guest users
+        const raw = localStorage.getItem('guest_cart');
+        const parsed: CartItem[] = raw ? JSON.parse(raw) : [];
+        setCart(parsed);
+      }
     } catch (error) {
       console.error('CartContext: Error loading cart:', error);
       setCart([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     loadCart();
@@ -71,42 +104,80 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const addToCart = async (product: any, quantity: number = 1) => {
     setLoading(true);
     try {
-      setCart((prevCart: CartItem[]) => {
-        const existingItem = prevCart.find(item => item.productId === product.id);
-        let newCart: CartItem[];
-        
+      if (user) {
+        // Add to Supabase for logged-in users
+        const { data: existingItem } = await supabase
+          .from('cart')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('product_id', product.id.toString())
+          .single();
+
         if (existingItem) {
-          newCart = prevCart.map(item =>
-            item.productId === product.id
-              ? { ...item, quantity: item.quantity + quantity }
-              : item
-          );
+          // Update existing item
+          const { error } = await supabase
+            .from('cart')
+            .update({ quantity: existingItem.quantity + quantity })
+            .eq('id', existingItem.id);
+
+          if (error) throw error;
         } else {
-          newCart = [
-            ...prevCart,
-            {
-              id: Date.now(),
-              cartId: Date.now(),
-              productId: product.id,
-              quantity,
-              cartProduct: {
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                image: product.image,
-                inStock: product.inStock || true,
-                description: product.description || '',
-                rating: product.rating || 4.5,
-                reviews: product.reviews || 0,
-                originalPrice: product.originalPrice || ''
-              }
-            }
-          ];
+          // Add new item with product details stored directly
+          const { error } = await supabase
+            .from('cart')
+            .insert({
+              user_id: user.id,
+              product_id: product.id.toString(),
+              product_name: product.name,
+              product_image: product.image,
+              product_price: Number(product.price),
+              quantity
+            });
+
+          if (error) throw error;
         }
         
-        localStorage.setItem('guest_cart', JSON.stringify(newCart));
-        return newCart;
-      });
+        // Reload cart
+        await loadCart();
+      } else {
+        // Use localStorage for guest users
+        setCart((prevCart: CartItem[]) => {
+          const existingItem = prevCart.find(item => item.productId === product.id);
+          let newCart: CartItem[];
+          
+          if (existingItem) {
+            newCart = prevCart.map(item =>
+              item.productId === product.id
+                ? { ...item, quantity: item.quantity + quantity }
+                : item
+            );
+          } else {
+            newCart = [
+              ...prevCart,
+              {
+                id: Date.now(),
+                cartId: Date.now(),
+                productId: product.id,
+                quantity,
+                cartProduct: {
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.image,
+                  inStock: product.inStock || true,
+                  description: product.description || '',
+                  rating: product.rating || 4.5,
+                  reviews: product.reviews || 0,
+                  originalPrice: product.originalPrice || ''
+                }
+              }
+            ];
+          }
+          
+          localStorage.setItem('guest_cart', JSON.stringify(newCart));
+          return newCart;
+        });
+      }
     } catch (error) {
       console.error('CartContext: Error adding to cart:', error);
     } finally {
@@ -122,13 +193,36 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         return;
       }
 
-      setCart(prevCart => {
-        const updatedCart = prevCart.map(item =>
-          item.id.toString() === productId ? { ...item, quantity } : item
-        );
-        localStorage.setItem('guest_cart', JSON.stringify(updatedCart));
-        return updatedCart;
-      });
+      if (user) {
+        // Update in Supabase for logged-in users
+        const { data: cartItem } = await supabase
+          .from('cart')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('product_id', parseInt(productId))
+          .single();
+
+        if (cartItem) {
+          const { error } = await supabase
+            .from('cart')
+            .update({ quantity })
+            .eq('id', cartItem.id);
+
+          if (error) throw error;
+        }
+        
+        // Reload cart
+        await loadCart();
+      } else {
+        // Update localStorage for guest users
+        setCart(prevCart => {
+          const updatedCart = prevCart.map(item =>
+            item.productId === parseInt(productId) ? { ...item, quantity } : item
+          );
+          localStorage.setItem('guest_cart', JSON.stringify(updatedCart));
+          return updatedCart;
+        });
+      }
     } catch (error) {
       console.error('Error updating cart item quantity:', error);
     } finally {
@@ -139,9 +233,32 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const removeFromCart = async (productId: string) => {
     setLoading(true);
     try {
-      const updatedCart = cart.filter(item => item.id !== parseInt(productId));
-      setCart(updatedCart);
-      localStorage.setItem('guest_cart', JSON.stringify(updatedCart));
+      if (user) {
+        // Remove from Supabase for logged-in users
+        const { data: cartItem } = await supabase
+          .from('cart')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('product_id', parseInt(productId))
+          .single();
+
+        if (cartItem) {
+          const { error } = await supabase
+            .from('cart')
+            .delete()
+            .eq('id', cartItem.id);
+
+          if (error) throw error;
+        }
+        
+        // Reload cart
+        await loadCart();
+      } else {
+        // Remove from localStorage for guest users
+        const updatedCart = cart.filter(item => item.productId !== parseInt(productId));
+        setCart(updatedCart);
+        localStorage.setItem('guest_cart', JSON.stringify(updatedCart));
+      }
     } catch (error) {
       console.error('Error removing item from cart:', error);
       throw error;
@@ -153,8 +270,22 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const clearCart = async () => {
     setLoading(true);
     try {
-      localStorage.removeItem('guest_cart');
-      setCart([]);
+      if (user) {
+        // Clear from Supabase for logged-in users
+        const { error } = await supabase
+          .from('cart')
+          .delete()
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        
+        // Reload cart
+        await loadCart();
+      } else {
+        // Clear localStorage for guest users
+        localStorage.removeItem('guest_cart');
+        setCart([]);
+      }
     } catch (error) {
       console.error('Error clearing cart:', error);
     } finally {

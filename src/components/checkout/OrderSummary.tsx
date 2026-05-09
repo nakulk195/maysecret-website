@@ -32,8 +32,8 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       
       {showItems && (
         <div className="divide-y divide-gray-200">
-          {items.map((item) => (
-            <div key={item.id} className="p-4 flex items-center">
+          {items.map((item, index) => (
+            <div key={`order-summary-${item.id}-${index}`} className="p-4 flex items-center">
               <div className="flex-shrink-0 h-16 w-16 rounded-md overflow-hidden bg-gray-100">
                 {item.cartProduct.image ? (
                   <img

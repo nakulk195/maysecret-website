@@ -141,8 +141,8 @@ const Orders: React.FC = () => {
 
                 <div className="border-b border-gray-200">
                   <ul className="divide-y divide-gray-200">
-                    {order.items.map((item) => (
-                      <li key={`${order.id}-${item.id}`} className="p-4 sm:p-6">
+                    {order.items.map((item, index) => (
+                      <li key={`order-${order.id}-item-${item.id}-${index}`} className="p-4 sm:p-6">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-20 w-20 rounded-md overflow-hidden bg-gray-200">
                             {item.image ? (

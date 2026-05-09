@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, MapPin, Phone, Mail, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useAddresses } from '../hooks/useAddresses';
+import { addressService } from '../services/database';
 
 // Indian states data
 const INDIAN_STATES = [
@@ -54,7 +56,12 @@ interface AddressFormData {
 const Address: React.FC = () => {
   const { user } = useAuth();
   const { cart, getCartTotal } = useCart();
+  const { addresses, loading: addressesLoading, addAddress, updateAddress, deleteAddress } = useAddresses();
   const navigate = useNavigate();
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
   
   const [formData, setFormData] = useState<AddressFormData>({
     fullName: '',
@@ -132,16 +139,113 @@ const Address: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      if (user) {
+        if (isEditing && editingAddressId) {
+          // Update existing address
+          await updateAddress(editingAddressId, {
+            full_name: formData.fullName,
+            phone: formData.mobileNumber,
+            address_line_1: formData.houseNo,
+            address_line_2: formData.apartment,
+            landmark: formData.landmark,
+            city: formData.city,
+            state: formData.state,
+            pincode: formData.pincode,
+            country: formData.country
+          });
+        } else {
+          // Create new address
+          await addAddress({
+            full_name: formData.fullName,
+            phone: formData.mobileNumber,
+            address_line_1: formData.houseNo,
+            address_line_2: formData.apartment,
+            landmark: formData.landmark,
+            city: formData.city,
+            state: formData.state,
+            pincode: formData.pincode,
+            country: formData.country
+          });
+        }
+      }
+
       // Save address to localStorage for use in payment page
       localStorage.setItem('shipping_address', JSON.stringify(formData));
       
-      // Redirect to payment page
-      navigate('/payment');
+      // Reset form and go back to address list
+      resetForm();
+      setShowAddressForm(false);
+      setIsEditing(false);
+      setEditingAddressId(null);
     } catch (error) {
       console.error('Error saving address:', error);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      fullName: '',
+      mobileNumber: '',
+      emailAddress: '',
+      houseNo: '',
+      apartment: '',
+      area: '',
+      landmark: '',
+      pincode: '',
+      city: '',
+      state: '',
+      country: 'India'
+    });
+    setErrors({});
+  };
+
+  const handleEditAddress = (address: any) => {
+    setFormData({
+      fullName: address.full_name,
+      mobileNumber: address.phone,
+      emailAddress: address.email || '',
+      houseNo: address.address_line_1,
+      apartment: address.address_line_2 || '',
+      area: address.landmark || '',
+      landmark: address.landmark || '',
+      pincode: address.pincode,
+      city: address.city,
+      state: address.state,
+      country: address.country
+    });
+    setIsEditing(true);
+    setEditingAddressId(address.id);
+    setShowAddressForm(true);
+  };
+
+  const handleDeleteAddress = async (addressId: string) => {
+    if (window.confirm('Are you sure you want to delete this address?')) {
+      try {
+        await deleteAddress(addressId);
+      } catch (error) {
+        console.error('Error deleting address:', error);
+      }
+    }
+  };
+
+  const handleSelectAddress = (address: any) => {
+    const addressFormData = {
+      fullName: address.full_name,
+      mobileNumber: address.phone,
+      emailAddress: address.email || user?.email || '',
+      houseNo: address.address_line_1,
+      apartment: address.address_line_2 || '',
+      area: address.landmark || '',
+      landmark: address.landmark || '',
+      pincode: address.pincode,
+      city: address.city,
+      state: address.state,
+      country: address.country
+    };
+    localStorage.setItem('shipping_address', JSON.stringify(addressFormData));
+    navigate('/payment');
   };
 
   if (!user) {
@@ -164,15 +268,31 @@ const Address: React.FC = () => {
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Cart
           </Link>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Delivery Address
-          </h1>
-          <p className="text-gray-600">
-            Enter your delivery address for shipping
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                {showAddressForm ? (isEditing ? 'Edit Address' : 'Add New Address') : 'Delivery Address'}
+              </h1>
+              <p className="text-gray-600">
+                {showAddressForm 
+                  ? 'Fill in the details below' 
+                  : 'Select an existing address or add a new one'
+                }
+              </p>
+            </div>
+            {!showAddressForm && (
+              <button
+                onClick={() => setShowAddressForm(true)}
+                className="bg-warm-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-warm-700 transition-colors"
+              >
+                Add New Address
+              </button>
+            )}
+          </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {showAddressForm ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Side - Address Form */}
           <div className="lg:col-span-2">
             <motion.div
@@ -566,6 +686,156 @@ const Address: React.FC = () => {
             </motion.div>
           </div>
         </div>
+        ) : (
+          // Address List View
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <div className="space-y-4">
+                {addressesLoading ? (
+                  <div className="flex justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-warm-600 border-t-transparent"></div>
+                  </div>
+                ) : addresses.length === 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-12 bg-white rounded-xl shadow-sm"
+                  >
+                    <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No Saved Addresses</h3>
+                    <p className="text-gray-600 mb-6">Add your first delivery address to get started</p>
+                    <button
+                      onClick={() => setShowAddressForm(true)}
+                      className="bg-warm-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-warm-700 transition-colors"
+                    >
+                      Add Your First Address
+                    </button>
+                  </motion.div>
+                ) : (
+                  addresses.map((address, index) => (
+                    <motion.div
+                      key={address.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:border-warm-300 transition-colors"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center mb-3">
+                            <User className="w-5 h-5 text-warm-600 mr-2" />
+                            <h3 className="font-semibold text-gray-800">{address.full_name}</h3>
+                          </div>
+                          <div className="space-y-2 text-sm text-gray-600">
+                            <div className="flex items-center">
+                              <Phone className="w-4 h-4 mr-2" />
+                              {address.phone}
+                            </div>
+                            <div className="flex items-start">
+                              <MapPin className="w-4 h-4 mr-2 mt-0.5" />
+                              <div>
+                                {address.address_line_1}
+                                {address.address_line_2 && <>, {address.address_line_2}</>}
+                                <br />
+                                {address.city}, {address.state} - {address.pincode}
+                                <br />
+                                {address.country}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleEditAddress(address)}
+                            className="text-warm-600 hover:text-warm-700 p-2 hover:bg-warm-50 rounded-lg transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteAddress(address.id)}
+                            className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            Delete
+                          </button>
+                          <button
+                            onClick={() => handleSelectAddress(address)}
+                            className="bg-warm-600 text-white px-4 py-2 rounded-lg hover:bg-warm-700 transition-colors"
+                          >
+                            Use This
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Right Side - Order Summary */}
+            <div className="lg:col-span-1">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="bg-white rounded-2xl shadow-lg p-6 sticky top-8"
+              >
+                <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                  Order Summary
+                </h2>
+                
+                <div className="space-y-4">
+                  {cart.map((item, index) => (
+                    <div key={`summary-${item.id}-${index}`} className="flex items-center space-x-4 pb-4 border-b border-gray-100 last:border-0">
+                      {/* Product Image */}
+                      <div className="flex-shrink-0">
+                        <img
+                          src={item.cartProduct?.image || '/placeholder-product.jpg'}
+                          alt={item.cartProduct?.name || 'Product'}
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                      </div>
+                      
+                      {/* Product Details */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-medium text-gray-800 truncate">
+                          {item.cartProduct?.name || 'Product'}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Qty: {item.quantity}
+                        </p>
+                      </div>
+                      
+                      {/* Price */}
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-warm-700">
+                          ₹{typeof item.cartProduct?.price === 'string' 
+                            ? (parseFloat(item.cartProduct.price) * item.quantity).toLocaleString()
+                            : ((item.cartProduct?.price || 0) * item.quantity).toLocaleString()
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Totals */}
+                <div className="border-t border-gray-200 pt-4 space-y-2">
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Subtotal</span>
+                    <span>₹{getCartTotal().toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Shipping</span>
+                    <span>FREE</span>
+                  </div>
+                  <div className="flex justify-between text-lg font-semibold text-gray-800 pt-2 border-t border-gray-200">
+                    <span>Total</span>
+                    <span className="text-warm-700">₹{getCartTotal().toLocaleString()}</span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, Trash2 } from 'lucide-react';
-import { Product } from '../utils/productData';
+import { Product } from '../lib/supabase';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 
 interface WishlistCardProps {
   product: Product;
-  onRemove: (productId: number) => void;
+  onRemove: (productId: string) => void;
 }
 
 const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
@@ -35,8 +36,8 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
     // Navigate to product details
   };
 
-  const discountPercentage = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const discountPercentage = product.original_price 
+    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : 0;
 
   return (
@@ -118,20 +119,20 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
               <span className="text-xl font-bold text-warm-700">
                 ₹{product.price.toLocaleString()}
               </span>
-              {product.originalPrice && (
+              {product.original_price && (
                 <span className="text-sm text-gray-500 line-through">
-                  ₹{product.originalPrice.toLocaleString()}
+                  ₹{product.original_price.toLocaleString()}
                 </span>
               )}
             </div>
             
             {/* Stock Status */}
             <span className={`text-xs px-2 py-1 rounded-full ${
-              product.inStock 
+              product.in_stock 
                 ? 'bg-green-100 text-green-700' 
                 : 'bg-red-100 text-red-700'
             }`}>
-              {product.inStock ? 'In Stock' : 'Out of Stock'}
+              {product.in_stock ? 'In Stock' : 'Out of Stock'}
             </span>
           </div>
         </Link>
@@ -142,7 +143,7 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleAddToCart}
-            disabled={!product.inStock}
+            disabled={!product.in_stock}
             className="flex-1 bg-warm-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-warm-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             <ShoppingCart size={16} />

@@ -9,8 +9,8 @@ interface MobileSidebarProps {
   setIsOpen: (open: boolean) => void;
 }
 
-export default function MobileSidebarClean({ isOpen, setIsOpen }: MobileSidebarProps) {
-  const { user, signOut } = useAuth();
+export const MobileSidebarClean: React.FC<MobileSidebarProps> = ({ isOpen, setIsOpen }) => {
+  const { user, profile, signOut } = useAuth();
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
   }, [isOpen]);
@@ -50,7 +50,7 @@ export default function MobileSidebarClean({ isOpen, setIsOpen }: MobileSidebarP
             <div className="p-4">
               <p className="text-sm text-gray-500">Welcome</p>
               <h3 className="text-lg font-semibold text-pink-600">
-                Hello {user?.user_metadata?.first_name || "Guest"} 👋
+                Hello {profile?.full_name?.split(' ')[0] || user?.user_metadata?.first_name || "Guest"} 👋
               </h3>
             </div>
 

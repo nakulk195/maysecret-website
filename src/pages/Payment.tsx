@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, CreditCard, Smartphone, Shield, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { orderService } from '../services/database';
 
 // Razorpay script
 const loadRazorpayScript = () => {
@@ -165,17 +166,32 @@ const Payment: React.FC = () => {
 
   const saveOrderToSupabase = async (paymentId: string) => {
     try {
-      // This would be implemented to save order to Supabase
-      console.log('Saving order with payment ID:', paymentId);
-      console.log('Order data:', {
-        user_id: user?.id,
-        address: address,
-        cart: cart,
-        total: getCartTotal(),
+      if (!user || !address) {
+        throw new Error('User or address data missing');
+      }
+
+      // Prepare order data
+      const orderData = {
+        total_amount: getCartTotal(),
+        shipping_address: address,
         payment_id: paymentId
-      });
+      };
+
+      // Prepare order items
+      const orderItems = cart.map(item => ({
+        product_id: item.productId,
+        quantity: item.quantity,
+        price: typeof item.cartProduct?.price === 'string' 
+          ? parseFloat(item.cartProduct.price) 
+          : (item.cartProduct?.price || 0)
+      }));
+
+      // Save order to Supabase
+      const { order, items } = await orderService.createOrder(user.id, orderData, orderItems);
       
-      // Store order in localStorage for now
+      console.log('Order saved successfully:', order);
+      
+      // Store order in localStorage as backup
       localStorage.setItem('last_order', JSON.stringify({
         user_id: user?.id,
         address: address,
@@ -188,6 +204,7 @@ const Payment: React.FC = () => {
       
     } catch (error) {
       console.error('Error saving order:', error);
+      throw error;
     }
   };
 

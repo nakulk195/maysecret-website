@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShoppingBag, ArrowLeft, Package, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useOrders, OrderWithItems } from '../hooks/useOrders';
 
 interface OrderItem {
   id: string;
@@ -26,51 +28,21 @@ interface Order {
   total: number;
   address: Address;
   paymentMethod: string;
-  status: string;
-  createdAt: string;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  created_at: string;
   date?: string; // For backward compatibility
   paymentStatus?: string; // For backward compatibility
 }
 
 const Orders: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
+  const { orders, loading: isLoading, fetchOrders } = useOrders();
 
   useEffect(() => {
-    const loadOrders = () => {
-      try {
-        const savedOrders = localStorage.getItem('orders');
-        if (savedOrders) {
-          const parsedOrders = JSON.parse(savedOrders);
-          // Ensure all orders have required fields
-          const validatedOrders = parsedOrders.map((order: any) => ({
-            id: order.id || `order-${Date.now()}`,
-            items: Array.isArray(order.items) ? order.items.map((item: any) => ({
-              id: item.id || 'item-' + Math.random().toString(36).substr(2, 9),
-              name: item.name || 'Unnamed Product',
-              image: item.image || '',
-              quantity: Number(item.quantity) || 1,
-              price: Number(item.price) || 0
-            })) : [],
-            total: Number(order.total) || 0,
-            address: order.address || {},
-            paymentMethod: order.paymentMethod || 'Unknown',
-            status: order.status || 'Completed',
-            createdAt: order.createdAt || order.date || new Date().toISOString()
-          }));
-          setOrders(validatedOrders);
-        }
-      } catch (error) {
-        console.error('Error loading orders:', error);
-        setOrders([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const timer = setTimeout(loadOrders, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    if (user) {
+      fetchOrders();
+    }
+  }, [user, fetchOrders]);
 
   if (isLoading) {
     return (
@@ -132,23 +104,23 @@ const Orders: React.FC = () => {
                       </h3>
                       <span className="ml-3 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 flex items-center">
                         <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-                        {order.status === 'successful' ? 'Successful' : order.status}
+                        {order.status}
                       </span>
                     </div>
-                    <p className="mt-1 text-sm text-gray-500">Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
+                    <p className="mt-1 text-sm text-gray-500">Placed on {new Date(order.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>
 
                 <div className="border-b border-gray-200">
                   <ul className="divide-y divide-gray-200">
-                    {order.items.map((item, index) => (
+                    {order.order_items?.map((item: any, index: number) => (
                       <li key={`order-${order.id}-item-${item.id}-${index}`} className="p-4 sm:p-6">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-20 w-20 rounded-md overflow-hidden bg-gray-200">
-                            {item.image ? (
+                            {item.product?.image ? (
                               <img
-                                src={item.image}
-                                alt={item.name}
+                                src={item.product?.image || '/placeholder-product.jpg'}
+                                alt={item.product?.name || 'Product'}
                                 className="h-full w-full object-cover object-center"
                               />
                             ) : (
@@ -161,15 +133,15 @@ const Orders: React.FC = () => {
                           <div className="ml-6 flex-1">
                             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
                               <h4 className="text-sm font-medium text-gray-900">
-                                {item.name}
+                                {item.product?.name || 'Product'}
                               </h4>
                               <p className="mt-1 sm:mt-0 text-sm font-medium text-gray-900">
-                                <p className="font-medium">₹{Number(item.price || 0).toFixed(2)}</p>
+                                ₹{item.price || 0}
                               </p>
                             </div>
                             <p className="mt-1 text-sm text-gray-500">Qty: {item.quantity || 1}</p>
                             <p className="mt-2 text-sm font-medium text-gray-900">
-                              <p className="font-medium">₹{(Number(item.price) * (item.quantity || 1)).toFixed(2)}</p>
+                              ₹{(item.price || 0) * (item.quantity || 1)}
                             </p>
                           </div>
                         </div>
@@ -183,24 +155,24 @@ const Orders: React.FC = () => {
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Delivery Address</h4>
                       <div className="mt-1 text-sm text-gray-900">
-                        <p>{order.address.name}</p>
-                        <p>{order.address.street}</p>
-                        <p>{order.address.city}, {order.address.state} {order.address.pincode}</p>
-                        <p>Phone: {order.address.phone}</p>
+                        <p>{order.shipping_address?.name || 'N/A'}</p>
+                        <p>{order.shipping_address?.address_line_1 || 'N/A'}</p>
+                        <p>{order.shipping_address?.city || 'N/A'}, {order.shipping_address?.state || 'N/A'} {order.shipping_address?.pincode || 'N/A'}</p>
+                        <p>Phone: {order.shipping_address?.phone || 'N/A'}</p>
                       </div>
                     </div>
 
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Payment Method</h4>
                       <p className="mt-1 text-sm text-gray-900 capitalize">
-                        {order.paymentMethod}
+                        {order.payment_id ? 'Paid Online' : 'Cash on Delivery'}
                       </p>
                     </div>
 
                     <div className="sm:col-span-2 lg:col-span-1">
                       <h4 className="text-sm font-medium text-gray-500">Order Total</h4>
                       <p className="mt-1 text-xl font-bold text-gray-900">
-                        ₹{order.total.toFixed(2)}
+                        ₹{order.total_amount || 0}
                       </p>
                     </div>
                   </div>

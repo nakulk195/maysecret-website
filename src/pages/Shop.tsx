@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, Grid, List, Search, X, ChevronDown, Star } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { products, getProductsByCategory, type Product, type Category, categories as productCategories } from '../utils/productData';
+import { products, getProductsByCategory, type Category, categories as productCategories } from '../utils/productData';
+import { Product as SupabaseProduct } from '../lib/supabase';
 import { useCart } from '../contexts/CartContext';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 
@@ -11,7 +12,21 @@ type SortOption = 'featured' | 'price-low' | 'price-high' | 'newest' | 'rating';
 const Shop: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const [filteredProducts, setFilteredProducts] = useState<SupabaseProduct[]>(products.map(p => ({
+    id: p.id.toString(),
+    name: p.name,
+    description: p.description,
+    price: p.price,
+    original_price: p.originalPrice,
+    image: p.image,
+    category: p.category,
+    in_stock: p.inStock,
+    is_featured: p.isFeatured || false,
+    rating: p.rating,
+    reviews: p.reviews,
+    created_at: p.createdAt,
+    updated_at: p.createdAt
+  })));
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [sortBy, setSortBy] = useState<SortOption>('featured');
@@ -68,7 +83,24 @@ const Shop: React.FC = () => {
         result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
     }
 
-    setFilteredProducts(result);
+    // Convert legacy products to Supabase format
+    const convertedResult = result.map(p => ({
+      id: p.id.toString(),
+      name: p.name,
+      description: p.description,
+      price: p.price,
+      original_price: p.originalPrice,
+      image: p.image,
+      category: p.category,
+      in_stock: p.inStock,
+      is_featured: p.isFeatured || false,
+      rating: p.rating,
+      reviews: p.reviews,
+      created_at: p.createdAt,
+      updated_at: p.createdAt
+    }));
+
+    setFilteredProducts(convertedResult);
   }, [selectedCategory, searchQuery, priceRange, sortBy]);
 
   const handleCategoryChange = (category: string) => {
@@ -330,23 +362,23 @@ const Shop: React.FC = () => {
                         <span className="text-lg font-bold text-warm-700">
                           ₹{product.price.toLocaleString()}
                         </span>
-                        {product.originalPrice && (
+                        {product.original_price && (
                           <span className="ml-2 text-sm text-gray-500 line-through">
-                            ₹{product.originalPrice.toLocaleString()}
+                            ₹{product.original_price.toLocaleString()}
                           </span>
                         )}
                       </div>
                       
                       <button
                         onClick={() => handleAddToCart(product)}
-                        disabled={!product.inStock}
+                        disabled={!product.in_stock}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          product.inStock
+                          product.in_stock
                             ? 'bg-rose-600 text-white hover:bg-rose-700'
                             : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         }`}
                       >
-                        {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                        {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
                       </button>
                     </div>
                   </div>

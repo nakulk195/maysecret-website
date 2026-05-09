@@ -26,7 +26,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { getCartCount } = useCart();
@@ -230,7 +230,7 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
                       <>
                         <div className="px-4 py-2 border-b border-gray-100">
                           <p className="text-sm font-medium text-gray-900">
-                            Hello, {user?.user_metadata?.first_name || 'User'} 👋
+                            Hello, {profile?.full_name?.split(' ')[0] || user?.user_metadata?.first_name || 'User'} 👋
                           </p>
                         </div>
                         <Link

@@ -1,14 +1,44 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Clock, Send, MessageCircle } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { contactService } from '../services/database';
 
 const Contact: React.FC = () => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Initialize form with user data if logged in
+  React.useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.user_metadata?.first_name ? 
+          `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`.trim() : '',
+        email: user.email || ''
+      }));
+    }
+  }, [user]);
+
+  // Clear success and error messages after 5 seconds
+  React.useEffect(() => {
+    if (successMessage || errorMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('');
+        setErrorMessage('');
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, errorMessage]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -17,12 +47,28 @@ const Contact: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
-    alert('Thank you for your message! We will get back to you soon.');
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    setIsSubmitting(true);
+
+    try {
+      // Save message to database for both logged-in users and guests
+      await contactService.saveMessage(user?.id || '', {
+        full_name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message
+      });
+
+      // Show success message instead of alert
+      setSuccessMessage('Thank you for your message! We will get back to you soon.');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setErrorMessage('There was an error sending your message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -79,6 +125,20 @@ const Contact: React.FC = () => {
               </h2>
             </div>
             
+            {/* Success Message */}
+            {successMessage && (
+              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+                {successMessage}
+              </div>
+            )}
+
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                {errorMessage}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
@@ -141,10 +201,20 @@ const Contact: React.FC = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="w-full bg-warm-700 text-white py-4 px-6 rounded-lg font-semibold hover:bg-warm-800 transition-colors flex items-center justify-center space-x-2"
+                disabled={isSubmitting}
+                className="w-full bg-warm-700 text-white py-4 px-6 rounded-lg font-semibold hover:bg-warm-800 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Send size={20} />
-                <span>Send Message</span>
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send size={20} />
+                    <span>Send Message</span>
+                  </>
+                )}
               </motion.button>
             </form>
           </motion.div>

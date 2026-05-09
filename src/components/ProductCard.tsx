@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, Eye } from 'lucide-react';
-import { Product } from '../utils/productData';
-import { addToWishlist, removeFromWishlist, isInWishlist, addToRecentlyViewed } from '../utils/storage';
+import { Product } from '../lib/supabase';
+import { addToRecentlyViewed } from '../utils/storage';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 
 interface ProductCardProps {
   product: Product;
@@ -13,10 +14,13 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, className = '' }) => {
-  const [isWishlisted, setIsWishlisted] = useState(isInWishlist(product.id));
+  const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
+  
+  // Use WishlistContext
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   
   // Add null safety check for CartContext
   let addToCart: (product: any, quantity?: number) => Promise<void>;
@@ -30,16 +34,29 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
     };
   }
 
-  const handleWishlistToggle = (e: React.MouseEvent) => {
+  // Check if product is in wishlist on component mount
+  useEffect(() => {
+    const checkWishlist = async () => {
+      const inWishlist = await isInWishlist(product.id);
+      setIsWishlisted(inWishlist);
+    };
+    checkWishlist();
+  }, [product.id, isInWishlist]);
+
+  const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (isWishlisted) {
-      removeFromWishlist(product.id);
-      setIsWishlisted(false);
-    } else {
-      addToWishlist(product);
-      setIsWishlisted(true);
+    try {
+      if (isWishlisted) {
+        await removeFromWishlist(product.id);
+        setIsWishlisted(false);
+      } else {
+        await addToWishlist(product);
+        setIsWishlisted(true);
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
     }
   };
 
@@ -56,11 +73,27 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
   };
 
   const handleProductClick = () => {
-    addToRecentlyViewed(product);
+    // Convert Supabase Product to legacy Product format for addToRecentlyViewed
+    const legacyProduct = {
+      id: parseInt(product.id),
+      name: product.name,
+      price: product.price,
+      originalPrice: product.original_price,
+      image: product.image,
+      images: [product.image],
+      description: product.description,
+      benefits: [],
+      category: product.category,
+      inStock: product.in_stock,
+      rating: product.rating,
+      reviews: product.reviews,
+      createdAt: product.created_at
+    };
+    addToRecentlyViewed(legacyProduct);
   };
 
-  const discountPercentage = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const discountPercentage = product.original_price 
+    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : 0;
 
   return (
@@ -176,9 +209,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
               <span className="text-lg font-bold text-gray-900">
                 ₹{product.price.toLocaleString()}
               </span>
-              {product.originalPrice && (
+              {product.original_price && (
                 <span className="text-sm text-gray-500 line-through">
-                  ₹{product.originalPrice.toLocaleString()}
+                  ₹{product.original_price.toLocaleString()}
                 </span>
               )}
             </div>
@@ -188,25 +221,25 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
         
         {/* Stock Status and Add to Cart - Always at bottom */}
         <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
-          <span className={`text-xs px-3 py-1.5 rounded-full font-medium whitespace-nowrap ${
-            product.inStock 
+          <span className={`text-xs px-2 py-1 rounded-full ${
+            product.in_stock 
               ? 'bg-green-100 text-green-700' 
               : 'bg-red-100 text-red-700'
           }`}>
-            {product.inStock ? 'In Stock' : 'Out of Stock'}
+            {product.in_stock ? 'In Stock' : 'Out of Stock'}
           </span>
           
           {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
-            disabled={!product.inStock}
+            disabled={!product.in_stock}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              product.inStock 
+              product.in_stock 
                 ? 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-lg' 
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
             }`}
           >
-            {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+            {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
           </button>
         </div>
       </div>

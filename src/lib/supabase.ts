@@ -148,6 +148,131 @@ export interface Database {
           created_at?: string
         }
       }
+      profiles: {
+        Row: {
+          id: string
+          user_id: string
+          full_name: string
+          email: string
+          phone: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          full_name?: string
+          email?: string
+          phone?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          full_name?: string
+          email?: string
+          phone?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      addresses: {
+        Row: {
+          id: string
+          user_id: string
+          full_name: string
+          phone: string
+          address_line_1: string
+          address_line_2: string
+          landmark: string
+          city: string
+          state: string
+          pincode: string
+          country: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          full_name: string
+          phone: string
+          address_line_1: string
+          address_line_2?: string
+          landmark?: string
+          city: string
+          state: string
+          pincode: string
+          country: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          full_name?: string
+          phone?: string
+          address_line_1?: string
+          address_line_2?: string
+          landmark?: string
+          city?: string
+          state?: string
+          pincode?: string
+          country?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      wishlist: {
+        Row: {
+          id: string
+          user_id: string
+          product_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          product_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          product_id?: string
+          created_at?: string
+        }
+      }
+      contact_messages: {
+        Row: {
+          id: string
+          user_id: string
+          full_name: string
+          email: string
+          subject: string
+          message: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          full_name: string
+          email: string
+          subject: string
+          message: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          full_name?: string
+          email?: string
+          subject?: string
+          message?: string
+          created_at?: string
+        }
+      }
     }
   }
 }
@@ -156,3 +281,7 @@ export type Product = Database['public']['Tables']['products']['Row']
 export type Cart = Database['public']['Tables']['cart']['Row']
 export type Order = Database['public']['Tables']['orders']['Row']
 export type OrderItem = Database['public']['Tables']['order_items']['Row']
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Address = Database['public']['Tables']['addresses']['Row']
+export type Wishlist = Database['public']['Tables']['wishlist']['Row']
+export type ContactMessage = Database['public']['Tables']['contact_messages']['Row']

@@ -4,12 +4,17 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, User, Mail, Phone, Calendar, Shield, Edit, Package, Heart, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { profileService, addressService, orderService } from '../services/database';
 
 const UserInfo: React.FC = () => {
   const { user, signOut } = useAuth();
   const { getCartCount } = useCart();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -24,16 +29,50 @@ const UserInfo: React.FC = () => {
     }
   }, [user, navigate]);
 
-  // Initialize form data from user metadata
+  // Load user data from database
   useEffect(() => {
-    if (user) {
-      setFormData({
-        firstName: user.user_metadata?.first_name || '',
-        lastName: user.user_metadata?.last_name || '',
-        email: user.email || '',
-        phone: user.user_metadata?.phone || ''
-      });
-    }
+    const loadUserData = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        
+        // Load profile
+        const userProfile = await profileService.getProfile(user.id);
+        if (userProfile) {
+          setProfile(userProfile);
+          setFormData({
+            firstName: userProfile.full_name?.split(' ')[0] || '',
+            lastName: userProfile.full_name?.split(' ')[1] || '',
+            email: userProfile.email || user.email || '',
+            phone: userProfile.phone || ''
+          });
+        } else {
+          // Fallback to user metadata if no profile exists
+          setFormData({
+            firstName: user.user_metadata?.first_name || '',
+            lastName: user.user_metadata?.last_name || '',
+            email: user.email || '',
+            phone: user.user_metadata?.phone || ''
+          });
+        }
+
+        // Load addresses
+        const userAddresses = await addressService.getUserAddresses(user.id);
+        setAddresses(userAddresses);
+
+        // Load orders
+        const userOrders = await orderService.getUserOrders(user.id);
+        setOrders(userOrders);
+        
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserData();
   }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,9 +81,24 @@ const UserInfo: React.FC = () => {
   };
 
   const handleSave = async () => {
-    // This would update user profile in Supabase
-    console.log('Saving user profile:', formData);
-    setIsEditing(false);
+    if (!user) return;
+    
+    try {
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      await profileService.updateProfile(user.id, {
+        full_name: fullName,
+        email: formData.email,
+        phone: formData.phone
+      });
+      
+      // Reload profile data
+      const updatedProfile = await profileService.getProfile(user.id);
+      setProfile(updatedProfile);
+      
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
   };
 
   const handleLogout = async () => {
@@ -54,6 +108,17 @@ const UserInfo: React.FC = () => {
 
   if (!user) {
     return null; // Will redirect via useEffect
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-warm-50 via-white to-warm-100 flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <User className="h-12 w-12 text-gray-400 mb-4" />
+          <p className="text-gray-500">Loading profile...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -213,6 +278,63 @@ const UserInfo: React.FC = () => {
                       <span className="text-sm font-medium text-green-600">Active</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Saved Addresses */}
+                <div className="pt-6 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Saved Addresses ({addresses.length})</h3>
+                  {addresses.length > 0 ? (
+                    <div className="space-y-3">
+                      {addresses.map((address, index) => (
+                        <div key={`address-${address.id}-${index}`} className="p-4 bg-gray-50 rounded-lg">
+                          <div className="space-y-1">
+                            <p className="font-medium text-gray-800">{address.full_name}</p>
+                            <p className="text-sm text-gray-600">{address.phone}</p>
+                            <p className="text-sm text-gray-600">
+                              {address.address_line_1}, {address.address_line_2 && `${address.address_line_2}, `}
+                              {address.city}, {address.state} - {address.pincode}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No saved addresses yet</p>
+                  )}
+                </div>
+
+                {/* Order History */}
+                <div className="pt-6 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Order History ({orders.length})</h3>
+                  {orders.length > 0 ? (
+                    <div className="space-y-3">
+                      {orders.map((order, index) => (
+                        <div key={`order-${order.id}-${index}`} className="p-4 bg-gray-50 rounded-lg">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium text-gray-800">Order #{order.id.substring(0, 8).toUpperCase()}</p>
+                              <p className="text-sm text-gray-600">
+                                {new Date(order.created_at).toLocaleDateString()} • {order.order_items?.length || 0} items
+                              </p>
+                              <p className="text-sm font-medium text-warm-700">
+                                ₹{order.total_amount?.toLocaleString()}
+                              </p>
+                            </div>
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                              order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                              order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {order.status || 'pending'}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No orders yet</p>
+                  )}
                 </div>
 
                 {/* Action Buttons */}

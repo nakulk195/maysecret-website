@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { WishlistProvider } from './contexts/WishlistContext';
 import AnnouncementBar from './components/AnnouncementBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import MobileBottomNav from './components/MobileBottomNav';
-import MobileSidebarClean from './components/MobileSidebarClean';
+import { MobileSidebarClean } from './components/MobileSidebarClean';
 import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -36,56 +37,57 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
-          <ScrollToTop />
-          <AnnouncementBar />
-          <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-          <div className="App pb-16 md:pb-0 w-full overflow-x-hidden">
-            <main>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/giftkit" element={<GiftKit />} />
-                <Route path="/product/:id" element={<ProductDetails />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/address" element={
-                  <ProtectedRoute>
-                    <Address />
-                  </ProtectedRoute>
-                } />
-                <Route path="/payment" element={
-                  <ProtectedRoute>
-                    <Payment />
-                  </ProtectedRoute>
-                } />
-                <Route path="/user-info" element={
-                  <ProtectedRoute>
-                    <UserInfo />
-                  </ProtectedRoute>
-                } />
-                <Route path="/checkout" element={
-                  <ProtectedRoute>
-                    <Checkout />
-                  </ProtectedRoute>
-                } />
-                <Route path="/order-success" element={<OrderSuccess />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/offer" element={<Offer />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/recently-viewed" element={<RecentlyViewed />} />
-                <Route path="/quiz" element={<Quiz />} />
-                <Route path="/skincare-tips" element={<SkincareTipsPage />} />
-                {/* Add protected routes here if needed */}
-              </Routes>
-            </main>
-            <Footer />
-            <MobileBottomNav />
-          </div>
-          <MobileSidebarClean isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
-        </Router>
+        <WishlistProvider>
+          <Router>
+            <ScrollToTop />
+            <AnnouncementBar />
+            <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+            <div className="App pb-16 md:pb-0 w-full overflow-x-hidden">
+              <main>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/giftkit" element={<GiftKit />} />
+                  <Route path="/product/:id" element={<ProductDetails />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/address" element={
+                    <ProtectedRoute>
+                      <Address />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/payment" element={
+                    <ProtectedRoute>
+                      <Payment />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/user-info" element={
+                    <ProtectedRoute>
+                      <UserInfo />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/checkout" element={
+                    <ProtectedRoute>
+                      <Checkout />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/order-success" element={<OrderSuccess />} />
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/offer" element={<Offer />} />
+                  <Route path="/search" element={<Search />} />
+                  <Route path="/recently-viewed" element={<RecentlyViewed />} />
+                  <Route path="/quiz" element={<Quiz />} />
+                  <Route path="/skincare-tips" element={<SkincareTipsPage />} />
+                </Routes>
+              </main>
+              <Footer />
+              <MobileBottomNav />
+            </div>
+            <MobileSidebarClean isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
+          </Router>
+        </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   );

@@ -1,11 +1,4 @@
 const Razorpay = require('razorpay');
-const { createClient } = require('@supabase/supabase-js');
-
-// Initialize Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
@@ -13,33 +6,31 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-exports.handler = async (event, context) => {
+module.exports = async (req, res) => {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      },
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   try {
-    const { amount, currency = 'INR', receipt } = JSON.parse(event.body);
+    const { amount, currency = 'INR', receipt } = req.body;
 
     // Validate amount
     if (!amount || amount <= 0) {
-      return {
-        statusCode: 400,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type',
-        },
-        body: JSON.stringify({ error: 'Invalid amount' }),
-      };
+      res.status(400).json({ error: 'Invalid amount' });
+      return;
     }
 
     // Create Razorpay order
@@ -50,30 +41,16 @@ exports.handler = async (event, context) => {
       payment_capture: 1, // Auto capture payment
     });
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-      body: JSON.stringify({
-        success: true,
-        order: order,
-      }),
-    };
+    res.status(200).json({
+      success: true,
+      order: order,
+    });
   } catch (error) {
     console.error('Error creating Razorpay order:', error);
-    return {
-      statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-      body: JSON.stringify({
-        success: false,
-        error: 'Failed to create order',
-        message: error.message,
-      }),
-    };
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create order',
+      message: error.message,
+    });
   }
 };

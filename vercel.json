@@ -23,6 +23,11 @@
       "dest": "/index.html"
     }
   ],
+  "functions": {
+    "api/*.js": {
+      "runtime": "@vercel/node"
+    }
+  },
   "env": {
     "RAZORPAY_KEY_ID": "rzp_live_SnfN5ldcu6oeYy",
     "RAZORPAY_KEY_SECRET": "2OL4Ur6DHgl368567PmzzlZ1",

@@ -206,7 +206,7 @@ const Payment: React.FC = () => {
       const razorpayOrder = await createRazorpayOrder();
 
       const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5GQV',
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_live_SnfN5ldcu6oeYy',
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         name: 'MAY SECRET',

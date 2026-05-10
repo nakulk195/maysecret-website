@@ -1,49 +1,8 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/create-order.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/manifest.json",
-      "dest": "/manifest.json"
-    },
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "functions": {
-    "api/*.js": {
-      "runtime": "@vercel/node"
-    }
-  },
-  "env": {
-    "RAZORPAY_KEY_ID": "rzp_live_SnfN5ldcu6oeYy",
-    "RAZORPAY_KEY_SECRET": "2OL4Ur6DHgl368567PmzzlZ1",
-    "SUPABASE_URL": "https://vhagoajwgolskffqkmqd.supabase.co",
-    "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoYWdvYWp3Z29sc2tmZnFrbXFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzAwNjAsImV4cCI6MjA5MzgwNjA2MH0.iCpoEEUj2b2fQ8__4qB7Hxd18U1GUGnWalU0FS5-Kpk"
-  }
+  ]
 }

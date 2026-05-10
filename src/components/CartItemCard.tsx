@@ -2,26 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Trash2, Plus, Minus, Star } from 'lucide-react';
-
-interface CartProduct {
-  id: number;
-  name: string;
-  price: number | string;
-  image: string;
-  inStock: boolean;
-  description?: string;
-  rating?: number;
-  reviews?: number;
-  originalPrice?: number | string;
-}
-
-interface CartItem {
-  id: number;
-  cartId: number;
-  productId: number;
-  quantity: number;
-  cartProduct?: CartProduct; // Make cartProduct optional
-}
+import { CartItem } from '../contexts/CartContext';
+import { Product } from '../lib/supabase';
 
 interface CartItemCardProps {
   item: CartItem;
@@ -40,11 +22,11 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
 
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity < 1) return;
-    onQuantityChange(String(item.productId), newQuantity);
+    onQuantityChange(item.product_id, newQuantity);
   };
 
   const handleRemove = () => {
-    onRemove(String(item.productId));
+    onRemove(item.product_id);
   };
 
   if (!item.cartProduct) {
@@ -58,9 +40,9 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
           <button
             onClick={handleRemove}
             className="text-red-500 hover:text-red-700 p-1"
-            disabled={updatingItem === String(item.id)}
+            disabled={updatingItem === item.id}
           >
-            {updatingItem === String(item.id) ? (
+            {updatingItem === item.id ? (
               <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-red-500"></div>
             ) : (
               <Trash2 size={18} />
@@ -71,15 +53,8 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
     );
   }
 
-  const price = typeof item.cartProduct.price === 'string' 
-    ? parseFloat(item.cartProduct.price)
-    : item.cartProduct.price;
-    
-  const originalPrice = item.cartProduct.originalPrice
-    ? (typeof item.cartProduct.originalPrice === 'string'
-        ? parseFloat(item.cartProduct.originalPrice)
-        : item.cartProduct.originalPrice)
-    : undefined;
+  const price = Number(item.cartProduct?.price || 0);
+  const originalPrice = Number(item.cartProduct?.original_price || 0) || undefined;
 
   return (
     <motion.div
@@ -92,7 +67,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
         <div className="flex items-start space-x-4">
           {/* Product Image */}
           <div className="flex-shrink-0">
-            <Link to={`/product/${item.productId}`}>
+            <Link to={`/product/${item.product_id}`}>
               <div className="relative w-24 h-24 rounded-lg overflow-hidden">
                 {item.cartProduct?.image ? (
                   <>
@@ -122,7 +97,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
 
           {/* Product Details */}
           <div className="flex-1 min-w-0">
-            <Link to={`/product/${item.productId}`}>
+            <Link to={`/product/${item.product_id}`}>
               <h3 className="text-lg font-semibold text-gray-800 hover:text-warm-700 transition-colors mb-2">
                 {item.cartProduct?.name || 'Product'}
               </h3>
@@ -173,19 +148,19 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => handleQuantityChange(item.quantity - 1)}
-                disabled={updatingItem === String(item.id)}
+                disabled={updatingItem === item.id}
                 className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 <Minus size={16} />
               </button>
               
               <span className="text-gray-800 font-medium min-w-[2rem] text-center">
-                {updatingItem === String(item.id) ? '...' : item.quantity}
+                {updatingItem === item.id ? '...' : item.quantity}
               </span>
               
               <button
                 onClick={() => handleQuantityChange(item.quantity + 1)}
-                disabled={updatingItem === String(item.id)}
+                disabled={updatingItem === item.id}
                 className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 <Plus size={16} />

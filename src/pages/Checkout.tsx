@@ -124,8 +124,7 @@ const Checkout: React.FC = () => {
 
       // Prepare order items for Supabase
       const orderItems = cart.map(item => ({
-        product_id: item.cartProduct?.id || item.id,
-        product_name: item.cartProduct?.name || 'Product',
+        product_id: item.product_id,
         quantity: item.quantity,
         price: Number(item.cartProduct?.price || 0)
       }));
@@ -143,7 +142,20 @@ const Checkout: React.FC = () => {
         id: createdOrder.id,
         items: cart.map(item => ({
           ...item,
-          cartProduct: item.cartProduct || item,
+          cartProduct: item.cartProduct || {
+            id: '',
+            name: 'Product',
+            price: 0,
+            image: '',
+            description: '',
+            category: '',
+            in_stock: false,
+            is_featured: false,
+            rating: 0,
+            reviews: 0,
+            created_at: '',
+            updated_at: ''
+          },
           price: Number(item.cartProduct?.price || 0)
         })),
         total: Number(getCartTotal() || 0),
@@ -485,24 +497,44 @@ const Checkout: React.FC = () => {
           <div className="mt-8 bg-white rounded-lg shadow-md p-6">
             <h3 className="text-lg font-medium mb-4">Order Summary</h3>
             <div className="space-y-4">
-              {cart.map((item, index) => (
-                <div key={`checkout-${item.id}-${index}`} className="flex justify-between">
-                  <div className="flex items-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-md mr-4 overflow-hidden">
-                      <img
-                        src={item.cartProduct.image}
-                        alt={item.cartProduct.name}
-                        className="w-full h-full object-cover"
-                      />
+              {cart.map((item, index) => {
+                if (!item.cartProduct) {
+                  return (
+                    <div key={`checkout-${item.id}-${index}`} className="flex justify-between p-4 bg-red-50 border border-red-200 rounded-lg mb-4">
+                      <div className="flex items-center">
+                        <div className="w-16 h-16 bg-gray-100 rounded-md mr-4 overflow-hidden">
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                            <span className="text-gray-500 text-xs">No image</span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="font-medium text-red-600">Product Unavailable</p>
+                          <p className="text-sm text-gray-500">ID: {item.product_id}</p>
+                        </div>
+                      </div>
+                      <p className="font-medium text-red-600">₹0</p>
                     </div>
-                    <div>
-                      <p className="font-medium">{item.cartProduct.name}</p>
-                      <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                  );
+                }
+                return (
+                  <div key={`checkout-${item.id}-${index}`} className="flex justify-between">
+                    <div className="flex items-center">
+                      <div className="w-16 h-16 bg-gray-100 rounded-md mr-4 overflow-hidden">
+                        <img
+                          src={item.cartProduct?.image || '/placeholder-product.jpg'}
+                          alt={item.cartProduct?.name || 'Product'}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <p className="font-medium">{item.cartProduct?.name || 'Product'}</p>
+                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                      </div>
                     </div>
+                    <p className="font-medium">₹{Number(item.cartProduct?.price || 0) * item.quantity}</p>
                   </div>
-                  <p className="font-medium">₹{Number(item.cartProduct.price) * item.quantity}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="border-t border-gray-200 mt-6 pt-4">
               <div className="flex justify-between mb-2">

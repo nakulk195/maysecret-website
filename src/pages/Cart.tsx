@@ -138,7 +138,7 @@ const Cart: React.FC = () => {
                           <div key={`cart-${item.id}`} className="p-4 bg-red-50 border border-red-200 rounded-lg mb-4">
                             <p className="text-red-600">⚠️ Product details unavailable (ID: {item.id})</p>
                             <button 
-                              onClick={() => handleRemoveItem(String(item.productId))}
+                              onClick={() => handleRemoveItem(item.product_id)}
                               className="mt-2 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
                             >
                               Remove from cart

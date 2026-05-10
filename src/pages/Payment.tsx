@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, CreditCard, Smartphone, Shield, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
-import { orderService } from '../services/database';
+import { supabase } from '../lib/supabase';
 
 // Razorpay script
 const loadRazorpayScript = () => {
@@ -19,7 +19,7 @@ const loadRazorpayScript = () => {
 
 const Payment: React.FC = () => {
   const { user } = useAuth();
-  const { cart, getCartTotal } = useCart();
+  const { cart, getCartTotal, clearCart } = useCart();
   const navigate = useNavigate();
   
   const [isProcessing, setIsProcessing] = useState(false);
@@ -115,6 +115,85 @@ const Payment: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const createRazorpayOrder = async () => {
+    try {
+      const response = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: getCartTotal(),
+          currency: 'INR',
+          receipt: `receipt_${Date.now()}`,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to create order');
+      }
+
+      return data.order;
+    } catch (error) {
+      console.error('Error creating Razorpay order:', error);
+      throw error;
+    }
+  };
+
+  const saveOrderToSupabase = async (razorpayPaymentId: string, razorpayOrderId: string) => {
+    try {
+      if (!user || !address) return;
+
+      // Create order in Supabase
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          total_amount: getCartTotal(),
+          payment_id: razorpayPaymentId,
+          razorpay_order_id: razorpayOrderId,
+          address_id: null, // Will be updated later
+          payment_status: 'completed',
+          order_status: 'processing',
+          shipping_address: address
+        })
+        .select()
+        .single();
+
+      if (orderError) {
+        throw new Error('Failed to save order');
+      }
+
+      // Save order items
+      const orderItems = cart.map(item => ({
+        order_id: orderData.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: Number(item.cartProduct?.price || 0)
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) {
+        throw new Error('Failed to save order items');
+      }
+
+      return orderData;
+    } catch (error) {
+      console.error('Error saving order to database:', error);
+      throw error;
+    }
+  };
+
   const handlePayment = async () => {
     if (!validateForm()) return;
 
@@ -123,91 +202,74 @@ const Payment: React.FC = () => {
       // Load Razorpay script
       await loadRazorpayScript();
 
+      // Create Razorpay order from backend
+      const razorpayOrder = await createRazorpayOrder();
+
       const options = {
-        key: 'rzp_test_1DP5mmOlF5GQV', // Replace with your Razorpay key
-        amount: getCartTotal() * 100, // Convert to paise
-        currency: 'INR',
-        name: 'Maysecret',
-        description: 'Order Payment',
-        image: '/images/Maysecret_logo.svg',
-        handler: function (response: any) {
-          // Payment successful
-          console.log('Payment successful:', response);
-          
-          // Save order to Supabase
-          saveOrderToSupabase(response.razorpay_payment_id);
-          
-          // Redirect to success page
-          navigate('/order-success');
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5GQV',
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: 'MAY SECRET',
+        description: 'Purchase of premium skincare products',
+        order_id: razorpayOrder.id,
+        handler: async function(response: any) {
+          try {
+            // Payment successful
+            const orderData = await saveOrderToSupabase(
+              response.razorpay_payment_id,
+              response.razorpay_order_id
+            );
+
+            // Clear cart
+            await clearCart();
+
+            // Clear shipping address from localStorage
+            localStorage.removeItem('shipping_address');
+
+            // Redirect to orders page
+            navigate('/orders');
+          } catch (error) {
+            console.error('Error processing payment success:', error);
+            alert('Payment successful but failed to save order. Please contact support.');
+          } finally {
+            setIsProcessing(false);
+          }
         },
         prefill: {
-          name: user?.user_metadata?.first_name || 'Customer',
-          email: user?.email || '',
+          name: address?.fullName || user?.user_metadata?.first_name || 'Customer',
+          email: address?.emailAddress || user?.email || '',
           contact: address?.mobileNumber || ''
         },
         theme: {
-          color: '#334155'
+          color: '#e91e63', // Pink color matching brand
         },
         modal: {
           ondismiss: function() {
             setIsProcessing(false);
-          }
-        }
+          },
+        },
       };
 
       const razorpay = new (window as any).Razorpay(options);
       razorpay.open();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment error:', error);
       setIsProcessing(false);
-    }
-  };
-
-  const saveOrderToSupabase = async (paymentId: string) => {
-    try {
-      if (!user || !address) {
-        throw new Error('User or address data missing');
+      
+      // Show user-friendly error message
+      const errorMessage = error?.message || 'Unknown error occurred. Please try again or contact support.';
+      if (errorMessage.includes('Insufficient balance')) {
+        alert('Insufficient balance in your Razorpay account. Please add funds or try another payment method.');
+      } else if (errorMessage.includes('Payment cancelled')) {
+        // User cancelled - no error message needed
+      } else {
+        alert(`Payment failed: ${errorMessage}`);
       }
-
-      // Prepare order data
-      const orderData = {
-        total_amount: getCartTotal(),
-        shipping_address: address,
-        payment_id: paymentId
-      };
-
-      // Prepare order items
-      const orderItems = cart.map(item => ({
-        product_id: item.productId,
-        quantity: item.quantity,
-        price: typeof item.cartProduct?.price === 'string' 
-          ? parseFloat(item.cartProduct.price) 
-          : (item.cartProduct?.price || 0)
-      }));
-
-      // Save order to Supabase
-      const { order, items } = await orderService.createOrder(user.id, orderData, orderItems);
-      
-      console.log('Order saved successfully:', order);
-      
-      // Store order in localStorage as backup
-      localStorage.setItem('last_order', JSON.stringify({
-        user_id: user?.id,
-        address: address,
-        cart: cart,
-        total: getCartTotal(),
-        payment_id: paymentId,
-        payment_status: 'success',
-        created_at: new Date().toISOString()
-      }));
-      
-    } catch (error) {
-      console.error('Error saving order:', error);
-      throw error;
     }
   };
 
+  // ... (rest of the code remains the same)
   if (!user) {
     return null; // Will redirect via useEffect
   }
@@ -514,10 +576,7 @@ const Payment: React.FC = () => {
                     {/* Price */}
                     <div className="text-right">
                       <p className="text-sm font-semibold text-warm-700">
-                        ₹{typeof item.cartProduct?.price === 'string' 
-                          ? (parseFloat(item.cartProduct.price) * item.quantity).toLocaleString()
-                          : ((item.cartProduct?.price || 0) * item.quantity).toLocaleString()
-                        }
+                        ₹{Number(item.cartProduct?.price || 0) * item.quantity}
                       </p>
                     </div>
                   </div>

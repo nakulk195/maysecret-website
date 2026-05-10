@@ -72,7 +72,11 @@ function App() {
                     </ProtectedRoute>
                   } />
                   <Route path="/order-success" element={<OrderSuccess />} />
-                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/orders" element={
+                    <ProtectedRoute>
+                      <Orders />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/wishlist" element={<Wishlist />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/offer" element={<Offer />} />

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Star } from 'lucide-react';
 import { products } from '../utils/productData';
 import { useCart } from '../contexts/CartContext';
+import type { Product } from '../lib/supabase';
 import ProductCard from '../components/ProductCard';
 import comingSoonImg from '../assets/images/coming-soon.png';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
@@ -21,7 +22,7 @@ import { BRAND_NAME } from '../config/brand';
 
 const Home: React.FC = () => {
   // Add null safety check for CartContext
-  let addToCart: (product: any, quantity?: number) => Promise<void>;
+  let addToCart: (product: Product, quantity?: number) => Promise<void>;
   try {
     const cartContext = useCart();
     addToCart = cartContext.addToCart;
@@ -32,7 +33,7 @@ const Home: React.FC = () => {
     };
   }
 
-  const handleAddToCart = async (product: any) => {
+  const handleAddToCart = async (product: Product) => {
     try {
       await addToCart(product, 1);
     } catch (error) {

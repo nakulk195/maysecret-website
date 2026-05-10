@@ -35,7 +35,6 @@ export class PaymentService {
 
       return new (window as any).Razorpay({
         key_id: process.env.REACT_APP_RAZORPAY_KEY_ID,
-        key_secret: process.env.REACT_APP_RAZORPAY_KEY_SECRET,
       });
     } catch (error) {
       console.error('Error initializing Razorpay:', error);

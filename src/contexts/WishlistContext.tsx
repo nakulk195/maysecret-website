@@ -51,7 +51,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
               .from('products')
               .select('*')
               .eq('id', item.product_id)
-              .single();
+              .maybeSingle();
             
             return product;
           })

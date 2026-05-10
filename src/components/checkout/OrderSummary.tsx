@@ -32,50 +32,75 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       
       {showItems && (
         <div className="divide-y divide-gray-200">
-          {items.map((item, index) => (
-            <div key={`order-summary-${item.id}-${index}`} className="p-4 flex items-center">
-              <div className="flex-shrink-0 h-16 w-16 rounded-md overflow-hidden bg-gray-100">
-                {item.cartProduct.image ? (
-                  <img
-                    src={item.cartProduct.image}
-                    alt={item.cartProduct.name}
-                    className="h-full w-full object-cover object-center"
-                  />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center bg-gray-200 text-gray-400">
-                    <svg
-                      className="h-8 w-8"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
+          {items.map((item, index) => {
+            if (!item.cartProduct) {
+              return (
+                <div key={`order-summary-${item.id}-${index}`} className="p-4 flex items-center bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex-shrink-0 h-16 w-16 rounded-md overflow-hidden bg-gray-100">
+                    <div className="h-full w-full flex items-center justify-center bg-gray-200 text-gray-400">
+                      <span className="text-xs">No image</span>
+                    </div>
                   </div>
-                )}
-              </div>
-              <div className="ml-4 flex-1">
-                <div className="flex justify-between text-base font-medium text-gray-900">
-                  <h3 className="line-clamp-1">{item.cartProduct.name}</h3>
-                  <p className="ml-4 whitespace-nowrap">
-                    ₹{parseFloat(item.cartProduct.price).toLocaleString('en-IN')}
-                  </p>
+                  <div className="ml-4 flex-1">
+                    <div className="flex justify-between text-base font-medium text-gray-900">
+                      <h3 className="line-clamp-1 text-red-600">Product Unavailable</h3>
+                      <p className="ml-4 whitespace-nowrap">
+                        ₹0
+                      </p>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-500 mt-1">
+                      <p>ID: {item.product_id}</p>
+                      <p>Qty: {item.quantity}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm text-gray-500 mt-1">
-                  <p>Qty: {item.quantity}</p>
-                  <p>
-                    ₹{(parseFloat(item.cartProduct.price) * item.quantity).toLocaleString('en-IN')}
-                  </p>
+              );
+            }
+            return (
+              <div key={`order-summary-${item.id}-${index}`} className="p-4 flex items-center">
+                <div className="flex-shrink-0 h-16 w-16 rounded-md overflow-hidden bg-gray-100">
+                  {item.cartProduct.image ? (
+                    <img
+                      src={item.cartProduct.image}
+                      alt={item.cartProduct.name}
+                      className="h-full w-full object-cover object-center"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center bg-gray-200 text-gray-400">
+                      <svg
+                        className="h-8 w-8"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <div className="ml-4 flex-1">
+                  <div className="flex justify-between text-base font-medium text-gray-900">
+                    <h3 className="line-clamp-1">{item.cartProduct.name}</h3>
+                    <p className="ml-4 whitespace-nowrap">
+                      ₹{Number(item.cartProduct.price || 0).toLocaleString('en-IN')}
+                    </p>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-500 mt-1">
+                    <p>Qty: {item.quantity}</p>
+                    <p>
+                      ₹{Number(item.cartProduct.price || 0) * item.quantity}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       

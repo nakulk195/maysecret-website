@@ -10,14 +10,14 @@ export const profileService = {
         .from('profiles')
         .insert([
           {
-            user_id: userId,
+            id: userId,
             full_name: fullName,
             email: email,
             phone: phone
           }
         ])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -33,8 +33,8 @@ export const profileService = {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', userId)
-        .single();
+        .eq('id', userId)
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       return data;
@@ -50,9 +50,9 @@ export const profileService = {
       const { data, error } = await supabase
         .from('profiles')
         .update(updates)
-        .eq('user_id', userId)
+        .eq('id', userId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -77,7 +77,7 @@ export const addressService = {
           }
         ])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -112,7 +112,7 @@ export const addressService = {
         .update(updates)
         .eq('id', addressId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -153,7 +153,7 @@ export const wishlistService = {
           }
         ])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -205,7 +205,7 @@ export const wishlistService = {
         .select('*')
         .eq('user_id', userId)
         .eq('product_id', productId)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       return !!data;
@@ -230,7 +230,7 @@ export const contactService = {
           }
         ])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -276,7 +276,7 @@ export const orderService = {
           }
         ])
         .select()
-        .single();
+        .maybeSingle();
 
       if (orderError) throw orderError;
 
@@ -339,7 +339,7 @@ export const orderService = {
         `)
         .eq('id', orderId)
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -357,7 +357,7 @@ export const orderService = {
         .update({ status })
         .eq('id', orderId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;

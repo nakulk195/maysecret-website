@@ -23,7 +23,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   
   // Add null safety check for CartContext
-  let addToCart: (product: any, quantity?: number) => Promise<void>;
+  let addToCart: (product: Product, quantity?: number) => Promise<void>;
   try {
     const cartContext = useCart();
     addToCart = cartContext.addToCart;
@@ -75,7 +75,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
   const handleProductClick = () => {
     // Convert Supabase Product to legacy Product format for addToRecentlyViewed
     const legacyProduct = {
-      id: parseInt(product.id),
+      id: parseInt(product.id) || 0, // Convert string ID to number for legacy compatibility
       name: product.name,
       price: product.price,
       originalPrice: product.original_price,

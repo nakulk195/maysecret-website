@@ -72,7 +72,23 @@ const ProductDetails: React.FC = () => {
 
   const handleAddToCart = async () => {
     try {
-      await addToCart(product, quantity);
+      // Convert legacy product to Supabase Product format
+      const supabaseProduct = {
+        id: String(product.id),
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        original_price: product.originalPrice,
+        image: product.image,
+        category: product.category,
+        in_stock: product.inStock,
+        is_featured: product.isFeatured || false,
+        rating: product.rating,
+        reviews: product.reviews,
+        created_at: product.createdAt,
+        updated_at: product.createdAt
+      };
+      await addToCart(supabaseProduct, quantity);
       // You can add a success notification here
     } catch (error) {
       console.error('Error adding to cart:', error);

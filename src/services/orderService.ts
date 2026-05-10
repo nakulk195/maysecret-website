@@ -32,16 +32,16 @@ export class OrderService {
           status: 'pending'
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (orderError) throw orderError;
 
       // Create order items
       const orderItems = cartItems.map(item => ({
         order_id: order.id,
-        product_id: item.productId,
+        product_id: item.product_id,
         quantity: item.quantity,
-        price: parseFloat(item.cartProduct.price.toString())
+        price: Number(item.cartProduct?.price || 0)
       }));
 
       const { error: itemsError } = await supabase
@@ -93,7 +93,7 @@ export class OrderService {
           )
         `)
         .eq('id', orderId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;

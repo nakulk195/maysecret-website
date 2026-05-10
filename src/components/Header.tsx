@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShoppingBag, 
   Heart, 
@@ -28,14 +29,36 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
   const { user, profile, signOut } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { getCartCount } = useCart();
   const navigate = useNavigate();
+  const mobileProfileDropdownRef = useRef<HTMLDivElement>(null);
+  const desktopProfileDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Auth state is now handled by AuthContext
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        mobileProfileDropdownRef.current && 
+        !mobileProfileDropdownRef.current.contains(event.target as Node) &&
+        desktopProfileDropdownRef.current && 
+        !desktopProfileDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+  };
+
+  const closeProfileDropdown = () => {
+    setIsProfileDropdownOpen(false);
   };
 
   const toggleSearch = () => {
@@ -89,46 +112,91 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
 
           {/* Profile/Login Icon */}
           {user ? (
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label="User menu"
-            >
-              <User className="w-6 h-6 text-gray-700" />
-            </button>
+            <div className="relative" ref={mobileProfileDropdownRef}>
+              <button
+                onClick={() => {
+                  setIsProfileDropdownOpen(!isProfileDropdownOpen);
+                  setIsMenuOpen(false); // Close sidebar if open
+                }}
+                className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="User menu"
+              >
+                <User className="w-6 h-6 text-gray-700" />
+              </button>
+
+              {/* Mobile Profile Dropdown */}
+              <AnimatePresence>
+                {isProfileDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 top-12 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 md:hidden"
+                  >
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">
+                        Hello, {profile?.full_name?.split(' ')[0] || user?.user_metadata?.first_name || 'User'} 👋
+                      </p>
+                    </div>
+                    <Link
+                      to="/user-info"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      onClick={() => {
+                        closeProfileDropdown();
+                        closeMenu();
+                      }}
+                    >
+                      User Info
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      onClick={() => {
+                        closeProfileDropdown();
+                        closeMenu();
+                      }}
+                    >
+                      Orders
+                    </Link>
+                    <Link
+                      to="/wishlist"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      onClick={() => {
+                        closeProfileDropdown();
+                        closeMenu();
+                      }}
+                    >
+                      Wishlist
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        await signOut();
+                        closeProfileDropdown();
+                        closeMenu();
+                        navigate('/');
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           ) : (
-            <Link to="/login" className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors" onClick={closeMenu}>
+            <Link 
+              to="/login" 
+              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors" 
+              onClick={() => {
+                closeMenu();
+                closeProfileDropdown();
+              }}
+            >
               <User className="w-6 h-6 text-gray-700" />
             </Link>
           )}
 
-        {/* Mobile Profile Dropdown */}
-        {user && isMenuOpen && (
-          <div className="absolute right-4 top-16 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 md:hidden">
-            <div className="px-4 py-2 border-b border-gray-100">
-              <p className="text-sm font-medium text-gray-900">
-                Hello, {user?.user_metadata?.first_name || 'User'} 👋
-              </p>
-            </div>
-            <Link
-              to="/user-info"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-              onClick={closeMenu}
-            >
-              User Info
-            </Link>
-            <button
-              onClick={async () => {
-                await signOut();
-                closeMenu();
-                window.location.href = '/login';
-              }}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-            >
-              Logout
-            </button>
-          </div>
-        )}
         </header>
 
         {/* Search Bar - Mobile only */}
@@ -211,9 +279,12 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
               </button>
 
               {/* User Menu */}
-              <div className="relative">
+              <div className="relative" ref={desktopProfileDropdownRef}>
                 <button
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  onClick={() => {
+                    setIsProfileDropdownOpen(!isProfileDropdownOpen);
+                    setIsMenuOpen(false); // Close sidebar if open
+                  }}
                   className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                   aria-label="User menu"
                 >
@@ -224,47 +295,81 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
                 </button>
 
                 {/* Dropdown Menu */}
-                {isMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                    {user ? (
-                      <>
-                        <div className="px-4 py-2 border-b border-gray-100">
-                          <p className="text-sm font-medium text-gray-900">
-                            Hello, {profile?.full_name?.split(' ')[0] || user?.user_metadata?.first_name || 'User'} 👋
-                          </p>
-                        </div>
-                        <Link
-                          to="/user-info"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                          onClick={closeMenu}
-                        >
-                          User Info
-                        </Link>
-                        <button
-                          onClick={async () => {
-                            await signOut();
-                            closeMenu();
-                            // Force a small delay to ensure auth state updates
-                            setTimeout(() => navigate('/'), 100);
-                          }}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                        >
-                          Logout
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <Link
-                          to="/login"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                          onClick={closeMenu}
-                        >
-                          Login
-                        </Link>
-                      </>
-                    )}
-                  </div>
-                )}
+                <AnimatePresence>
+                  {isProfileDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
+                    >
+                      {user ? (
+                        <>
+                          <div className="px-4 py-2 border-b border-gray-100">
+                            <p className="text-sm font-medium text-gray-900">
+                              Hello, {profile?.full_name?.split(' ')[0] || user?.user_metadata?.first_name || 'User'} 👋
+                            </p>
+                          </div>
+                          <Link
+                            to="/user-info"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            onClick={() => {
+                              closeProfileDropdown();
+                              closeMenu();
+                            }}
+                          >
+                            User Info
+                          </Link>
+                          <Link
+                            to="/orders"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            onClick={() => {
+                              closeProfileDropdown();
+                              closeMenu();
+                            }}
+                          >
+                            Orders
+                          </Link>
+                          <Link
+                            to="/wishlist"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            onClick={() => {
+                              closeProfileDropdown();
+                              closeMenu();
+                            }}
+                          >
+                            Wishlist
+                          </Link>
+                          <button
+                            onClick={async () => {
+                              await signOut();
+                              closeProfileDropdown();
+                              closeMenu();
+                              navigate('/');
+                            }}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                          >
+                            Logout
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <Link
+                            to="/login"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            onClick={() => {
+                              closeProfileDropdown();
+                              closeMenu();
+                            }}
+                          >
+                            Login
+                          </Link>
+                        </>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>

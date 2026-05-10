@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "MAY SECRET",
+  "name": "MAY SECRET - Premium Korean Beauty",
+  "description": "Premium Korean Beauty Products. Discover natural beauty with our exclusive range of cosmetics.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,8 +19,9 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#e91e63",
+  "background_color": "#ffffff",
+  "orientation": "portrait"
 }

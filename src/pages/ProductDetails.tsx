@@ -78,9 +78,10 @@ const ProductDetails: React.FC = () => {
         name: product.name,
         description: product.description,
         price: product.price,
+        original_price: product.originalPrice,
         image: product.image,
         category: product.category,
-        in_stock: product.inStock,
+        stock: product.inStock ? 1 : 0, // Convert boolean inStock to numeric stock
         is_featured: product.isFeatured || false,
         rating: product.rating,
         reviews: product.reviews,

@@ -27,7 +27,7 @@ const Shop: React.FC = () => {
       try {
         const { data, error } = await supabase
           .from('products')
-          .select('*')
+          .select('id, name, description, price, original_price, image, stock, category, is_featured, rating, reviews, created_at, updated_at')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -37,6 +37,7 @@ const Shop: React.FC = () => {
         console.error('Error loading products:', error);
         setProducts([]);
         setFilteredProducts([]);
+        setLoading(false);
       } finally {
         setLoading(false);
       }
@@ -366,14 +367,14 @@ const Shop: React.FC = () => {
                       
                       <button
                         onClick={() => handleAddToCart(product)}
-                        disabled={!product.in_stock}
+                        disabled={!product.stock}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          product.in_stock
+                          product.stock > 0
                             ? 'bg-rose-600 text-white hover:bg-rose-700'
                             : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         }`}
                       >
-                        {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
+                        {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
                       </button>
                     </div>
                   </div>

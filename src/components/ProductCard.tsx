@@ -78,12 +78,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
       id: parseInt(product.id) || 0, // Convert string ID to number for legacy compatibility
       name: product.name,
       price: product.price,
+      originalPrice: product.original_price,
       image: product.image,
       images: [product.image],
       description: product.description,
       benefits: [],
       category: product.category,
-      inStock: product.in_stock,
+      inStock: product.stock > 0,
       rating: product.rating,
       reviews: product.reviews,
       createdAt: product.created_at
@@ -214,24 +215,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
         {/* Stock Status and Add to Cart - Always at bottom */}
         <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
           <span className={`text-xs px-2 py-1 rounded-full ${
-            product.in_stock 
+            product.stock > 0 
               ? 'bg-green-100 text-green-700' 
               : 'bg-red-100 text-red-700'
           }`}>
-            {product.in_stock ? 'In Stock' : 'Out of Stock'}
+            {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
           </span>
           
           {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
-            disabled={!product.in_stock}
+            disabled={!product.stock}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              product.in_stock 
+              product.stock > 0 
                 ? 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-lg' 
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
             }`}
           >
-            {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
+            {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
           </button>
         </div>
       </div>

@@ -121,11 +121,11 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
             
             {/* Stock Status */}
             <span className={`text-xs px-2 py-1 rounded-full ${
-              product.in_stock 
+              product.stock > 0 
                 ? 'bg-green-100 text-green-700' 
                 : 'bg-red-100 text-red-700'
             }`}>
-              {product.in_stock ? 'In Stock' : 'Out of Stock'}
+              {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
             </span>
           </div>
         </Link>
@@ -136,7 +136,7 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleAddToCart}
-            disabled={!product.in_stock}
+            disabled={!product.stock}
             className="flex-1 bg-warm-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-warm-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             <ShoppingCart size={16} />

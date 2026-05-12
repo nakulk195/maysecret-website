@@ -31,7 +31,7 @@ const Home: React.FC = () => {
       try {
         const { data, error } = await supabase
           .from('products')
-          .select('*')
+          .select('id, name, description, price, original_price, image, stock, category, is_featured, rating, reviews, created_at, updated_at')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -39,6 +39,7 @@ const Home: React.FC = () => {
       } catch (error) {
         console.error('Error loading products:', error);
         setProducts([]);
+        setLoading(false);
       } finally {
         setLoading(false);
       }

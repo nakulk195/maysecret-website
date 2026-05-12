@@ -13,7 +13,7 @@ interface OrderItem {
     name: string;
     price: string;
     image: string;
-    inStock: boolean;
+    stock: number;
   };
 }
 

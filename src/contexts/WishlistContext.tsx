@@ -42,6 +42,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
       try {
         setLoading(true);
+        console.log('Fetching wishlist from Supabase for user:', user.id);
         // Load wishlist with product relationships
         const { data, error } = await supabase
           .from('wishlist')
@@ -67,6 +68,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+        console.log('Fetched wishlist data:', data);
 
         // Extract products from the relationship
         const products = (data || [])

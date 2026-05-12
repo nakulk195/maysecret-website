@@ -25,12 +25,14 @@ const Shop: React.FC = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
+        console.log('Fetching products for shop page from Supabase');
         const { data, error } = await supabase
           .from('products')
           .select('id, name, description, price, original_price, image, stock, category, is_featured, rating, reviews, created_at, updated_at')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+        console.log('Shop products fetched:', data);
         setProducts(data || []);
         setFilteredProducts(data || []);
       } catch (error) {

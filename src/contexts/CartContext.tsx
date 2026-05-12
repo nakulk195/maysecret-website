@@ -48,6 +48,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       try {
         if (user) {
           // Load from Supabase for logged-in users with product data
+          console.log('Fetching cart from Supabase for user:', user.id);
           const { data, error } = await supabase
             .from('cart')
             .select(`
@@ -71,6 +72,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             .eq('user_id', user.id);
 
           if (error) throw error;
+          console.log('Fetched cart data:', data);
 
           const cartItems: CartItem[] = (data || []).map(item => ({
             id: item.id,
@@ -90,6 +92,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         }
       } catch (error) {
         console.error('Error loading cart:', error);
+        // Set empty cart on error to prevent crashes
+        setCart([]);
       } finally {
         setLoading(false);
       }

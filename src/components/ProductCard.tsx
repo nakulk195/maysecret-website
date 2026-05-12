@@ -7,6 +7,7 @@ import { addToRecentlyViewed } from '../utils/storage';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 
+
 interface ProductCardProps {
   product: Product;
   onAddToCart?: () => void;
@@ -73,23 +74,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
   };
 
   const handleProductClick = () => {
-    // Convert Supabase Product to legacy Product format for addToRecentlyViewed
-    const legacyProduct = {
-      id: parseInt(product.id) || 0, // Convert string ID to number for legacy compatibility
-      name: product.name,
-      price: product.price,
-      originalPrice: product.original_price,
-      image: product.image,
-      images: [product.image],
-      description: product.description,
-      benefits: [],
-      category: product.category,
-      inStock: product.stock > 0,
-      rating: product.rating,
-      reviews: product.reviews,
-      createdAt: product.created_at
-    };
-    addToRecentlyViewed(legacyProduct);
+    // Add to recently viewed directly
+    addToRecentlyViewed(product);
   };
 
   const discountPercentage = 0; // No discount calculation since original_price doesn't exist

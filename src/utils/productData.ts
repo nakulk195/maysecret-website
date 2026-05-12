@@ -28,13 +28,13 @@ export interface Product {
   description: string;
   benefits: string[];
   category: string;
-  inStock: boolean;
+  stock: number;
   rating: number;
   reviews: number;
   size?: string;
   ingredients?: string[];
   howToUse?: string[];
-  createdAt: string; // ISO date string
+  created_at: string; // ISO date string
   isFeatured?: boolean; // Indicates if the product is featured
   storage?: string;
   caution?: string;
@@ -59,7 +59,7 @@ export const products: Product[] = [
     name: "MAY SECRET Sunscreen Spray",
     isFeatured: true,
     price: 1299,
-    createdAt: "2024-11-01T00:00:00.000Z",
+    created_at: "2024-11-01T00:00:00.000Z",
     originalPrice: 1599,
     image: sunscreenSprayImg,
     images: [
@@ -79,7 +79,7 @@ export const products: Product[] = [
       "Net Qty: 100 ml"
     ],
     category: "sunscreen",
-    inStock: true,
+    stock: 1,
     rating: 4.6,
     reviews: 89,
     size: "100 ml",
@@ -132,7 +132,7 @@ export const products: Product[] = [
     name: "Rice Brightening Serum",
     isFeatured: true,
     price: 999,
-    createdAt: "2024-11-15T00:00:00.000Z",
+    created_at: "2024-11-15T00:00:00.000Z",
     originalPrice: 2000,
     image: brighteningSerumImg,
     images: [
@@ -152,7 +152,7 @@ export const products: Product[] = [
       "Net Qty: 30 ml"
     ],
     category: "serum",
-    inStock: true,
+    stock: 1,
     rating: 4.8,
     reviews: 127,
     size: "30 ml",
@@ -221,7 +221,7 @@ export const products: Product[] = [
     name: "May Secret Glow Combo Pack",
     isFeatured: true,
     price: 1799,
-    createdAt: "2024-11-20T00:00:00.000Z",
+    created_at: "2024-11-20T00:00:00.000Z",
     originalPrice: 2999,
     image: comboImg,
     images: [
@@ -236,7 +236,7 @@ export const products: Product[] = [
       "Perfect K-Beauty glow routine"
     ],
     category: "combo",
-    inStock: true,
+    stock: 1,
     rating: 4.7,
     reviews: 45,
     size: "2 products",
@@ -287,10 +287,10 @@ export const getProductsFromSupabase = async (): Promise<Product[]> => {
       description: sp.description,
       benefits: [], // Will need to add benefits field to Supabase
       category: sp.category,
-      inStock: sp.stock > 0,
+      stock: sp.stock,
       rating: sp.rating,
       reviews: sp.reviews,
-      createdAt: sp.created_at,
+      created_at: sp.created_at,
       isFeatured: sp.is_featured
     }));
   } catch (error) {
@@ -307,15 +307,15 @@ export const getProductsByCategoryFromSupabase = async (category: string): Promi
       id: parseInt(sp.id),
       name: sp.name,
       price: sp.price,
-            image: sp.image,
+      image: sp.image,
       images: [sp.image],
       description: sp.description,
       benefits: [],
       category: sp.category,
-      inStock: sp.stock > 0,
+      stock: sp.stock,
       rating: sp.rating,
       reviews: sp.reviews,
-      createdAt: sp.created_at,
+      created_at: sp.created_at,
       isFeatured: sp.is_featured
     }));
   } catch (error) {
@@ -332,15 +332,15 @@ export const searchProductsFromSupabase = async (query: string): Promise<Product
       id: parseInt(sp.id),
       name: sp.name,
       price: sp.price,
-            image: sp.image,
+      image: sp.image,
       images: [sp.image],
       description: sp.description,
       benefits: [],
       category: sp.category,
-      inStock: sp.stock > 0,
+      stock: sp.stock,
       rating: sp.rating,
       reviews: sp.reviews,
-      createdAt: sp.created_at,
+      created_at: sp.created_at,
       isFeatured: sp.is_featured
     }));
   } catch (error) {

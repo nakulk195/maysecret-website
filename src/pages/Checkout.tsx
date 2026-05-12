@@ -149,7 +149,7 @@ const Checkout: React.FC = () => {
             image: '',
             description: '',
             category: '',
-            in_stock: false,
+            stock: 0,
             is_featured: false,
             rating: 0,
             reviews: 0,

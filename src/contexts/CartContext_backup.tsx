@@ -7,7 +7,7 @@ export interface CartProduct {
   name: string;
   price: string;
   image: string;
-  inStock: boolean;
+  stock: number;
   description?: string;
   rating?: number;
   reviews?: number;
@@ -74,7 +74,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             name: item.product_name,
             price: item.product_price.toString(),
             image: item.product_image,
-            inStock: true,
+            stock: 1,
             description: '',
             rating: 4.5,
             reviews: 0,
@@ -164,7 +164,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
                   name: product.name,
                   price: product.price,
                   image: product.image,
-                  inStock: product.inStock || true,
+                  stock: product.stock || 1,
                   description: product.description || '',
                   rating: product.rating || 4.5,
                   reviews: product.reviews || 0,

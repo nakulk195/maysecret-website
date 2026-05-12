@@ -1,8 +1,24 @@
-import { Product } from './productData';
+import { Product as ImportedProduct } from './productData';
 
 export interface CartItem {
   product: Product;
   quantity: number;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+  original_price?: number;
+  image: string;
+  stock: number;
+  description: string;
+  category: string;
+  is_featured?: boolean;
+  rating: number;
+  reviews: number;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface Order {
@@ -33,13 +49,13 @@ export const addToCart = (product: Product, quantity: number = 1): void => {
   localStorage.setItem('maysecret_cart', JSON.stringify(cart));
 };
 
-export const removeFromCart = (productId: number): void => {
+export const removeFromCart = (productId: string): void => {
   const cart = getCart();
   const updatedCart = cart.filter(item => item.product.id !== productId);
   localStorage.setItem('maysecret_cart', JSON.stringify(updatedCart));
 };
 
-export const updateCartQuantity = (productId: number, quantity: number): void => {
+export const updateCartQuantity = (productId: string, quantity: number): void => {
   const cart = getCart();
   const item = cart.find(item => item.product.id === productId);
   if (item) {
@@ -71,13 +87,13 @@ export const addToWishlist = (product: Product): void => {
   }
 };
 
-export const removeFromWishlist = (productId: number): void => {
+export const removeFromWishlist = (productId: string): void => {
   const wishlist = getWishlist();
   const updatedWishlist = wishlist.filter(product => product.id !== productId);
   localStorage.setItem('maysecret_wishlist', JSON.stringify(updatedWishlist));
 };
 
-export const isInWishlist = (productId: number): boolean => {
+export const isInWishlist = (productId: string): boolean => {
   const wishlist = getWishlist();
   return wishlist.some(product => product.id === productId);
 };

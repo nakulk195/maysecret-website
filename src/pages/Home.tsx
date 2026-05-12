@@ -29,12 +29,14 @@ const Home: React.FC = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
+        console.log('Fetching products for homepage from Supabase');
         const { data, error } = await supabase
           .from('products')
           .select('id, name, description, price, original_price, image, stock, category, is_featured, rating, reviews, created_at, updated_at')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+        console.log('Homepage products fetched:', data);
         setProducts(data || []);
       } catch (error) {
         console.error('Error loading products:', error);

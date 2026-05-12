@@ -5,7 +5,7 @@ export interface SafeProduct {
   name: string;
   price: number;
   image: string;
-  inStock: boolean;
+  stock: number;
 }
 
 export interface SafeCartItem {
@@ -57,7 +57,7 @@ export const getSafeProductValues = (product: any): SafeProduct => {
     name: product.name || 'Unnamed Product',
     price: typeof product.price === 'number' && !isNaN(product.price) ? product.price : 0,
     image: product.image || '/placeholder.svg',
-    inStock: product.inStock !== undefined ? product.inStock : true
+    stock: product.stock !== undefined ? product.stock : 1
   };
 };
 

@@ -78,7 +78,6 @@ const ProductDetails: React.FC = () => {
         name: product.name,
         description: product.description,
         price: product.price,
-        original_price: product.originalPrice,
         image: product.image,
         category: product.category,
         in_stock: product.inStock,

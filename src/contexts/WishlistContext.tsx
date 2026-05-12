@@ -52,7 +52,6 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
               name,
               description,
               price,
-              original_price,
               image,
               category,
               in_stock,

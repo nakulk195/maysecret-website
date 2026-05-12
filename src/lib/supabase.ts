@@ -23,7 +23,6 @@ export interface Database {
           name: string
           description: string
           price: number
-          original_price?: number
           image: string
           category: string
           in_stock: boolean
@@ -38,7 +37,6 @@ export interface Database {
           name: string
           description: string
           price: number
-          original_price?: number
           image: string
           category: string
           in_stock?: boolean
@@ -53,7 +51,6 @@ export interface Database {
           name?: string
           description?: string
           price?: number
-          original_price?: number
           image?: string
           category?: string
           in_stock?: boolean

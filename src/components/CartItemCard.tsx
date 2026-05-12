@@ -54,7 +54,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
   }
 
   const price = Number(item.cartProduct?.price || 0);
-  const originalPrice = Number(item.cartProduct?.original_price || 0) || undefined;
+  const originalPrice = undefined; // No original_price since field doesn't exist
 
   return (
     <motion.div
@@ -130,15 +130,10 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
             )}
             
             {/* Price */}
-            <div className="flex items-center space-x-2 mb-4">
-              <span className="text-xl font-bold text-warm-700">
+            <div className="flex items-center space-x-2">
+              <span className="text-lg font-semibold text-gray-900">
                 ₹{price.toLocaleString()}
               </span>
-              {originalPrice && (
-                <span className="text-sm text-gray-500 line-through">
-                  ₹{originalPrice.toLocaleString()}
-                </span>
-              )}
             </div>
           </div>
 

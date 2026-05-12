@@ -308,7 +308,7 @@ const Home: React.FC = () => {
               gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))'
             }}
           >
-            {products && products.length > 0 && products.slice(0, 6).map((product: any, index: number) => (
+            {products && products.length > 0 && products.slice(0, 6).map((product: Product, index: number) => (
               <motion.div
                 key={product.id}
                 variants={itemVariants}
@@ -325,16 +325,17 @@ const Home: React.FC = () => {
               </motion.div>
             ))}
             
-            {/* Coming Soon Product Card */}
-            <motion.div
-              variants={itemVariants}
-              whileHover={{ 
-                scale: 1.02,
-                y: -3,
-                transition: { duration: 0.2 }
-              }}
-              className="relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full min-h-[500px]"
-            >
+            {/* Only show Coming Soon if no products are loaded */}
+            {(!products || products.length === 0) && !loading && (
+              <motion.div
+                variants={itemVariants}
+                whileHover={{ 
+                  scale: 1.02,
+                  y: -3,
+                  transition: { duration: 0.2 }
+                }}
+                className="relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full min-h-[500px]"
+              >
               {/* Image Area */}
               <div className="relative overflow-hidden h-40 md:h-52 w-full">
                 <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
@@ -394,6 +395,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
             </motion.div>
+            )}
           </motion.div>
 
           {products && products.length > 6 && (

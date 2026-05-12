@@ -362,11 +362,6 @@ const Shop: React.FC = () => {
                         <span className="text-lg font-bold text-warm-700">
                           ₹{product.price.toLocaleString()}
                         </span>
-                        {product.original_price && (
-                          <span className="ml-2 text-sm text-gray-500 line-through">
-                            ₹{product.original_price.toLocaleString()}
-                          </span>
-                        )}
                       </div>
                       
                       <button

@@ -36,9 +36,7 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
     // Navigate to product details
   };
 
-  const discountPercentage = product.original_price 
-    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
-    : 0;
+  const discountPercentage = 0; // No discount calculation since original_price doesn't exist
 
   return (
     <motion.div
@@ -119,11 +117,6 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
               <span className="text-xl font-bold text-warm-700">
                 ₹{product.price.toLocaleString()}
               </span>
-              {product.original_price && (
-                <span className="text-sm text-gray-500 line-through">
-                  ₹{product.original_price.toLocaleString()}
-                </span>
-              )}
             </div>
             
             {/* Stock Status */}

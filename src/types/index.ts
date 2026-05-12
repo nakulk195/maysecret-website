@@ -63,7 +63,6 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  original_price?: number;
   image: string;
   category: string;
   in_stock: boolean;

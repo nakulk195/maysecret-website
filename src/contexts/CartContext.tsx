@@ -55,8 +55,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
               products:product_id (
                 id,
                 name,
+                description,
                 price,
-                image
+                image,
+                category,
+                in_stock,
+                is_featured,
+                rating,
+                reviews,
+                created_at,
+                updated_at
               )
             `)
             .eq('user_id', user.id);

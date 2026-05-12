@@ -78,7 +78,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
       id: parseInt(product.id) || 0, // Convert string ID to number for legacy compatibility
       name: product.name,
       price: product.price,
-      originalPrice: product.original_price,
       image: product.image,
       images: [product.image],
       description: product.description,
@@ -92,9 +91,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
     addToRecentlyViewed(legacyProduct);
   };
 
-  const discountPercentage = product.original_price 
-    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
-    : 0;
+  const discountPercentage = 0; // No discount calculation since original_price doesn't exist
 
   return (
     <motion.div
@@ -209,11 +206,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
               <span className="text-lg font-bold text-gray-900">
                 ₹{product.price.toLocaleString()}
               </span>
-              {product.original_price && (
-                <span className="text-sm text-gray-500 line-through">
-                  ₹{product.original_price.toLocaleString()}
-                </span>
-              )}
             </div>
             <div className="text-xs text-gray-500 mt-1">Inclusive of all taxes</div>
           </div>

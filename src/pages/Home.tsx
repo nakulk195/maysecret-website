@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Star } from 'lucide-react';
-import { products } from '../utils/productData';
+// Remove legacy productData import - will use Supabase products
 import { useCart } from '../contexts/CartContext';
 import type { Product } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import ProductCard from '../components/ProductCard';
 import comingSoonImg from '../assets/images/coming-soon.png';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
@@ -21,6 +22,31 @@ import GlassSkinRoutine from '../components/GlassSkinRoutine';
 import { BRAND_NAME } from '../config/brand';
 
 const Home: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load products from Supabase
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setProducts(data || []);
+      } catch (error) {
+        console.error('Error loading products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
   // Add null safety check for CartContext
   let addToCart: (product: Product, quantity?: number) => Promise<void>;
   try {

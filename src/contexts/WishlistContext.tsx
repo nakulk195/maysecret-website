@@ -42,22 +42,38 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
       try {
         setLoading(true);
-        const wishlistItems = await wishlistService.getUserWishlist(user.id);
-        
-        // Fetch product details for each wishlist item
-        const products = await Promise.all(
-          wishlistItems.map(async (item) => {
-            const { data: product } = await supabase
-              .from('products')
-              .select('*')
-              .eq('id', item.product_id)
-              .maybeSingle();
-            
-            return product;
-          })
-        );
-        
-        setWishlist(products.filter(Boolean));
+        // Load wishlist with product relationships
+        const { data, error } = await supabase
+          .from('wishlist')
+          .select(`
+            *,
+            products:product_id (
+              id,
+              name,
+              description,
+              price,
+              original_price,
+              image,
+              category,
+              in_stock,
+              is_featured,
+              rating,
+              reviews,
+              created_at,
+              updated_at
+            )
+          `)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Extract products from the relationship
+        const products = (data || [])
+          .map(item => item.products)
+          .filter(Boolean);
+
+        setWishlist(products);
       } catch (error) {
         console.error('Error loading wishlist:', error);
         setWishlist([]);

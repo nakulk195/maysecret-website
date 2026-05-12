@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, Grid, List, Search, X, ChevronDown, Star } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { products, getProductsByCategory, type Category, categories as productCategories } from '../utils/productData';
 import { Product as SupabaseProduct } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { useCart } from '../contexts/CartContext';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 
@@ -12,31 +12,45 @@ type SortOption = 'featured' | 'price-low' | 'price-high' | 'newest' | 'rating';
 const Shop: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filteredProducts, setFilteredProducts] = useState<SupabaseProduct[]>(products.map(p => ({
-    id: p.id.toString(),
-    name: p.name,
-    description: p.description,
-    price: p.price,
-    original_price: p.originalPrice,
-    image: p.image,
-    category: p.category,
-    in_stock: p.inStock,
-    is_featured: p.isFeatured || false,
-    rating: p.rating,
-    reviews: p.reviews,
-    created_at: p.createdAt,
-    updated_at: p.createdAt
-  })));
+  const [products, setProducts] = useState<SupabaseProduct[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<SupabaseProduct[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { addToCart } = useCart();
 
-  // Add 'All Products' to the beginning of categories
-  const categories: Array<Category & { id: string; name: string }> = [
+  // Load products from Supabase
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setProducts(data || []);
+        setFilteredProducts(data || []);
+      } catch (error) {
+        console.error('Error loading products:', error);
+        setProducts([]);
+        setFilteredProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  // Define categories based on actual products
+  const categories = [
     { id: 'all', name: 'All Products' },
-    ...productCategories
+    { id: 'sunscreen', name: 'Sunscreen' },
+    { id: 'serum', name: 'Serum' },
+    { id: 'combo', name: 'Combo Packs' },
   ];
 
   // Filter and sort products based on selected options
@@ -45,7 +59,7 @@ const Shop: React.FC = () => {
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      result = getProductsByCategory(selectedCategory);
+      result = result.filter(product => product.category === selectedCategory);
     }
 
     // Filter by search query
@@ -73,35 +87,21 @@ const Shop: React.FC = () => {
         result.sort((a, b) => b.price - a.price);
         break;
       case 'newest':
-        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         break;
       case 'rating':
         result.sort((a, b) => b.rating - a.rating);
         break;
       default:
         // Featured (default)
-        result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
+        result.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
     }
 
-    // Convert legacy products to Supabase format
-    const convertedResult = result.map(p => ({
-      id: p.id.toString(),
-      name: p.name,
-      description: p.description,
-      price: p.price,
-      original_price: p.originalPrice,
-      image: p.image,
-      category: p.category,
-      in_stock: p.inStock,
-      is_featured: p.isFeatured || false,
-      rating: p.rating,
-      reviews: p.reviews,
-      created_at: p.createdAt,
-      updated_at: p.createdAt
-    }));
+    // Products are already in Supabase format, no conversion needed
+    const convertedResult = result;
 
     setFilteredProducts(convertedResult);
-  }, [selectedCategory, searchQuery, priceRange, sortBy]);
+  }, [products, selectedCategory, searchQuery, priceRange, sortBy]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);

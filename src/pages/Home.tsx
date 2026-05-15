@@ -13,6 +13,8 @@ import heroimg2 from '../assets/images/heroimg2.png';
 import heroimg3 from '../assets/images/heroimg3.png';
 import heroimg4 from '../assets/images/heroimg4.png';
 import heroimg5 from '../assets/images/heroimg5.png';
+import combinedProduct from '../assets/images/Combined_product.PNG';
+import combinedHorizontal from '../assets/images/Combined_horizontal.PNG';
 import RotatingTagline from '../components/RotatingTagline';
 import SkincareTips from '../components/SkincareTips';
 import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
@@ -93,7 +95,7 @@ const Home: React.FC = () => {
   };
 
   // Rotating banner setup
-  const heroImages = [heroimg1, heroimg2, heroimg3, heroimg4, heroimg5];
+  const heroImages = [heroimg1, heroimg2, heroimg3, heroimg4, heroimg5, combinedProduct, combinedHorizontal];
   const [currentIndex, setCurrentIndex] = useState(0);
   useEffect(() => {
     const id = setInterval(() => {

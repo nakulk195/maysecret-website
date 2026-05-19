@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, CreditCard, Smartphone, Shield, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { getProductImage } from '../utils/productImages';
 import { supabase } from '../lib/supabase';
 
 // Razorpay script
@@ -557,7 +558,7 @@ const Payment: React.FC = () => {
                     {/* Product Image */}
                     <div className="flex-shrink-0">
                       <img
-                        src={item.cartProduct?.image || '/placeholder-product.jpg'}
+                        src={getProductImage(item.cartProduct?.image)}
                         alt={item.cartProduct?.name || 'Product'}
                         className="w-16 h-16 object-cover rounded-lg"
                       />

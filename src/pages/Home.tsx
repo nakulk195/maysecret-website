@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Star } from 'lucide-react';
-// Remove legacy productData import - will use Supabase products
+// Load products from local productData
+import { products as localProducts } from '../utils/productData';
 import { useCart } from '../contexts/CartContext';
-import type { Product } from '../lib/supabase';
-import { supabase } from '../lib/supabase';
+import type { Product } from '../utils/productData';
 import ProductCard from '../components/ProductCard';
 import comingSoonImg from '../assets/images/coming-soon.png';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
@@ -13,7 +13,7 @@ import heroimg2 from '../assets/images/heroimg2.png';
 import heroimg3 from '../assets/images/heroimg3.png';
 import heroimg4 from '../assets/images/heroimg4.png';
 import heroimg5 from '../assets/images/heroimg5.png';
-import combinedProduct from '../assets/images/Combined_product.PNG';
+import combinedProduct from '../assets/images/combo.PNG';
 import combinedHorizontal from '../assets/images/Combined_horizontal.PNG';
 import RotatingTagline from '../components/RotatingTagline';
 import SkincareTips from '../components/SkincareTips';
@@ -27,33 +27,22 @@ const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load products from Supabase
+  // Load products from local productData
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        console.log('Fetching products for homepage from Supabase');
-        const { data, error } = await supabase
-          .from('products')
-          .select('id, name, description, price, original_price, image, stock, category, is_featured, rating, reviews, created_at, updated_at')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        console.log('Homepage products fetched:', data);
-        setProducts(data || []);
-      } catch (error) {
-        console.error('Error loading products:', error);
-        setProducts([]);
-        setLoading(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProducts();
+    try {
+      console.log('Loading products for homepage from local productData');
+      setProducts(localProducts);
+      console.log('Homepage products loaded:', localProducts);
+    } catch (error) {
+      console.error('Error loading products:', error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   // Add null safety check for CartContext
-  let addToCart: (product: Product, quantity?: number) => Promise<void>;
+  let addToCart: (product: any, quantity?: number) => Promise<void>;
   try {
     const cartContext = useCart();
     addToCart = cartContext.addToCart;
@@ -315,7 +304,7 @@ const Home: React.FC = () => {
           >
             {products && products.length > 0 && products.slice(0, 6).map((product: Product, index: number) => (
               <motion.div
-                key={product.id}
+              key={product.id}
                 variants={itemVariants}
                 whileHover={{ 
                   scale: 1.02,

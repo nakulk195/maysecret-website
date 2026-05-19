@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, Eye } from 'lucide-react';
-import { Product } from '../lib/supabase';
+import { Product } from '../utils/productData';
+import { getProductImage } from '../utils/productImages';
 import { addToRecentlyViewed } from '../utils/storage';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
@@ -24,7 +25,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   
   // Add null safety check for CartContext
-  let addToCart: (product: Product, quantity?: number) => Promise<void>;
+  let addToCart: (product: any, quantity?: number) => Promise<void>;
   try {
     const cartContext = useCart();
     addToCart = cartContext.addToCart;
@@ -38,7 +39,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
   // Check if product is in wishlist on component mount
   useEffect(() => {
     const checkWishlist = async () => {
-      const inWishlist = await isInWishlist(product.id);
+      const inWishlist = await isInWishlist(String(product.id));
       setIsWishlisted(inWishlist);
     };
     checkWishlist();
@@ -50,10 +51,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
     
     try {
       if (isWishlisted) {
-        await removeFromWishlist(product.id);
+        await removeFromWishlist(String(product.id));
         setIsWishlisted(false);
       } else {
-        await addToWishlist(product);
+        await addToWishlist(product as any);
         setIsWishlisted(true);
       }
     } catch (error) {
@@ -75,7 +76,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
 
   const handleProductClick = () => {
     // Add to recently viewed directly
-    addToRecentlyViewed(product);
+    addToRecentlyViewed(product as any);
   };
 
   const discountPercentage = 0; // No discount calculation since original_price doesn't exist
@@ -99,7 +100,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
           
           {/* Product Image */}
           <motion.img
-            src={product.image}
+            src={getProductImage(product.image)}
             alt={product.name}
             className={`w-full h-full object-cover transition-transform duration-500 ${
               isHovered ? 'scale-110' : 'scale-100'

@@ -1,9 +1,9 @@
 import { ProductService } from '../services/productService';
 import { Product as SupabaseProduct } from '../lib/supabase';
 
-import brighteningSerumImg from "../assets/images/brightening-serum.png";
-import sunscreenSprayImg from "../assets/images/sunscreen-spray.png";
-import comboImg from "../assets/images/combo.png";
+import brighteningSerumImg from "../assets/images/brightening-serum.PNG";
+import sunscreenSprayImg from "../assets/images/sunscreen-spray.PNG";
+import comboImg from "../assets/images/combo.PNG";
 
 // Category type and available product categories
 export interface Category {

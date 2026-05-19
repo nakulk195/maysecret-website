@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { getProductImage } from '../utils/productImages';
 import { CheckCircle, Package, Truck, Heart } from 'lucide-react';
 
 interface OrderItem {
@@ -106,7 +107,7 @@ const OrderSuccess: React.FC = () => {
                   <div key={`order-success-${item.id}-${index}`} className="flex items-center">
                     <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-md overflow-hidden">
                       <img
-                        src={item.cartProduct.image}
+                        src={getProductImage(item.cartProduct.image)}
                         alt={item.cartProduct.name}
                         className="w-full h-full object-cover object-center"
                       />

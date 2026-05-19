@@ -22,11 +22,18 @@ import {
 } from 'lucide-react';
 import { getProductById } from '../utils/productData';
 import { addToWishlist, removeFromWishlist, isInWishlist, addToRecentlyViewed } from '../utils/storage';
+import { getProductImage, getProductImages } from '../utils/productImages';
 import { useCart } from '../contexts/CartContext';
 import { Product as SupabaseProduct } from '../lib/supabase';
 import { ProductService } from '../services/productService';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 import { BRAND_NAME } from '../config/brand';
+
+// Helper: Check if string is a valid UUID
+const isValidUUID = (id: string): boolean => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(id);
+};
 
 const ProductDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -51,22 +58,25 @@ const ProductDetails: React.FC = () => {
         console.log('Loading product with ID:', id);
         setLoading(true);
         
-        // Try to get from Supabase first
-        const supabaseProduct = await ProductService.getProductById(id);
-        if (supabaseProduct) {
-          setProduct(supabaseProduct);
-          console.log('Product loaded from Supabase:', supabaseProduct);
-        } else {
-          // Fallback to legacy data
-          const legacy = getProductById(Number(id));
-          if (legacy) {
-            setLegacyProduct(legacy);
-            console.log('Product loaded from legacy data:', legacy);
+        // Only try Supabase if ID is a valid UUID
+        if (isValidUUID(id)) {
+          const supabaseProduct = await ProductService.getProductById(id);
+          if (supabaseProduct) {
+            setProduct(supabaseProduct);
+            console.log('Product loaded from Supabase:', supabaseProduct);
+            return;
           }
+        }
+        
+        // Fallback to legacy data for numeric IDs or if not found in Supabase
+        const legacy = getProductById(Number(id));
+        if (legacy) {
+          setLegacyProduct(legacy);
+          console.log('Product loaded from legacy data:', legacy);
         }
       } catch (error) {
         console.error('Error loading product:', error);
-        // Fallback to legacy data
+        // Fallback to legacy data on error
         const legacy = getProductById(Number(id));
         if (legacy) {
           setLegacyProduct(legacy);
@@ -110,10 +120,12 @@ const ProductDetails: React.FC = () => {
   // Get images array (single image for Supabase, multiple for legacy)
   const getImages = () => {
     if (product) {
-      return [product.image];
+      return getProductImages([product.image]);
     }
     if (legacyProduct) {
-      return legacyProduct.images || [legacyProduct.image];
+      return legacyProduct.images
+        ? getProductImages(legacyProduct.images)
+        : getProductImages([legacyProduct.image]);
     }
     return [];
   };
@@ -139,7 +151,7 @@ const ProductDetails: React.FC = () => {
       addToRecentlyViewed(storageProduct);
       setIsWishlisted(isInWishlist(String(currentProduct.id)));
     }
-  }, [currentProduct]);
+  }, [currentProduct, product]);
 
   if (loading) {
     return (
@@ -166,11 +178,12 @@ const ProductDetails: React.FC = () => {
   }
 
   const handleWishlistToggle = () => {
+    if (!currentProduct) return;
     if (isWishlisted) {
-      removeFromWishlist(product.id);
+      removeFromWishlist(currentProduct.id);
       setIsWishlisted(false);
     } else {
-      addToWishlist(product);
+      addToWishlist(currentProduct);
       setIsWishlisted(true);
     }
   };
@@ -194,9 +207,11 @@ const ProductDetails: React.FC = () => {
     setSelectedImage((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  const images = getImages();
+
   // @ts-ignore
   const discountPercentage = currentProduct?.originalPrice || currentProduct?.original_price 
-    ? Math.round((((currentProduct?.originalPrice || currentProduct?.original_price) - currentProduct.price) / (currentProduct?.originalPrice || currentProduct?.original_price)) * 100)
+    ? Math.round((((currentProduct?.originalPrice || currentProduct?.original_price) - (currentProduct?.price || 0)) / (currentProduct?.originalPrice || currentProduct?.original_price)) * 100)
     : 0;
 
   return (
@@ -226,14 +241,14 @@ const ProductDetails: React.FC = () => {
             {/* Main Image */}
             <div className="relative aspect-square bg-white rounded-3xl shadow-2xl overflow-hidden group">
               <motion.img
-                src={product.images[selectedImage]}
-                alt={product.name}
+                src={images[selectedImage]}
+                alt={currentProduct?.name || 'Product'}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 whileHover={{ scale: 1.05 }}
               />
               
               {/* Navigation Arrows */}
-              {product.images.length > 1 && (
+              {images.length > 1 && (
                 <>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
@@ -256,9 +271,9 @@ const ProductDetails: React.FC = () => {
             </div>
 
             {/* Thumbnail Images */}
-            {product.images.length > 1 && (
+            {images.length > 1 && (
               <div className="flex space-x-3 justify-center">
-                {product.images.map((image, index) => (
+                {images.map((image, index) => (
                   <motion.button
                     key={index}
                     whileHover={{ scale: 1.05 }}
@@ -272,7 +287,7 @@ const ProductDetails: React.FC = () => {
                   >
                     <img
                       src={image}
-                      alt={`${product.name} ${index + 1}`}
+                      alt={`${currentProduct?.name || 'Product'} ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
                   </motion.button>
@@ -296,7 +311,7 @@ const ProductDetails: React.FC = () => {
                 transition={{ delay: 0.2 }}
                 className="text-3xl md:text-4xl font-light text-gray-900 mb-3"
               >
-                {product.name}
+                {currentProduct?.name || 'Product'}
               </motion.h1>
               
               {/* Subtitle */}
@@ -306,9 +321,9 @@ const ProductDetails: React.FC = () => {
                 transition={{ delay: 0.3 }}
                 className="text-gray-600 text-lg mb-4"
               >
-                {product.category === 'sunscreen' && "SPF 50 PA+++ | Broad Spectrum UVA/UVB Protection"}
-                {product.category === 'serum' && "Glow Boost Complex | Rice Extract Formula"}
-                {product.category === 'combo' && "Complete K-Beauty Routine | Sunscreen + Serum"}
+                {currentProduct?.category === 'sunscreen' && "SPF 50 PA+++ | Broad Spectrum UVA/UVB Protection"}
+                {currentProduct?.category === 'serum' && "Glow Boost Complex | Rice Extract Formula"}
+                {currentProduct?.category === 'combo' && "Complete K-Beauty Routine | Sunscreen + Serum"}
               </motion.p>
 
               {/* Feature Badges */}
@@ -318,7 +333,7 @@ const ProductDetails: React.FC = () => {
                 transition={{ delay: 0.4 }}
                 className="flex flex-wrap gap-2 mb-6"
               >
-                {product.category === 'sunscreen' && (
+                {currentProduct?.category === 'sunscreen' && (
                   <>
                     <div className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium border border-orange-200">
                       <Sun size={14} />
@@ -334,7 +349,7 @@ const ProductDetails: React.FC = () => {
                     </div>
                   </>
                 )}
-                {product.category === 'serum' && (
+                {currentProduct?.category === 'serum' && (
                   <>
                     <div className="flex items-center gap-1.5 bg-gradient-to-r from-pink-100 to-rose-100 text-pink-800 px-4 py-2 rounded-full text-sm font-medium border border-pink-200">
                       <Sparkles size={14} />
@@ -373,15 +388,15 @@ const ProductDetails: React.FC = () => {
                       key={i}
                       size={18}
                       className={`${
-                        i < Math.floor(product.rating)
+                        i < Math.floor(currentProduct?.rating || 4.5) 
                           ? 'text-yellow-400 fill-current'
                           : 'text-gray-300'
                       }`}
                     />
                   ))}
-                  <span className="ml-2 text-gray-600 text-sm">({product.reviews} reviews)</span>
+                  <span className="ml-2 text-gray-600 text-sm">({currentProduct?.reviews} reviews)</span>
                   <span className="text-sm text-gray-400 mx-2">•</span>
-                  <span className="text-sm text-gray-600">{product.size}</span>
+                  <span className="text-sm text-gray-600">{currentProduct?.size}</span>
                 </div>
               </motion.div>
 
@@ -394,12 +409,12 @@ const ProductDetails: React.FC = () => {
               >
                 <div className="flex items-center space-x-4">
                   <span className="text-4xl font-light text-gray-900">
-                    ₹{product.price.toLocaleString()}
+                    ₹{(currentProduct?.price || 0).toLocaleString()}
                   </span>
-                  {product.originalPrice && (
+                  {(currentProduct?.originalPrice || currentProduct?.original_price) && (
                     <>
                       <span className="text-xl text-gray-400 line-through">
-                        ₹{product.originalPrice.toLocaleString()}
+                        ₹{(currentProduct?.originalPrice || currentProduct?.original_price || 0).toLocaleString()}
                       </span>
                       <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                         {discountPercentage}% OFF
@@ -417,7 +432,7 @@ const ProductDetails: React.FC = () => {
                 transition={{ delay: 0.7 }}
                 className="mb-6"
               >
-                {product.stock > 0 ? (
+                {currentProduct?.stock && currentProduct.stock > 0 ? (
                   <div className="flex items-center text-green-600">
                     <Check size={20} className="mr-2" />
                     <span className="font-medium">In Stock</span>
@@ -469,7 +484,7 @@ const ProductDetails: React.FC = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleAddToCart}
-                  disabled={!product.stock}
+                  disabled={!currentProduct?.stock}
                   className="flex-1 bg-gradient-to-r from-pink-500 to-orange-400 text-white py-4 px-6 rounded-2xl font-medium hover:from-pink-600 hover:to-orange-500 transition-all disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg"
                 >
                   <ShoppingCart size={20} />
@@ -559,7 +574,7 @@ const ProductDetails: React.FC = () => {
                   <div className="bg-gradient-to-r from-pink-50 to-orange-50 rounded-2xl p-8">
                     <h3 className="text-2xl font-light text-gray-900 mb-4">Product Overview</h3>
                     <p className="text-gray-700 leading-relaxed text-lg">
-                      {product.description}
+                      {currentProduct?.description || 'Product description not available'}
                     </p>
                   </div>
                   
@@ -567,7 +582,7 @@ const ProductDetails: React.FC = () => {
                   <div className="bg-white rounded-2xl border border-gray-100 p-6">
                     <h4 className="text-lg font-semibold text-gray-900 mb-4 tracking-wide">Key Benefits</h4>
                     <div className="space-y-3">
-                      {product.benefits.slice(0, 5).map((benefit, index) => (
+                      {currentProduct?.benefits?.slice(0, 5).map((benefit, index) => (
                         <motion.div
                           key={index}
                           initial={{ opacity: 0, x: -20 }}
@@ -600,7 +615,7 @@ const ProductDetails: React.FC = () => {
                       Complete Benefits
                     </h3>
                     <div className="space-y-3">
-                      {product.benefits.map((benefit, index) => (
+                      {currentProduct?.benefits?.map((benefit, index) => (
                         <motion.div
                           key={index}
                           initial={{ opacity: 0, x: -20 }}
@@ -633,7 +648,7 @@ const ProductDetails: React.FC = () => {
                       Active Ingredients
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {product.ingredients && product.ingredients.map((ingredient, index) => (
+                      {currentProduct?.ingredients && currentProduct.ingredients.length > 0 && currentProduct.ingredients.map((ingredient, index) => (
                         <motion.div
                           key={index}
                           initial={{ opacity: 0, scale: 0.9 }}
@@ -664,7 +679,7 @@ const ProductDetails: React.FC = () => {
                       How to Use
                     </h3>
                     <div className="space-y-4">
-                      {product.howToUse && product.howToUse.map((step, index) => (
+                      {currentProduct?.howToUse && currentProduct.howToUse.length > 0 && currentProduct.howToUse.map((step, index) => (
                         <motion.div
                           key={index}
                           initial={{ opacity: 0, x: -20 }}
@@ -696,26 +711,26 @@ const ProductDetails: React.FC = () => {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  {product.storage && (
+                  {currentProduct?.storage && (
                     <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-8">
                       <h3 className="text-2xl font-light text-gray-900 mb-6 flex items-center gap-3">
                         <Shield className="text-orange-500" />
                         Storage Instructions
                       </h3>
                       <div className="bg-white rounded-xl p-6 border-l-4 border-orange-400">
-                        <p className="text-gray-700 leading-relaxed">{product.storage}</p>
+                        <p className="text-gray-700 leading-relaxed">{currentProduct?.storage}</p>
                       </div>
                     </div>
                   )}
                   
-                  {product.caution && (
+                  {currentProduct?.caution && (
                     <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-8">
                       <h3 className="text-2xl font-light text-gray-900 mb-6 flex items-center gap-3">
                         <ShieldCheck className="text-red-500" />
                         Safety & Caution
                       </h3>
                       <div className="bg-white rounded-xl p-6 border-l-4 border-red-400">
-                        <p className="text-gray-700 leading-relaxed">{product.caution}</p>
+                        <p className="text-gray-700 leading-relaxed">{currentProduct?.caution}</p>
                       </div>
                     </div>
                   )}
@@ -726,7 +741,8 @@ const ProductDetails: React.FC = () => {
           </div>
 
           {/* Product Information Accordion */}
-          {product.manufacturer && (
+          {currentProduct?.manufacturer && (
+
             <div className="mt-10 border-t pt-6">
               <button
                 onClick={() => setShowInfo(!showInfo)}
@@ -750,11 +766,11 @@ const ProductDetails: React.FC = () => {
                   
                   <p>
                     <strong>Manufactured By:</strong><br/>
-                    {product.manufacturer?.manufacturedBy?.name || 'MAXNOVA HEALTHCARE'}<br/>
-                    {product.manufacturer?.manufacturedBy?.address?.split(',').map((addressPart, index) => (
+                    {currentProduct?.manufacturer?.manufacturedBy?.name || 'MAXNOVA HEALTHCARE'}<br/>
+                    {currentProduct?.manufacturer?.manufacturedBy?.address?.split(',').map((addressPart, index) => (
                       <span key={index}>
                         {addressPart}
-                        {index < (product.manufacturer?.manufacturedBy?.address?.split(',').length || 0) - 1 && <br/>}
+                        {index < (currentProduct?.manufacturer?.manufacturedBy?.address?.split(',').length || 0) - 1 && <br/>}
                       </span>
                     )) || 'Plot No 5, 6 & 7<br/>Davni Industrial Area<br/>PO Gurumajra, Baddi<br/>Distt Solan, Himachal Pradesh 174101'}
                   </p>
@@ -762,11 +778,11 @@ const ProductDetails: React.FC = () => {
                   <br/>
                   
                   <p>
-                    <strong>Manufacturing License:</strong> {product.manufacturer?.manufacturedBy?.licenseNo || 'HIM/COS/L/24/370'}
+                    <strong>Manufacturing License:</strong> {currentProduct?.manufacturer?.manufacturedBy?.licenseNo || 'HIM/COS/L/24/370'}
                   </p>
                   
                   <p>
-                    <strong>Net Quantity:</strong> {product.size || '100 ml'}
+                    <strong>Net Quantity:</strong> {currentProduct?.size || '100 ml'}
                   </p>
                   
                   <p>

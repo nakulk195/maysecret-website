@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, Trash2 } from 'lucide-react';
 import { Product } from '../lib/supabase';
+import { getProductImage } from '../utils/productImages';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 
@@ -55,7 +56,7 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
           
           {/* Product Image */}
           <motion.img
-            src={product.image}
+            src={getProductImage(product.image)}
             alt={product.name}
             className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, Grid, List, Search, X, ChevronDown, Star } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { Product as SupabaseProduct } from '../lib/supabase';
-import { supabase } from '../lib/supabase';
+import { Product } from '../utils/productData';
+import { products as localProducts } from '../utils/productData';
+import { getProductImage } from '../utils/productImages';
 import { useCart } from '../contexts/CartContext';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 
@@ -12,8 +13,8 @@ type SortOption = 'featured' | 'price-low' | 'price-high' | 'newest' | 'rating';
 const Shop: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [products, setProducts] = useState<SupabaseProduct[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<SupabaseProduct[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
@@ -21,31 +22,20 @@ const Shop: React.FC = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { addToCart } = useCart();
 
-  // Load products from Supabase
+  // Load products from local productData
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        console.log('Fetching products for shop page from Supabase');
-        const { data, error } = await supabase
-          .from('products')
-          .select('id, name, description, price, original_price, image, stock, category, is_featured, rating, reviews, created_at, updated_at')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        console.log('Shop products fetched:', data);
-        setProducts(data || []);
-        setFilteredProducts(data || []);
-      } catch (error) {
-        console.error('Error loading products:', error);
-        setProducts([]);
-        setFilteredProducts([]);
-        setLoading(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProducts();
+    try {
+      console.log('Loading products for shop page from local productData');
+      setProducts(localProducts);
+      setFilteredProducts(localProducts);
+      console.log('Shop products loaded:', localProducts);
+    } catch (error) {
+      console.error('Error loading products:', error);
+      setProducts([]);
+      setFilteredProducts([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   // Define categories based on actual products
@@ -97,13 +87,10 @@ const Shop: React.FC = () => {
         break;
       default:
         // Featured (default)
-        result.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+        result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
     }
 
-    // Products are already in Supabase format, no conversion needed
-    const convertedResult = result;
-
-    setFilteredProducts(convertedResult);
+    setFilteredProducts(result);
   }, [products, selectedCategory, searchQuery, priceRange, sortBy]);
 
   const handleCategoryChange = (category: string) => {
@@ -336,7 +323,7 @@ const Shop: React.FC = () => {
                 <div className="flex flex-col sm:flex-row">
                   <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
                     <img
-                      src={product.image}
+                      src={getProductImage(product.image)}
                       alt={product.name}
                       className="w-full h-full object-cover"
                       loading="lazy"

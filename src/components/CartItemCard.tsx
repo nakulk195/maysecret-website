@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Trash2, Plus, Minus, Star } from 'lucide-react';
 import { CartItem } from '../contexts/CartContext';
 import { Product } from '../lib/supabase';
+import { getProductImage } from '../utils/productImages';
 
 interface CartItemCardProps {
   item: CartItem;
@@ -72,7 +73,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
                 {item.cartProduct?.image ? (
                   <>
                     <img
-                      src={item.cartProduct?.image || '/placeholder-product.jpg'}
+                      src={getProductImage(item.cartProduct?.image)}
                       alt={item.cartProduct?.name || 'Product'}
                       className="w-24 h-24 object-cover rounded-lg"
                       onLoad={() => setImageLoaded(true)}

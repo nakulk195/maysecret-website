@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { CartItem } from '../../contexts/CartContext';
+import { getProductImage } from '../../utils/productImages';
 
 interface OrderSummaryProps {
   items: CartItem[];
@@ -61,7 +62,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 <div className="flex-shrink-0 h-16 w-16 rounded-md overflow-hidden bg-gray-100">
                   {item.cartProduct.image ? (
                     <img
-                      src={item.cartProduct.image}
+                      src={getProductImage(item.cartProduct.image)}
                       alt={item.cartProduct.name}
                       className="h-full w-full object-cover object-center"
                     />

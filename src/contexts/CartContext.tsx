@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase, Product } from '../lib/supabase';
 import { useAuth } from './AuthContext';
+import { resolveSupabaseProductId } from '../utils/productIdResolver';
 
 // Types
 export interface CartItem {
@@ -105,17 +106,34 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         if (user && cart.length > 0) {
           // Save to Supabase for logged-in users
           for (const item of cart) {
-            await supabase
-              .from('cart')
-              .upsert({
-                user_id: user.id,
-                product_id: item.product_id,
-                quantity: item.quantity
+            try {
+              // Resolve product_id to UUID if it's numeric
+              const resolvedProductId = await resolveSupabaseProductId({
+                id: item.product_id
               });
+
+              await supabase
+                .from('cart')
+                .upsert({
+                  user_id: user.id,
+                  product_id: resolvedProductId,
+                  quantity: item.quantity
+                });
+            } catch (resolveError) {
+              console.error(
+                `[CartContext] Failed to save cart item with product_id ${item.product_id}:`,
+                resolveError instanceof Error ? resolveError.message : resolveError
+              );
+              // Continue with next item but ensure error is visible
+              throw resolveError;
+            }
           }
         }
       } catch (error) {
-        console.error('Error saving cart:', error);
+        console.error(
+          '[CartContext] Error saving cart to Supabase:',
+          error instanceof Error ? error.message : error
+        );
       }
     };
 
@@ -123,38 +141,76 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   }, [cart, user]);
 
   const addToCart = async (product: Product, quantity: number = 1) => {
-    const productId = String(product.id);
+    const localProductId = String(product.id);
 
     try {
       if (user) {
+        // Resolve product UUID for Supabase operations
+        let resolvedProductId: string;
+        try {
+          resolvedProductId = await resolveSupabaseProductId(product);
+        } catch (resolveError) {
+          console.error(
+            `[CartContext] Failed to resolve product UUID for local product_id ${localProductId}:`,
+            resolveError instanceof Error ? resolveError.message : resolveError
+          );
+          throw resolveError;
+        }
+
         // Check if item already exists in cart
-        const { data: existingItem } = await supabase
+        const { data: existingItem, error: queryError } = await supabase
           .from('cart')
           .select('*')
           .eq('user_id', user.id)
-          .eq('product_id', productId)
+          .eq('product_id', resolvedProductId)
           .maybeSingle();
+
+        if (queryError) {
+          console.error(
+            `[CartContext] Supabase query error for product ${resolvedProductId}:`,
+            queryError
+          );
+          throw queryError;
+        }
 
         if (existingItem) {
           // Update existing item
           const newQuantity = existingItem.quantity + quantity;
-          await supabase
+          const { error: updateError } = await supabase
             .from('cart')
             .update({ quantity: newQuantity })
             .eq('user_id', user.id)
-            .eq('product_id', productId);
+            .eq('product_id', resolvedProductId);
+
+          if (updateError) {
+            console.error(
+              `[CartContext] Supabase update error for product ${resolvedProductId}:`,
+              updateError
+            );
+            throw updateError;
+          }
         } else {
           // Add new item
-          await supabase
+          const { error: insertError } = await supabase
             .from('cart')
             .insert({
               user_id: user.id,
-              product_id: productId,
+              product_id: resolvedProductId,
               quantity: quantity
             });
+
+          if (insertError) {
+            console.error(
+              `[CartContext] Supabase insert error for product ${resolvedProductId}:`,
+              insertError
+            );
+            throw insertError;
+          }
         }
+
+        // Update local state with resolved UUID
         setCart(prev => {
-          const existingIndex = prev.findIndex(item => item.product_id === productId);
+          const existingIndex = prev.findIndex(item => item.product_id === resolvedProductId);
           if (existingIndex >= 0) {
             return prev.map((item, index) =>
               index === existingIndex
@@ -166,9 +222,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           return [
             ...prev,
             {
-              id: `cart_${Date.now()}_${productId}`,
+              id: `cart_${Date.now()}_${resolvedProductId}`,
               user_id: user.id,
-              product_id: productId,
+              product_id: resolvedProductId,
               quantity,
               cartProduct: product
             }
@@ -178,7 +234,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         throw new Error('Please log in to add products to cart.');
       }
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      console.error(
+        `[CartContext] Error adding product ${localProductId} to cart:`,
+        error instanceof Error ? error.message : error
+      );
       throw error;
     }
   };
@@ -186,18 +245,42 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const removeFromCart = async (productId: string) => {
     try {
       if (user) {
+        // Resolve product_id to UUID if needed
+        let resolvedProductId: string;
+        try {
+          resolvedProductId = await resolveSupabaseProductId({ id: productId });
+        } catch (resolveError) {
+          console.error(
+            `[CartContext] Failed to resolve product UUID for removal ${productId}:`,
+            resolveError instanceof Error ? resolveError.message : resolveError
+          );
+          throw resolveError;
+        }
+
         const { error } = await supabase
           .from('cart')
           .delete()
           .eq('user_id', user.id)
-          .eq('product_id', productId);
+          .eq('product_id', resolvedProductId);
 
-        if (error) throw error;
+        if (error) {
+          console.error(
+            `[CartContext] Supabase delete error for product ${resolvedProductId}:`,
+            error
+          );
+          throw error;
+        }
+
+        // Update local state to remove item
+        setCart(prev => prev.filter(item => item.product_id !== resolvedProductId));
       } else {
         setCart([]);
       }
     } catch (error) {
-      console.error('Error removing from cart:', error);
+      console.error(
+        `[CartContext] Error removing product ${productId} from cart:`,
+        error instanceof Error ? error.message : error
+      );
       throw error;
     }
   };
@@ -205,18 +288,48 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const updateQuantity = async (productId: string, newQuantity: number) => {
     try {
       if (user) {
+        // Resolve product_id to UUID if needed
+        let resolvedProductId: string;
+        try {
+          resolvedProductId = await resolveSupabaseProductId({ id: productId });
+        } catch (resolveError) {
+          console.error(
+            `[CartContext] Failed to resolve product UUID for quantity update ${productId}:`,
+            resolveError instanceof Error ? resolveError.message : resolveError
+          );
+          throw resolveError;
+        }
+
         const { error } = await supabase
           .from('cart')
           .update({ quantity: newQuantity })
           .eq('user_id', user.id)
-          .eq('product_id', productId);
+          .eq('product_id', resolvedProductId);
 
-        if (error) throw error;
+        if (error) {
+          console.error(
+            `[CartContext] Supabase update error for product ${resolvedProductId}:`,
+            error
+          );
+          throw error;
+        }
+
+        // Update local state
+        setCart(prev =>
+          prev.map(item =>
+            item.product_id === resolvedProductId
+              ? { ...item, quantity: newQuantity }
+              : item
+          )
+        );
       } else {
         throw new Error('Please log in to update your cart.');
       }
     } catch (error) {
-      console.error('Error updating quantity:', error);
+      console.error(
+        `[CartContext] Error updating quantity for product ${productId}:`,
+        error instanceof Error ? error.message : error
+      );
       throw error;
     }
   };

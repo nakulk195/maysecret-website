@@ -2,38 +2,43 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getProductImage } from '../utils/productImages';
+import { supabase } from '../lib/supabase';
 import { CheckCircle, Package, Truck, Heart } from 'lucide-react';
 
 interface OrderItem {
-  id: number;
-  cartId: number;
-  productId: number;
+  id: string;
+  order_id: string;
+  product_id: string;
   quantity: number;
-  cartProduct: {
-    id: number;
-    name: string;
-    price: string;
-    image: string;
-    stock: number;
-  };
+  price: number;
+  product_number?: number;
+  product_name?: string;
+  product_image?: string;
+  product_price?: number;
 }
 
 interface Order {
   id: string;
-  items: OrderItem[];
-  total: number;
-  address: {
-    name: string;
-    phone: string;
-    street: string;
-    city: string;
-    pincode: string;
-    state: string;
+  user_id: string;
+  total_amount: number;
+  payment_id?: string;
+  razorpay_order_id?: string;
+  payment_status?: string;
+  order_status?: string;
+  shipping_address?: {
+    fullName?: string;
+    mobileNumber?: string;
+    houseNo?: string;
+    address_line_1?: string;
+    area?: string;
+    landmark?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+    emailAddress?: string;
   };
-  date: string;
-  status: string;
-  paymentMethod: string;
-  paymentStatus: string;
+  created_at?: string;
+  order_items?: OrderItem[];
 }
 
 const OrderSuccess: React.FC = () => {
@@ -43,14 +48,49 @@ const OrderSuccess: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const orderId = searchParams.get('orderId');
-    if (orderId) {
-      // Get order from localStorage
-      const orders = JSON.parse(localStorage.getItem('guest_orders') || '[]');
-      const foundOrder = orders.find((o: Order) => o.id === orderId);
-      setOrder(foundOrder || null);
-    }
-    setLoading(false);
+    const loadOrder = async () => {
+      const orderId = searchParams.get('orderId');
+      if (!orderId) {
+        setOrder(null);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select(`
+            *,
+            order_items (
+              id,
+              order_id,
+              product_id,
+              quantity,
+              price,
+              product_number,
+              product_name,
+              product_image,
+              product_price
+            )
+          `)
+          .eq('id', orderId)
+          .maybeSingle();
+
+        if (error) {
+          console.error('[OrderSuccess] Supabase query error:', error);
+          setOrder(null);
+        } else {
+          setOrder(data as Order | null);
+        }
+      } catch (error) {
+        console.error('[OrderSuccess] Error fetching order:', error);
+        setOrder(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadOrder();
   }, [searchParams]);
 
   if (loading) {
@@ -94,65 +134,110 @@ const OrderSuccess: React.FC = () => {
               <p className="mt-2 text-sm text-gray-500">
                 Your order has been placed successfully.
               </p>
-              <p className="text-sm text-gray-500">
-                Order ID: {order.id}
+              <p className="mt-4 text-sm font-medium text-gray-700">
+                Order ID: <span className="text-gray-900">{order.id}</span>
               </p>
+              <div className="mt-3 flex flex-wrap justify-center gap-3 text-sm">
+                <span className="px-3 py-2 rounded-full bg-green-50 text-green-700">
+                  Payment: {order.payment_status || 'Completed'}
+                </span>
+                <span className="px-3 py-2 rounded-full bg-blue-50 text-blue-700">
+                  Status: {order.order_status || 'Processing'}
+                </span>
+              </div>
             </div>
 
-            {/* Order Summary */}
+            {/* Ordered Products */}
             <div className="border-t border-gray-200 pt-8">
-              <h2 className="text-lg font-medium text-gray-900 mb-6">Order Summary</h2>
-              <div className="space-y-6">
-                {order.items.map((item, index) => (
-                  <div key={`order-success-${item.id}-${index}`} className="flex items-center">
-                    <div className="flex-shrink-0 w-20 h-20 bg-gray-200 rounded-md overflow-hidden">
-                      <img
-                        src={getProductImage(item.cartProduct.image)}
-                        alt={item.cartProduct.name}
-                        className="w-full h-full object-cover object-center"
-                      />
+              <h2 className="text-lg font-medium text-gray-900 mb-6">Ordered Items</h2>
+              <div className="space-y-4">
+                {order.order_items?.map((item, index) => (
+                  <div key={`order-success-item-${item.id}-${index}`} className="grid grid-cols-12 gap-4 items-center bg-gray-50 p-4 rounded-xl">
+                    <div className="col-span-3">
+                      <div className="w-full h-24 bg-gray-200 rounded-lg overflow-hidden">
+                        <img
+                          src={getProductImage(item.product_image || '')}
+                          alt={item.product_name || 'Product'}
+                          className="w-full h-full object-cover object-center"
+                        />
+                      </div>
                     </div>
-                    <div className="ml-4 flex-1">
-                      <h3 className="text-base font-medium text-gray-900">
-                        {item.cartProduct.name}
+                    <div className="col-span-5">
+                      <h3 className="text-base font-semibold text-gray-900">
+                        {item.product_name || 'Product'}
                       </h3>
-                      <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                      <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                     </div>
-                    <p className="text-base font-medium text-gray-900">
-                      ₹{item.cartProduct.price}
-                    </p>
+                    <div className="col-span-4 text-right">
+                      <p className="text-base font-semibold text-gray-900">
+                        ₹{(item.product_price ?? item.price)?.toLocaleString()}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        ₹{((item.product_price ?? item.price) * item.quantity).toLocaleString()} total
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
 
               <div className="border-t border-gray-200 mt-8 pt-6">
-                <div className="flex justify-between text-base font-medium text-gray-900">
-                  <p>Total</p>
-                  <p>₹{order.total.toLocaleString()}</p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+                  <div>
+                    <p className="text-sm text-gray-500">Total amount</p>
+                    <p className="text-2xl font-bold text-gray-900">₹{order.total_amount?.toLocaleString()}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => navigate('/shop')}
+                      className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-warm-600 text-white text-sm font-semibold hover:bg-warm-700 transition-colors"
+                    >
+                      Continue Shopping
+                    </button>
+                    <button
+                      onClick={() => navigate('/orders')}
+                      className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-gray-100 text-gray-900 text-sm font-semibold hover:bg-gray-200 transition-colors"
+                    >
+                      View Orders
+                    </button>
+                    <button
+                      onClick={() => navigate('/orders')}
+                      className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
+                    >
+                      Track Order
+                    </button>
+                  </div>
                 </div>
-                <p className="mt-1 text-sm text-gray-500">
-                  Including all taxes and shipping fees
-                </p>
               </div>
             </div>
 
             {/* Delivery Address */}
             <div className="mt-10 border-t border-gray-200 pt-8">
               <h2 className="text-lg font-medium text-gray-900 mb-4">Delivery Address</h2>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-medium text-gray-900">{order.address.name}</p>
-                <p className="text-gray-600">{order.address.phone}</p>
-                <p className="text-gray-600">{order.address.street}</p>
-                <p className="text-gray-600">
-                  {order.address.city}, {order.address.state} {order.address.pincode}
+              <div className="bg-gray-50 p-6 rounded-xl">
+                <p className="font-semibold text-gray-900">
+                  {order.shipping_address?.fullName || order.shipping_address?.address_line_1 || 'N/A'}
                 </p>
-                <div className="text-sm text-blue-600">
-                  <p>Email: support@maysecret.com</p>
-                </div>
+                <p className="text-gray-600 mt-1">
+                  {order.shipping_address?.mobileNumber || ''}
+                </p>
+                <p className="text-gray-600 mt-2">
+                  {order.shipping_address?.houseNo || ''}
+                  {order.shipping_address?.houseNo && order.shipping_address?.address_line_1 ? ', ' : ''}
+                  {order.shipping_address?.address_line_1 || ''}
+                </p>
+                <p className="text-gray-600">
+                  {order.shipping_address?.area || order.shipping_address?.landmark || ''}
+                </p>
+                <p className="text-gray-600">
+                  {order.shipping_address?.city || ''}, {order.shipping_address?.state || ''} {order.shipping_address?.pincode || ''}
+                </p>
+                {order.shipping_address?.emailAddress && (
+                  <p className="text-gray-600">Email: {order.shipping_address.emailAddress}</p>
+                )}
               </div>
             </div>
-            </div>
           </div>
+        </div>
 
         {/* Additional Information */}
         <motion.div

@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { getProductImage } from '../utils/productImages';
 import { supabase } from '../lib/supabase';
+import { resolveSupabaseProductIdFromValue } from '../utils/productIdResolver';
 
 // Razorpay script
 const loadRazorpayScript = () => {
@@ -150,7 +151,7 @@ const Payment: React.FC = () => {
 
   const saveOrderToSupabase = async (razorpayPaymentId: string, razorpayOrderId: string) => {
     try {
-      if (!user || !address) return;
+      if (!user || !address) return null;
 
       // Create order in Supabase
       const { data: orderData, error: orderError } = await supabase
@@ -169,28 +170,51 @@ const Payment: React.FC = () => {
         .single();
 
       if (orderError) {
-        throw new Error('Failed to save order');
+        console.error('[Payment] Supabase order insert error:', orderError);
+        throw orderError;
       }
 
-      // Save order items
-      const orderItems = cart.map(item => ({
-        order_id: orderData.id,
-        product_id: item.product_id,
-        quantity: item.quantity,
-        price: Number(item.cartProduct?.price || 0)
-      }));
+      if (!orderData?.id) {
+        throw new Error('Order insertion returned no order id');
+      }
+
+      const isNumeric = (value: any): boolean => {
+        if (typeof value === 'number') return !Number.isNaN(value);
+        if (typeof value === 'string') return value.trim() !== '' && !Number.isNaN(Number(value));
+        return false;
+      };
+
+      const orderItems = await Promise.all(
+        cart.map(async item => {
+          const originalProductId = item.product_id;
+          const resolvedProductId = await resolveSupabaseProductIdFromValue(originalProductId);
+          const productNumber = isNumeric(originalProductId) ? Number(originalProductId) : undefined;
+
+          return {
+            order_id: orderData.id,
+            product_id: resolvedProductId,
+            ...(productNumber !== undefined ? { product_number: productNumber } : {}),
+            product_name: item.cartProduct?.name || '',
+            product_image: item.cartProduct?.image || '',
+            product_price: Number(item.cartProduct?.price || 0),
+            quantity: item.quantity,
+            price: Number(item.cartProduct?.price || 0)
+          } as any;
+        })
+      );
 
       const { error: itemsError } = await supabase
         .from('order_items')
         .insert(orderItems);
 
       if (itemsError) {
-        throw new Error('Failed to save order items');
+        console.error('[Payment] Supabase order_items insert error:', itemsError);
+        throw itemsError;
       }
 
       return orderData;
     } catch (error) {
-      console.error('Error saving order to database:', error);
+      console.error('[Payment] Error saving order to Supabase:', error);
       throw error;
     }
   };
@@ -221,17 +245,23 @@ const Payment: React.FC = () => {
               response.razorpay_order_id
             );
 
-            // Clear cart
+            if (!orderData?.id) {
+              throw new Error('Order save returned invalid order id');
+            }
+
+            // Clear cart only after order and order_items successfully saved
             await clearCart();
 
             // Clear shipping address from localStorage
             localStorage.removeItem('shipping_address');
 
-            // Redirect to orders page
-            navigate('/orders');
+            // Redirect to order success page
+            navigate(`/order-success?orderId=${orderData.id}`);
           } catch (error) {
-            console.error('Error processing payment success:', error);
-            alert('Payment successful but failed to save order. Please contact support.');
+            console.error('[Payment] Error processing payment success:', error);
+            alert(
+              'Payment successful but failed to save order. Please contact support with order details.'
+            );
           } finally {
             setIsProcessing(false);
           }

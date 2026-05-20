@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { useAuth } from './AuthContext';
 import { wishlistService } from '../services/database';
 import { supabase, Product } from '../lib/supabase';
+import { resolveSupabaseProductId } from '../utils/productIdResolver';
 
 interface WishlistContextType {
   wishlist: Product[];
@@ -97,11 +98,25 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     try {
       setLoading(true);
       const productId = String(product.id);
-      await wishlistService.addToWishlist(user.id, productId);
+      let resolvedProductId: string;
+
+      try {
+        resolvedProductId = await resolveSupabaseProductId(product);
+      } catch (resolveError) {
+        console.error(
+          `[WishlistContext] Failed to resolve product UUID for wishlist add ${productId}:`,
+          resolveError instanceof Error ? resolveError.message : resolveError
+        );
+        throw resolveError;
+      }
+
+      await wishlistService.addToWishlist(user.id, resolvedProductId);
       
       // Add to local state
       setWishlist(prev => (
-        prev.some(item => String(item.id) === productId) ? prev : [...prev, product]
+        prev.some(item => String(item.id) === productId || String(item.id) === resolvedProductId)
+          ? prev
+          : [...prev, product]
       ));
     } catch (error) {
       console.error('Error adding to wishlist:', error);
@@ -115,10 +130,23 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
     try {
       setLoading(true);
+      let resolvedProductId = productId;
+
+      try {
+        resolvedProductId = await resolveSupabaseProductId({ id: productId });
+      } catch (resolveError) {
+        console.error(
+          `[WishlistContext] Failed to resolve product UUID for wishlist remove ${productId}:`,
+          resolveError instanceof Error ? resolveError.message : resolveError
+        );
+      }
+
       await wishlistService.removeFromWishlist(user.id, productId);
       
       // Remove from local state
-      setWishlist(prev => prev.filter(item => String(item.id) !== productId));
+      setWishlist(prev => prev.filter(item =>
+        String(item.id) !== productId && String(item.id) !== resolvedProductId
+      ));
     } catch (error) {
       console.error('Error removing from wishlist:', error);
     } finally {

@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Profile, Address, Wishlist, ContactMessage } from '../lib/supabase';
+import { resolveSupabaseProductIdFromValue } from '../utils/productIdResolver';
 
 // Profile Service
 export const profileService = {
@@ -144,21 +145,31 @@ export const wishlistService = {
   // Add item to wishlist
   async addToWishlist(userId: string, productId: string) {
     try {
+      const resolvedProductId = await resolveSupabaseProductIdFromValue(productId);
       const { data, error } = await supabase
         .from('wishlist')
         .upsert([
           {
             user_id: userId,
-            product_id: productId
+            product_id: resolvedProductId
           }
         ], { onConflict: 'user_id,product_id' })
         .select()
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error(
+          `[database.wishlistService] Error adding to wishlist for product ${productId}:`,
+          error
+        );
+        throw error;
+      }
       return data;
     } catch (error) {
-      console.error('Error adding to wishlist:', error);
+      console.error(
+        `[database.wishlistService] Failed to resolve or add wishlist product ${productId}:`,
+        error
+      );
       throw error;
     }
   },
@@ -183,16 +194,26 @@ export const wishlistService = {
   // Remove item from wishlist
   async removeFromWishlist(userId: string, productId: string) {
     try {
+      const resolvedProductId = await resolveSupabaseProductIdFromValue(productId);
       const { error } = await supabase
         .from('wishlist')
         .delete()
         .eq('user_id', userId)
-        .eq('product_id', productId);
+        .eq('product_id', resolvedProductId);
 
-      if (error) throw error;
+      if (error) {
+        console.error(
+          `[database.wishlistService] Error removing wishlist product ${productId}:`,
+          error
+        );
+        throw error;
+      }
       return true;
     } catch (error) {
-      console.error('Error removing from wishlist:', error);
+      console.error(
+        `[database.wishlistService] Failed to resolve or remove wishlist product ${productId}:`,
+        error
+      );
       throw error;
     }
   },
@@ -200,17 +221,27 @@ export const wishlistService = {
   // Check if item is in wishlist
   async isInWishlist(userId: string, productId: string) {
     try {
+      const resolvedProductId = await resolveSupabaseProductIdFromValue(productId);
       const { data, error } = await supabase
         .from('wishlist')
         .select('*')
         .eq('user_id', userId)
-        .eq('product_id', productId)
+        .eq('product_id', resolvedProductId)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error && error.code !== 'PGRST116') {
+        console.error(
+          `[database.wishlistService] Error checking wishlist product ${productId}:`,
+          error
+        );
+        throw error;
+      }
       return !!data;
     } catch (error) {
-      console.error('Error checking wishlist:', error);
+      console.error(
+        `[database.wishlistService] Failed to resolve or check wishlist product ${productId}:`,
+        error
+      );
       return false;
     }
   }

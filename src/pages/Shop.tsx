@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, Grid, List, Search, X, ChevronDown, Star } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
@@ -6,6 +7,7 @@ import { Product } from '../utils/productData';
 import { products as localProducts } from '../utils/productData';
 import { getProductImage } from '../utils/productImages';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'newest' | 'rating';
@@ -20,7 +22,10 @@ const Shop: React.FC = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [cartMessage, setCartMessage] = useState('');
   const { addToCart } = useCart();
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   // Load products from local productData
   useEffect(() => {
@@ -106,8 +111,18 @@ const Shop: React.FC = () => {
   };
 
   const handleAddToCart = async (product: any) => {
+    if (!product.stock || authLoading) return;
+
+    if (!user) {
+      localStorage.setItem('redirect_after_login', window.location.pathname);
+      navigate('/login');
+      return;
+    }
+
     try {
       await addToCart(product, 1);
+      setCartMessage(`${product.name} added to cart`);
+      window.setTimeout(() => setCartMessage(''), 2500);
     } catch (error) {
       console.error('Shop: Error adding to cart:', error);
     }
@@ -117,6 +132,11 @@ const Shop: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 py-4 sm:py-8">
       {/* Floating Social Buttons */}
       <FloatingSocialButtons />
+      {cartMessage && (
+        <div className="fixed left-1/2 top-20 z-50 -translate-x-1/2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-lg">
+          {cartMessage}
+        </div>
+      )}
       
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
@@ -304,9 +324,7 @@ const Shop: React.FC = () => {
                 transition={{ duration: 0.3 }}
               >
                 <ProductCard 
-                  product={product} 
-                  onAddToCart={() => handleAddToCart(product)}
-                />
+                  product={product}                 />
               </motion.div>
             ))}
           </div>
@@ -400,3 +418,5 @@ const Shop: React.FC = () => {
 };
 
 export default Shop; 
+
+

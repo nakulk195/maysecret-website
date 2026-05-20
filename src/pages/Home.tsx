@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Sparkles, Star } from 'lucide-react';
 // Load products from local productData
 import { products as localProducts } from '../utils/productData';
-import { useCart } from '../contexts/CartContext';
 import type { Product } from '../utils/productData';
 import ProductCard from '../components/ProductCard';
-import comingSoonImg from '../assets/images/coming-soon.png';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 import heroimg1 from '../assets/images/heroimg1.png';
 import heroimg2 from '../assets/images/heroimg2.png';
@@ -40,26 +38,6 @@ const Home: React.FC = () => {
       setLoading(false);
     }
   }, []);
-
-  // Add null safety check for CartContext
-  let addToCart: (product: any, quantity?: number) => Promise<void>;
-  try {
-    const cartContext = useCart();
-    addToCart = cartContext.addToCart;
-  } catch (error) {
-    console.error('Home: CartContext not available:', error);
-    addToCart = async () => {
-      console.warn('Home: CartContext not available - addToCart disabled');
-    };
-  }
-
-  const handleAddToCart = async (product: Product) => {
-    try {
-      await addToCart(product, 1);
-    } catch (error) {
-      console.error('Home: Error adding to cart:', error);
-    }
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -313,9 +291,7 @@ const Home: React.FC = () => {
                 }}
               >
                 <ProductCard 
-                  product={product} 
-                  onAddToCart={() => handleAddToCart(product)}
-                />
+                  product={product}                />
               </motion.div>
             ))}
             
@@ -467,3 +443,4 @@ const Home: React.FC = () => {
 };
 
 export default Home; 
+

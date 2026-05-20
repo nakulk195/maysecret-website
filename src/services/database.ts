@@ -146,12 +146,12 @@ export const wishlistService = {
     try {
       const { data, error } = await supabase
         .from('wishlist')
-        .insert([
+        .upsert([
           {
             user_id: userId,
             product_id: productId
           }
-        ])
+        ], { onConflict: 'user_id,product_id' })
         .select()
         .maybeSingle();
 
@@ -378,3 +378,7 @@ export const initializeDatabase = async () => {
     console.error('Error initializing database:', error);
   }
 };
+
+
+
+

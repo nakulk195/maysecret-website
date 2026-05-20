@@ -96,10 +96,13 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
     try {
       setLoading(true);
-      await wishlistService.addToWishlist(user.id, product.id);
+      const productId = String(product.id);
+      await wishlistService.addToWishlist(user.id, productId);
       
       // Add to local state
-      setWishlist(prev => [...prev, product]);
+      setWishlist(prev => (
+        prev.some(item => String(item.id) === productId) ? prev : [...prev, product]
+      ));
     } catch (error) {
       console.error('Error adding to wishlist:', error);
     } finally {
@@ -115,7 +118,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       await wishlistService.removeFromWishlist(user.id, productId);
       
       // Remove from local state
-      setWishlist(prev => prev.filter(item => item.id !== productId));
+      setWishlist(prev => prev.filter(item => String(item.id) !== productId));
     } catch (error) {
       console.error('Error removing from wishlist:', error);
     } finally {
@@ -141,7 +144,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       setLoading(true);
       // Clear all items for user
       for (const item of wishlist) {
-        await wishlistService.removeFromWishlist(user.id, item.id);
+        await wishlistService.removeFromWishlist(user.id, String(item.id));
       }
       setWishlist([]);
     } catch (error) {
@@ -169,3 +172,5 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     </WishlistContext.Provider>
   );
 };
+
+

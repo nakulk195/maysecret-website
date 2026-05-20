@@ -7,19 +7,21 @@ import { getProductImage } from '../utils/productImages';
 import { addToRecentlyViewed } from '../utils/storage';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
+import { useAuth } from '../contexts/AuthContext';
 
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart?: () => void;
   className?: string;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, className = '' }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [cartMessage, setCartMessage] = useState('');
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   
   // Use WishlistContext
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -45,9 +47,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
     checkWishlist();
   }, [product.id, isInWishlist]);
 
+  const goToLogin = () => {
+    localStorage.setItem('redirect_after_login', window.location.pathname);
+    navigate('/login');
+  };
+
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (authLoading) return;
+    if (!user) {
+      goToLogin();
+      return;
+    }
     
     try {
       if (isWishlisted) {
@@ -65,10 +78,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!product.stock || authLoading) return;
+    if (!user) {
+      goToLogin();
+      return;
+    }
     
     try {
       await addToCart(product, 1);
-      if (onAddToCart) onAddToCart();
+      setCartMessage(`${product.name} added to cart`);
+      window.setTimeout(() => setCartMessage(''), 2500);
     } catch (error) {
       console.error('Error adding product to cart:', error);
     }
@@ -91,6 +111,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {cartMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute top-3 left-3 right-3 z-20 rounded-lg bg-gray-900 px-3 py-2 text-center text-xs font-semibold text-white shadow-lg"
+        >
+          {cartMessage}
+        </motion.div>
+      )}
+
       <Link to={`/product/${product.id}`} onClick={handleProductClick} className="block">
         <div className="relative overflow-hidden h-40 md:h-52 w-full">
           {/* Loading placeholder */}
@@ -228,3 +258,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, classNa
 };
 
 export default ProductCard;
+
+
+

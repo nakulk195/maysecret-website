@@ -83,12 +83,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           }));
           setCart(cartItems);
         } else {
-          // Load from localStorage for guest users
-          const savedCart = localStorage.getItem('guest_cart');
-          if (savedCart) {
-            const cartItems: CartItem[] = JSON.parse(savedCart);
-            setCart(cartItems);
-          }
+          localStorage.removeItem('guest_cart');
+          setCart([]);
         }
       } catch (error) {
         console.error('Error loading cart:', error);
@@ -117,9 +113,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
                 quantity: item.quantity
               });
           }
-        } else if (!user && cart.length > 0) {
-          // Save to localStorage for guest users
-          localStorage.setItem('guest_cart', JSON.stringify(cart));
         }
       } catch (error) {
         console.error('Error saving cart:', error);
@@ -130,6 +123,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   }, [cart, user]);
 
   const addToCart = async (product: Product, quantity: number = 1) => {
+    const productId = String(product.id);
+
     try {
       if (user) {
         // Check if item already exists in cart
@@ -137,8 +132,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           .from('cart')
           .select('*')
           .eq('user_id', user.id)
-          .eq('product_id', product.id)
-          .single();
+          .eq('product_id', productId)
+          .maybeSingle();
 
         if (existingItem) {
           // Update existing item
@@ -147,35 +142,40 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             .from('cart')
             .update({ quantity: newQuantity })
             .eq('user_id', user.id)
-            .eq('product_id', product.id);
+            .eq('product_id', productId);
         } else {
           // Add new item
           await supabase
             .from('cart')
             .insert({
               user_id: user.id,
-              product_id: product.id,
+              product_id: productId,
               quantity: quantity
             });
         }
+        setCart(prev => {
+          const existingIndex = prev.findIndex(item => item.product_id === productId);
+          if (existingIndex >= 0) {
+            return prev.map((item, index) =>
+              index === existingIndex
+                ? { ...item, quantity: item.quantity + quantity, cartProduct: item.cartProduct || product }
+                : item
+            );
+          }
+
+          return [
+            ...prev,
+            {
+              id: `cart_${Date.now()}_${productId}`,
+              user_id: user.id,
+              product_id: productId,
+              quantity,
+              cartProduct: product
+            }
+          ];
+        });
       } else {
-        // Handle guest cart
-        const newCart = [...cart];
-        const existingIndex = newCart.findIndex(item => item.product_id === product.id);
-        
-        if (existingIndex >= 0) {
-          newCart[existingIndex].quantity += quantity;
-        } else {
-          newCart.push({
-            id: `cart_${Date.now()}_${product.id}`,
-            user_id: 'guest',
-            product_id: product.id,
-            quantity,
-            cartProduct: product
-          });
-        }
-        
-        setCart(newCart);
+        throw new Error('Please log in to add products to cart.');
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -194,8 +194,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
         if (error) throw error;
       } else {
-        const newCart = cart.filter(item => item.product_id !== productId);
-        setCart(newCart);
+        setCart([]);
       }
     } catch (error) {
       console.error('Error removing from cart:', error);
@@ -214,10 +213,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
         if (error) throw error;
       } else {
-        const newCart = cart.map(item =>
-          item.product_id === productId ? { ...item, quantity: newQuantity } : item
-        );
-        setCart(newCart);
+        throw new Error('Please log in to update your cart.');
       }
     } catch (error) {
       console.error('Error updating quantity:', error);
@@ -272,3 +268,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     </CartContext.Provider>
   );
 };
+
+
+
+

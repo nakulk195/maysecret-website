@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Clock, Send, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { contactService } from '../services/database';
 
 const Contact: React.FC = () => {
   const { user } = useAuth();
@@ -50,22 +49,25 @@ const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      setErrorMessage('Please fill in all required fields before sending your message.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const message = `New Contact Inquiry from May Secret Website\n\nName: ${formData.name}\nEmail: ${formData.email}\nSubject: ${formData.subject}\nMessage: ${formData.message}`;
+    const encodedMessage = encodeURIComponent(message);
+    const waUrl = `https://wa.me/919075849555?text=${encodedMessage}`;
 
     try {
-      // Save message to database for both logged-in users and guests
-      await contactService.saveMessage(user?.id || '', {
-        full_name: formData.name,
-        email: formData.email,
-        subject: formData.subject,
-        message: formData.message
-      });
-
-      // Show success message instead of alert
-      setSuccessMessage('Thank you for your message! We will get back to you soon.');
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      window.open(waUrl, '_blank');
+      setSuccessMessage('WhatsApp opened. Please send the message to complete your inquiry.');
     } catch (error) {
-      console.error('Error sending message:', error);
-      setErrorMessage('There was an error sending your message. Please try again.');
+      console.error('Error opening WhatsApp:', error);
+      setErrorMessage('Unable to open WhatsApp. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

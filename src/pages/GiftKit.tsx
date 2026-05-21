@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import giftKitPack from '../assets/images/giftkit_pack.png';
 
 const GiftKit: React.FC = () => {
   useEffect(() => {
@@ -29,36 +30,40 @@ const GiftKit: React.FC = () => {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
+          whileHover={{ y: -8 }}
+          whileTap={{ scale: 0.995 }}
           className="max-w-md mx-auto"
         >
-          <div className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-warm-100">
-            <div className="relative overflow-hidden aspect-square">
-              {/* Placeholder image area */}
-              <div className="absolute inset-0 bg-gradient-to-br from-warm-50 to-warm-100 flex items-center justify-center">
-                <div className="w-24 h-16 sm:w-28 sm:h-20 bg-rose-200/60 rounded-lg" />
+          <div className="group bg-white rounded-[2rem] shadow-xl shadow-rose-100/50 hover:shadow-2xl transition-all duration-500 overflow-hidden border border-rose-100">
+            <div className="relative overflow-hidden bg-gradient-to-br from-rose-50 via-white to-pink-50">
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-100/60 via-white to-rose-100/80" />
+              <div className="relative aspect-[4/3] flex items-center justify-center p-6">
+                <motion.img
+                  src={giftKitPack}
+                  alt="Luxury Gift Kit"
+                  className="max-h-full w-full object-contain rounded-3xl shadow-lg shadow-rose-200/50 transition-transform duration-500 group-hover:scale-[1.03]"
+                />
               </div>
 
               {/* Coming soon tag */}
-              <div className="absolute top-3 left-3 bg-rose-100 text-rose-700 text-xs font-medium px-3 py-1 rounded-full">
+              <div className="absolute top-4 left-4 bg-rose-100/95 text-rose-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-rose-200 shadow-sm animate-pulse">
                 Coming Soon
               </div>
             </div>
 
             {/* Info */}
-            <div className="p-5">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2 text-center">
+            <div className="p-6 text-center">
+              <h3 className="text-xl font-semibold text-gray-800 mb-3">
                 Luxury Gift Kit
               </h3>
+              <p className="text-sm text-gray-500 mb-6">Available Soon</p>
 
-              <div className="flex flex-col items-center space-y-3">
-                <span className="text-sm text-gray-500">Available Soon</span>
-                <button
-                  disabled
-                  className="w-full cursor-not-allowed opacity-70 bg-gray-200 text-gray-500 py-3 px-4 rounded-lg font-medium"
-                >
-                  Add to Cart
-                </button>
-              </div>
+              <button
+                disabled
+                className="w-full cursor-not-allowed opacity-80 bg-gray-200 text-gray-500 py-3 px-4 rounded-2xl font-medium"
+              >
+                Add to Cart
+              </button>
             </div>
           </div>
         </motion.div>

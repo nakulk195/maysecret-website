@@ -13,6 +13,7 @@ interface AuthContextType {
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error: any; data: any }>
   fetchProfile: (userId: string) => Promise<void>
+  signInWithGoogle: () => Promise<{ data: any; error: any }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -29,7 +30,7 @@ interface AuthProviderProps {
   children: ReactNode
 }
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
@@ -137,6 +138,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await supabase.auth.signOut()
   }
 
+  const signInWithGoogle = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/` }
+      })
+
+      return { data, error }
+    } catch (error) {
+      return { data: null, error }
+    }
+  }
+
   const resetPassword = async (email: string) => {
     try {
       const { data, error } = await supabase.auth.resetPasswordForEmail(email)
@@ -184,6 +198,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signIn,
     signOut,
     resetPassword,
+    signInWithGoogle,
     fetchProfile
   }
 

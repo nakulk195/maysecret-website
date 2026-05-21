@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, MessageCircle, Youtube, Facebook, Mail, CreditCard, Smartphone, Wallet } from 'lucide-react';
+import { Instagram, MessageCircle, Facebook, Mail, CreditCard, Smartphone, Wallet } from 'lucide-react';
 import { BRAND_NAME } from '../config/brand';
 
 const Footer: React.FC = () => {
@@ -30,50 +30,55 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/product/sunscreen" className="hover:text-pink-400 transition duration-200">
+                <Link to="/product/1" className="hover:text-pink-400 transition duration-200">
                   Sunscreen Spray
                 </Link>
               </li>
               <li>
-                <Link to="/product/serum" className="hover:text-pink-400 transition duration-200">
+                <Link to="/product/2" className="hover:text-pink-400 transition duration-200">
                   Brightening Serum
                 </Link>
               </li>
               <li>
-                <Link to="/combo" className="hover:text-pink-400 transition duration-200">
+                <Link to="/product/3" className="hover:text-pink-400 transition duration-200">
                   Combo Packs
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Customer Care */}
+          {/* Customer Service */}
           <div>
-            <h3 className="font-semibold mb-4 text-lg">Customer Care</h3>
+            <h3 className="font-semibold mb-4 text-lg">Customer Service</h3>
             <ul className="space-y-2 text-gray-400 text-sm">
-              <li>
-                <Link to="/contact" className="hover:text-pink-400 transition duration-200">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/orders" className="hover:text-pink-400 transition duration-200">
-                  Track Order
-                </Link>
-              </li>
               <li>
                 <Link to="/faq" className="hover:text-pink-400 transition duration-200">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link to="/shipping" className="hover:text-pink-400 transition duration-200">
+                <Link to="/shipping-policy" className="hover:text-pink-400 transition duration-200">
                   Shipping Policy
                 </Link>
               </li>
               <li>
-                <Link to="/returns" className="hover:text-pink-400 transition duration-200">
+                <Link to="/return-policy" className="hover:text-pink-400 transition duration-200">
                   Return Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy-policy" className="hover:text-pink-400 transition duration-200">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms-and-conditions" className="hover:text-pink-400 transition duration-200">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-pink-400 transition duration-200">
+                  Contact Us
                 </Link>
               </li>
             </ul>
@@ -86,21 +91,6 @@ const Footer: React.FC = () => {
               <li>
                 <Link to="/skincare-tips" className="hover:text-pink-400 transition duration-200">
                   Skincare Tips
-                </Link>
-              </li>
-              <li>
-                <Link to="/korean-skincare" className="hover:text-pink-400 transition duration-200">
-                  K-Beauty Routine
-                </Link>
-              </li>
-              <li>
-                <Link to="/ingredients" className="hover:text-pink-400 transition duration-200">
-                  Ingredient Guide
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="hover:text-pink-400 transition duration-200">
-                  Beauty Blog
                 </Link>
               </li>
             </ul>
@@ -138,15 +128,7 @@ const Footer: React.FC = () => {
               >
                 <MessageCircle className="w-5 h-5" />
               </a>
-              <a 
-                href="https://youtube.com/maysecret" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="hover:text-red-400 transition duration-200"
-                aria-label="YouTube"
-              >
-                <Youtube className="w-5 h-5" />
-              </a>
+              {/* YouTube removed because the site does not have a YouTube channel at this time */}
               <a 
                 href="https://facebook.com/maysecret" 
                 target="_blank" 

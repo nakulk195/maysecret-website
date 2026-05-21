@@ -75,20 +75,20 @@ const Contact: React.FC = () => {
     {
               icon: <Mail size={24} className="text-warm-700" />,
       title: "Email",
-      details: "support@maysecret.com",
+      details: "maysecretskinandbeauty@gmail.com",
       description: "Send us an email anytime"
     },
     {
               icon: <MapPin size={24} className="text-warm-700" />,
       title: "Address",
-      details: "123 Beauty Street, Mumbai, Maharashtra 400001",
-      description: "Visit our office"
+      details: "Pune, Maharashtra, India",
+      description: ""
     },
     {
               icon: <Clock size={24} className="text-warm-700" />,
       title: "Business Hours",
-      details: "Monday - Saturday",
-      description: "9:00 AM - 6:00 PM"
+      details: "Business hr - 10 am - 8pm (Mon - Sat)",
+      description: ""
     }
   ];
 
@@ -291,23 +291,7 @@ const Contact: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Map Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-16"
-        >
-          <div className="bg-white rounded-xl shadow-sm border border-rose-100 p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-              <span className="font-bold"></span>
-              <span className="text-sm text-gray-500 ml-2">(Visit Our Store)</span>
-            </h2>
-            <div className="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
-              <p className="text-gray-600">Map placeholder - Would show actual location</p>
-            </div>
-          </div>
-        </motion.div>
+        {/* Map / Visit our store removed per update */}
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ const AnnouncementBar: React.FC = () => {
   }, [messages.length]);
 
   return (
-    <div className="w-full bg-red-600 flex items-center justify-center h-12 overflow-hidden relative">
+    <div className="w-full bg-black flex items-center justify-center h-12 overflow-hidden relative">
       <div className="w-full h-full flex items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.div

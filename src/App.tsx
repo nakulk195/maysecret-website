@@ -28,6 +28,11 @@ import RecentlyViewed from './pages/RecentlyViewed';
 import Quiz from './pages/Quiz';
 import GiftKit from './pages/GiftKit';
 import SkincareTipsPage from './pages/SkincareTipsPage';
+import FAQ from './pages/FAQ';
+import ShippingPolicy from './pages/ShippingPolicy';
+import ReturnPolicy from './pages/ReturnPolicy';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import './App.css';
 
@@ -84,6 +89,11 @@ function App() {
                   <Route path="/recently-viewed" element={<RecentlyViewed />} />
                   <Route path="/quiz" element={<Quiz />} />
                   <Route path="/skincare-tips" element={<SkincareTipsPage />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                  <Route path="/return-policy" element={<ReturnPolicy />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
                 </Routes>
               </main>
               <Footer />

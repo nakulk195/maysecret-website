@@ -99,7 +99,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
     addToRecentlyViewed(product as any);
   };
 
-  const discountPercentage = 0; // No discount calculation since original_price doesn't exist
+  const discountPercentage = product.originalPrice && product.originalPrice > product.price
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
 
   return (
     <motion.div
@@ -122,28 +124,28 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
       )}
 
       <Link to={`/product/${product.id}`} onClick={handleProductClick} className="block">
-        <div className="relative overflow-hidden h-40 md:h-52 w-full">
+        <div className="relative overflow-hidden h-40 md:h-52 w-full bg-gray-50 flex items-center justify-center">
           {/* Loading placeholder */}
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-gradient-to-br from-warm-50 to-warm-100 animate-pulse" />
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-gray-50 to-white animate-pulse" />
           )}
           
           {/* Product Image */}
           <motion.img
             src={getProductImage(product.image)}
             alt={product.name}
-            className={`w-full h-full object-cover transition-transform duration-500 ${
-              isHovered ? 'scale-110' : 'scale-100'
+            className={`max-w-full max-h-full transition-transform duration-500 ${
+              isHovered ? 'scale-105' : 'scale-100'
             } ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             onLoad={() => setImageLoaded(true)}
             loading="lazy"
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            style={{ objectFit: 'contain', objectPosition: 'center' }}
           />
           
           {/* Discount Badge */}
           {discountPercentage > 0 && (
-            <div className="absolute top-2 left-2 bg-warm-700 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
-              -{discountPercentage}% OFF
+            <div className="absolute top-2 left-2 bg-rose-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+              {discountPercentage}% OFF
             </div>
           )}
           
@@ -220,10 +222,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
           
           {/* Price */}
           <div className="mb-4">
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-baseline gap-3 flex-wrap">
               <span className="text-lg font-bold text-gray-900">
                 ₹{product.price.toLocaleString()}
               </span>
+              {product.originalPrice && product.originalPrice > product.price && (
+                <span className="text-sm text-gray-500 line-through">
+                  ₹{product.originalPrice.toLocaleString()}
+                </span>
+              )}
             </div>
             <div className="text-xs text-gray-500 mt-1">Inclusive of all taxes</div>
           </div>

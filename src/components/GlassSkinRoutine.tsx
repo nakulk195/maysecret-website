@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles, Droplets, Shield } from 'lucide-react';
-import serumImg from '../assets/images/products/serum.png';
-import sunscreenImg from '../assets/images/products/sunscreen.png';
-import glowImg from '../assets/images/products/glow.png';
+import serumImg from '../assets/images/brightening-serum.PNG';
+import sunscreenImg from '../assets/images/sunscreen-spray.PNG';
+import glowImg from '../assets/images/combo.PNG';
 import { BRAND_NAME } from '../config/brand';
 
 const GlassSkinRoutine: React.FC = () => {
@@ -18,12 +18,12 @@ const GlassSkinRoutine: React.FC = () => {
       icon: <Sparkles className="w-6 h-6 text-pink-600" />,
       buttonColor: 'bg-pink-600 hover:bg-pink-700',
       buttonText: 'View Product',
-      link: '/product/serum'
+      link: '/product/2'
     },
     {
       id: 2,
       title: 'Step 2 – Hydrate & Glow',
-      product: 'Niacinamide + Rice Extract',
+      product: 'May Secret Glow Combo Pack',
       description: 'Niacinamide and rice extract help hydrate skin and improve brightness.',
       image: glowImg,
       icon: <Droplets className="w-6 h-6 text-blue-600" />,
@@ -40,7 +40,7 @@ const GlassSkinRoutine: React.FC = () => {
       icon: <Shield className="w-6 h-6 text-green-600" />,
       buttonColor: 'bg-green-600 hover:bg-green-700',
       buttonText: 'View Product',
-      link: '/product/sunscreen'
+      link: '/product/1'
     }
   ];
 
@@ -172,7 +172,7 @@ const GlassSkinRoutine: React.FC = () => {
             <p className="text-gray-600 mb-6">
               Complete the full routine for best results and achieve that coveted Korean glass glow.
             </p>
-            <Link to="/combo">
+            <Link to="/product/3">
               <button className="px-8 py-3 bg-gradient-to-r from-pink-600 to-pink-700 text-white rounded-lg font-semibold hover:from-pink-700 hover:to-pink-800 transition-all duration-300 transform hover:scale-105">
                 Shop Complete Routine
               </button>

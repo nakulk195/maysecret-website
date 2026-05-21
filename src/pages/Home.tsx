@@ -78,14 +78,14 @@ const Home: React.FC = () => {
 
       {/* Rotating Banner (below header) */}
       <section className="relative w-full overflow-hidden">
-        <div className="relative w-full flex items-center justify-center bg-black overflow-hidden h-[220px] sm:h-[280px] md:h-[450px] lg:h-[550px]">
+        <div className="relative w-full flex items-center justify-center bg-black overflow-hidden border-b border-white/10 h-[260px] sm:h-[320px] md:h-[420px] lg:h-[520px]">
           {heroImages.map((img, index) =>
             img ? (
               <img
                 key={index}
                 src={img}
                 alt="Hero"
-                className={`absolute top-0 left-0 w-full h-[220px] sm:h-[280px] md:h-[450px] lg:h-[550px] object-cover bg-black transition-opacity duration-700 ${
+                className={`absolute inset-0 w-full h-full object-contain bg-black transition-opacity duration-700 ${
                   index === currentIndex ? "opacity-100" : "opacity-0"
                 }`}
               />
@@ -109,132 +109,7 @@ const Home: React.FC = () => {
       {/* New Rotating Tagline Below Hero Images */}
       <RotatingTagline />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-pink-50 via-white to-cream-100 py-6 md:py-10 px-4 scroll-smooth">
-        {/* Background Animation Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            animate={{
-              x: [0, 100, 0],
-              y: [0, -50, 0],
-              rotate: [0, 180, 360]
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-pink-200/30 to-rose-300/20 rounded-full blur-xl"
-          />
-          <motion.div
-            animate={{
-              x: [0, -80, 0],
-              y: [0, 60, 0],
-              rotate: [360, 180, 0]
-            }}
-            transition={{
-              duration: 25,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="absolute bottom-20 right-20 w-40 h-40 bg-gradient-to-br from-cream-300/20 to-pink-200/30 rounded-full blur-xl"
-          />
-          <motion.div
-            animate={{
-              x: [0, 60, 0],
-              y: [0, -30, 0],
-              scale: [1, 1.2, 1]
-            }}
-            transition={{
-              duration: 15,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="absolute top-1/2 left-1/2 w-24 h-24 bg-gradient-to-br from-pink-300/20 to-cream-400/20 rounded-full blur-lg"
-          />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 lg:py-32">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="text-center"
-          >
-            {/* Brand Name with Korean Text and Animation */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="mb-8"
-            >
-              <motion.h1 
-                initial={{ opacity: 0, letterSpacing: "0.5em" }}
-                animate={{ opacity: 1, letterSpacing: "0.1em" }}
-                transition={{ duration: 1.2, delay: 0.4 }}
-                className="text-2xl md:text-4xl lg:text-6xl font-bold mb-4 text-black leading-tight tracking-wide text-center px-4"
-              >
-                <span className="tracking-widest font-bold">{BRAND_NAME}</span>
-              </motion.h1>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="text-xl md:text-2xl lg:text-3xl font-medium text-pink-600 mb-6"
-              >
-                메이시크릿
-              </motion.div>
-              
-              {/* Shimmer Effect */}
-              <motion.div
-                animate={{
-                  backgroundPosition: ["200% center", "-200% center"]
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-                className="h-1 w-32 mx-auto bg-gradient-to-r from-transparent via-pink-400 to-transparent bg-[length:200%_100%] rounded-full"
-              />
-            </motion.div>
-            
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-              className="text-sm md:text-base lg:text-xl mb-10 max-w-3xl mx-auto text-gray-600 leading-relaxed text-center px-4"
-            >
-              Premium skincare products crafted with nature's finest ingredients, 
-              designed to reveal your skin's natural radiance and vitality.
-            </motion.p>
-
-            {/* Decorative Elements */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 1 }}
-              className="flex justify-center space-x-4 mb-8"
-            >
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="w-3 h-3 bg-pink-400 rounded-full"
-              />
-              <motion.div
-                animate={{ rotate: [360, 0] }}
-                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                className="w-3 h-3 bg-cream-500 rounded-full"
-              />
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                className="w-3 h-3 bg-pink-400 rounded-full"
-              />
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
+      {/* Hero Section moved below Featured Products to tighten layout */}
 
       {/* Featured Products */}
       <section className="py-8 md:py-12 px-4 bg-gradient-to-br from-pink-50 to-white">
@@ -384,6 +259,133 @@ const Home: React.FC = () => {
               </button>
             </motion.div>
           )}
+        </div>
+      </section>
+
+      {/* May Secret Brand section (moved below Featured Products) */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-pink-50 via-white to-cream-100 py-6 md:py-8 px-4 scroll-smooth">
+        {/* Background Animation Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            animate={{
+              x: [0, 100, 0],
+              y: [0, -50, 0],
+              rotate: [0, 180, 360]
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-pink-200/30 to-rose-300/20 rounded-full blur-xl"
+          />
+          <motion.div
+            animate={{
+              x: [0, -80, 0],
+              y: [0, 60, 0],
+              rotate: [360, 180, 0]
+            }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="absolute bottom-20 right-20 w-40 h-40 bg-gradient-to-br from-cream-300/20 to-pink-200/30 rounded-full blur-xl"
+          />
+          <motion.div
+            animate={{
+              x: [0, 60, 0],
+              y: [0, -30, 0],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute top-1/2 left-1/2 w-24 h-24 bg-gradient-to-br from-pink-300/20 to-cream-400/20 rounded-full blur-lg"
+          />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 lg:py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="text-center"
+          >
+            {/* Brand Name with Korean Text and Animation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mb-6"
+            >
+              <motion.h1 
+                initial={{ opacity: 0, letterSpacing: "0.5em" }}
+                animate={{ opacity: 1, letterSpacing: "0.1em" }}
+                transition={{ duration: 1.2, delay: 0.4 }}
+                className="text-2xl md:text-4xl lg:text-6xl font-bold mb-3 text-black leading-tight tracking-wide text-center px-4"
+              >
+                <span className="tracking-widest font-bold">{BRAND_NAME}</span>
+              </motion.h1>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="text-xl md:text-2xl lg:text-3xl font-medium text-pink-600 mb-4"
+              >
+                메이시크릿
+              </motion.div>
+              
+              {/* Shimmer Effect */}
+              <motion.div
+                animate={{
+                  backgroundPosition: ["200% center", "-200% center"]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                className="h-1 w-24 mx-auto bg-gradient-to-r from-transparent via-pink-400 to-transparent bg-[length:200%_100%] rounded-full"
+              />
+            </motion.div>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="text-sm md:text-base lg:text-lg mb-6 max-w-3xl mx-auto text-gray-600 leading-relaxed text-center px-4"
+            >
+              Premium skincare products crafted with nature's finest ingredients, 
+              designed to reveal your skin's natural radiance and vitality.
+            </motion.p>
+
+            {/* Decorative Elements */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 1 }}
+              className="flex justify-center space-x-4 mb-6"
+            >
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="w-3 h-3 bg-pink-400 rounded-full"
+              />
+              <motion.div
+                animate={{ rotate: [360, 0] }}
+                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                className="w-3 h-3 bg-cream-500 rounded-full"
+              />
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="w-3 h-3 bg-pink-400 rounded-full"
+              />
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 

@@ -39,7 +39,7 @@ const RotatingTagline: React.FC = () => {
   const CurrentIcon = taglines[currentTaglineIndex].icon;
 
   return (
-    <div className="w-full flex items-center justify-center py-4 bg-gradient-to-r from-pink-500 via-rose-500 to-orange-400 overflow-hidden relative">
+    <div className="w-full flex items-center justify-center py-4 bg-black overflow-hidden relative border-t border-b border-white/10">
       <div className="w-full h-full flex items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.div

@@ -58,9 +58,9 @@ export const products: Product[] = [
     id: 1,
     name: "MAY SECRET Sunscreen Spray",
     isFeatured: true,
-    price: 1299,
+    price: 499,
     created_at: "2024-11-01T00:00:00.000Z",
-    originalPrice: 1599,
+    originalPrice: 999,
     image: sunscreenSprayImg,
     images: [
       sunscreenSprayImg
@@ -133,7 +133,7 @@ export const products: Product[] = [
     isFeatured: true,
     price: 999,
     created_at: "2024-11-15T00:00:00.000Z",
-    originalPrice: 2000,
+    originalPrice: 1499,
     image: brighteningSerumImg,
     images: [
       brighteningSerumImg
@@ -220,9 +220,9 @@ export const products: Product[] = [
     id: 3,
     name: "May Secret Glow Combo Pack",
     isFeatured: true,
-    price: 1799,
+    price: 1199,
     created_at: "2024-11-20T00:00:00.000Z",
-    originalPrice: 2999,
+    originalPrice: 2498,
     image: comboImg,
     images: [
       comboImg

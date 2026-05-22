@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const AnnouncementBar: React.FC = () => {
   const messages: string[] = [
-    "🌸 Get 40% OFF on our MAY SECRET Combo Pack!",
-    "💝 Free shipping on orders above ₹999!"
+    "Get 52% off on combo pack!",
+    "Get 40% off on sunscreen spray!",
+    "Get 33% off on rice Brighting serum!"
   ];
 
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
@@ -12,13 +13,13 @@ const AnnouncementBar: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
-    }, 4000); // 4 seconds per message
+    }, 5000); // 5 seconds per message
 
     return () => clearInterval(interval);
   }, [messages.length]);
 
   return (
-    <div className="w-full bg-black flex items-center justify-center h-12 overflow-hidden relative">
+    <div className="w-full bg-black flex items-center justify-center h-10 md:h-12 overflow-hidden relative">
       <div className="w-full h-full flex items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.div
@@ -30,7 +31,7 @@ const AnnouncementBar: React.FC = () => {
             className="w-full h-full flex items-center justify-center"
           >
             <p
-              className="text-white text-center font-semibold text-base md:text-lg px-6 py-2 w-full flex items-center justify-center"
+              className="text-white text-center font-semibold text-sm md:text-base px-4 md:px-6 py-2 w-full flex items-center justify-center"
               role="status"
               aria-live="polite"
               aria-atomic="true"

@@ -19,7 +19,6 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
-import { BRAND_NAME } from '../config/brand';
 
 interface HeaderProps {
   isMenuOpen: boolean;
@@ -35,6 +34,7 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
   const navigate = useNavigate();
   const mobileProfileDropdownRef = useRef<HTMLDivElement>(null);
   const desktopProfileDropdownRef = useRef<HTMLDivElement>(null);
+  const cartCount = getCartCount();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -101,101 +101,27 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
             />
           </Link>
 
-          {/* Search Icon */}
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            aria-label="Search"
-          >
-            <Search className="w-6 h-6 text-gray-700" />
-          </button>
-
-          {/* Profile/Login Icon */}
-          {user ? (
-            <div className="relative" ref={mobileProfileDropdownRef}>
-              <button
-                onClick={() => {
-                  setIsProfileDropdownOpen(!isProfileDropdownOpen);
-                  setIsMenuOpen(false); // Close sidebar if open
-                }}
-                className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                aria-label="User menu"
-              >
-                <User className="w-6 h-6 text-gray-700" />
-              </button>
-
-              {/* Mobile Profile Dropdown */}
-              <AnimatePresence>
-                {isProfileDropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute right-0 top-12 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 md:hidden"
-                  >
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-900">
-                        Hello, {profile?.full_name?.split(' ')[0] || user?.user_metadata?.first_name || 'User'} 👋
-                      </p>
-                    </div>
-                    <Link
-                      to="/user-info"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                      onClick={() => {
-                        closeProfileDropdown();
-                        closeMenu();
-                      }}
-                    >
-                      User Info
-                    </Link>
-                    <Link
-                      to="/orders"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                      onClick={() => {
-                        closeProfileDropdown();
-                        closeMenu();
-                      }}
-                    >
-                      Orders
-                    </Link>
-                    <Link
-                      to="/wishlist"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                      onClick={() => {
-                        closeProfileDropdown();
-                        closeMenu();
-                      }}
-                    >
-                      Wishlist
-                    </Link>
-                    <button
-                      onClick={async () => {
-                        await signOut();
-                        closeProfileDropdown();
-                        closeMenu();
-                        navigate('/');
-                      }}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      Logout
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ) : (
-            <Link 
-              to="/login" 
-              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors" 
-              onClick={() => {
-                closeMenu();
-                closeProfileDropdown();
-              }}
+          <div className="flex items-center gap-2">
+            <Link
+              to="/wishlist"
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Wishlist"
             >
-              <User className="w-6 h-6 text-gray-700" />
+              <Heart className="w-6 h-6 text-gray-700" />
             </Link>
-          )}
+            <Link
+              to="/cart"
+              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Cart"
+            >
+              <ShoppingBag className="w-6 h-6 text-gray-700" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 inline-flex min-w-[1.25rem] h-5 items-center justify-center rounded-full bg-pink-500 text-[10px] font-bold text-white px-1.5">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          </div>
 
         </header>
 

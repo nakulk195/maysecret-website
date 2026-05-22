@@ -6,9 +6,8 @@ const MobileBottomNav = () => {
 
   const navItems = [
     { name: "Home", icon: Home, path: "/" },
-    { name: "Cart", icon: ShoppingCart, path: "/cart" },
-    { name: "Orders", icon: User, path: "/orders" },
-    { name: "Quiz", icon: Brain, path: "/quiz" }
+    { name: "Quiz", icon: Brain, path: "/quiz" },
+    { name: "Login", icon: User, path: "/login" }
   ];
 
   return (

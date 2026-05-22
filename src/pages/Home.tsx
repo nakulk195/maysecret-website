@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Star } from 'lucide-react';
+import { Sparkles, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 // Load products from local productData
 import { products as localProducts } from '../utils/productData';
 import type { Product } from '../utils/productData';
@@ -64,10 +64,19 @@ const Home: React.FC = () => {
   // Rotating banner setup
   const heroImages = [heroimg1, heroimg2, heroimg3, heroimg4, heroimg5, combinedProduct, combinedHorizontal];
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const showPreviousImage = () => {
+    setCurrentIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  };
+
+  const showNextImage = () => {
+    setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+  };
+
   useEffect(() => {
     const id = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % heroImages.length);
-    }, 3000); // 3 seconds per slide
+    }, 5000); // 5 seconds per slide
     return () => clearInterval(id);
   }, [heroImages.length]);
 
@@ -91,7 +100,25 @@ const Home: React.FC = () => {
               />
             ) : null
           )}
-          
+
+          <button
+            type="button"
+            onClick={showPreviousImage}
+            className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 text-gray-900 shadow-md p-2 md:left-6 md:p-3 hover:bg-white z-20"
+            aria-label="Previous image"
+          >
+            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
+
+          <button
+            type="button"
+            onClick={showNextImage}
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 text-gray-900 shadow-md p-2 md:right-6 md:p-3 hover:bg-white z-20"
+            aria-label="Next image"
+          >
+            <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
+
           {/* Dots Indicator */}
           <div className="absolute bottom-4 w-full flex justify-center gap-2">
             {heroImages.map((_, index) => (

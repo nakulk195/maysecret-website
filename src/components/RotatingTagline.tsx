@@ -39,7 +39,7 @@ const RotatingTagline: React.FC = () => {
   const CurrentIcon = taglines[currentTaglineIndex].icon;
 
   return (
-    <div className="w-full flex items-center justify-center py-4 bg-black overflow-hidden relative border-t border-b border-white/10">
+    <div className="w-full flex items-center justify-center py-3 md:py-4 bg-gradient-to-r from-pink-500 via-rose-500 to-orange-400 overflow-hidden relative border-t border-white/40 border-b border-white/40 shadow-sm">
       <div className="w-full h-full flex items-center justify-center">
         <AnimatePresence mode="wait">
           <motion.div
@@ -50,19 +50,19 @@ const RotatingTagline: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="w-full h-full flex items-center justify-center"
           >
-            <div className="flex flex-col items-center text-center">
+            <div className="flex flex-col items-center text-center px-4 md:px-0">
               <div className="flex items-center gap-2 justify-center">
                 <CurrentIcon className="text-white w-5 h-5" />
                 <p 
-                  className="text-white text-lg md:text-xl font-bold tracking-wide"
-                  style={{ textShadow: "0px 1px 4px rgba(0,0,0,0.3)" }}
+                  className="text-white text-base md:text-xl font-bold tracking-wide"
+                  style={{ textShadow: "0px 1px 4px rgba(0,0,0,0.18)" }}
                 >
                   {taglines[currentTaglineIndex].english}
                 </p>
               </div>
               <p 
-                className="text-white text-sm md:text-base font-medium opacity-90 mt-1"
-                style={{ textShadow: "0px 1px 3px rgba(0,0,0,0.2)" }}
+                className="text-white text-xs md:text-base font-medium opacity-95 mt-1"
+                style={{ textShadow: "0px 1px 3px rgba(0,0,0,0.15)" }}
               >
                 {taglines[currentTaglineIndex].korean}
               </p>

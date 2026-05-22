@@ -47,7 +47,7 @@ function App() {
             <ScrollToTop />
             <AnnouncementBar />
             <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-            <div className="App pb-16 md:pb-0 w-full overflow-x-hidden">
+            <div className="App pb-20 md:pb-0 w-full overflow-x-hidden">
               <main>
                 <Routes>
                   <Route path="/" element={<Home />} />

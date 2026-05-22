@@ -19,6 +19,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
+import maysecretLogo from '../assets/images/maysecret_logo.png';
 
 interface HeaderProps {
   isMenuOpen: boolean;
@@ -78,8 +79,8 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
   return (
     <>
       {/* Mobile Header - Only shows on small screens */}
-      <div className="md:hidden relative z-50">
-        <header className="flex justify-between items-center px-4 py-3 bg-white shadow-sm sticky top-0">
+      <div className="md:hidden relative z-50 w-full max-w-full overflow-hidden">
+        <header className="grid w-full max-w-full grid-cols-[48px_1fr_96px] items-center px-3 py-2 bg-white shadow-sm sticky top-0 gap-2">
           {/* Hamburger Menu */}
           <button
             onClick={() => {
@@ -93,15 +94,15 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
           </button>
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center justify-center min-w-0">
             <img
-              src="/images/Maysecret_logo.svg"
-              alt="MΛY SΞCRΞT"
-              className="h-8 sm:h-10 md:h-12 lg:h-14 w-auto object-contain flex-shrink-0"
+              src={maysecretLogo}
+              alt="MAY SECRET"
+              className="maysecret-logo"
             />
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-1">
             <Link
               to="/wishlist"
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -126,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
         </header>
 
         {/* Search Bar - Mobile only */}
-        <div className="flex md:hidden px-4 pb-3 bg-white border-b border-gray-100">
+        <div className="flex md:hidden px-3 pb-2 bg-white border-b border-gray-100">
           <div className="relative w-full">
             <input
               type="text"
@@ -147,17 +148,17 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
         </div>
       </div>
 
-      {/* Desktop Header - Keep unchanged */}
+      {/* Desktop Header - Compact spacing */}
       <header className="hidden md:block bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5">
           <div className="flex items-center justify-between">
             {/* Left Section - Logo */}
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center gap-3">
                 <img
-                  src="/images/Maysecret_logo.svg"
-                  alt="MΛY SΞCRΞT"
-                  className="h-12 sm:h-14 md:h-16 lg:h-20 w-auto object-contain flex-shrink-0 max-h-[80px] md:max-h-none hover:scale-105 transition-transform duration-300"
+                  src={maysecretLogo}
+                  alt="MAY SECRET"
+                  className="maysecret-logo"
                 />
               </Link>
             </div>

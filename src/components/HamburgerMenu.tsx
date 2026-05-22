@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import maysecretLogo from '../assets/images/maysecret_logo.png';
 
 const navLinks = [
   { to: '/offer', label: 'Offer' },
@@ -36,9 +37,9 @@ const HamburgerMenu = () => {
             {/* Logo Section */}
             <div className="flex items-center justify-center pb-6 border-b border-gray-200 mb-4">
               <img
-                src="/images/maysecret-logo.jpg"
-                alt="MaySecret Logo"
-                className="h-16 w-32 object-contain"
+                src={maysecretLogo}
+                alt="MAY SECRET"
+                className="maysecret-logo"
               />
             </div>
             

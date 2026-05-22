@@ -10,9 +10,17 @@ html, body {
   font-family: 'Inter', 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -61,6 +69,129 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   line-height: 1.1;
+}
+
+/* Navbar Styling - Compact */
+.navbar {
+  display: flex;
+  align-items: center;
+}
+
+/* MAY SECRET Logo - Responsive Styling */
+.maysecret-logo {
+  width: 220px;
+  height: 50px;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  max-width: 100%;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  flex-shrink: 0;
+}
+
+/* Desktop (769px and above) */
+@media (min-width: 769px) {
+  .maysecret-logo {
+    width: 220px;
+    height: 50px;
+  }
+}
+
+/* Tablet (481px - 768px) */
+@media (max-width: 768px) and (min-width: 481px) {
+  .maysecret-logo {
+    width: 180px;
+    height: 42px;
+  }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+  .maysecret-logo {
+    width: 150px;
+    height: 34px;
+  }
+}
+
+/* Extra Small Devices (360px and below) */
+@media (max-width: 360px) {
+  .maysecret-logo {
+    width: 120px;
+    height: 30px;
+  }
+}
+
+/* Logo Container - Perfect Alignment */
+.logo-container {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+/* Footer Styling - Compact Premium */
+.footer {
+  background-color: #ffffff;
+  color: #000000;
+  border-top: 1px solid #e5e7eb;
+}
+
+.footer a,
+.footer p,
+.footer h1,
+.footer h2,
+.footer h3,
+.footer h4,
+.footer h5,
+.footer h6,
+.footer span {
+  color: #000000;
+}
+
+.footer a:hover {
+  color: #e91e63;
+  transition: color 0.2s ease;
+}
+
+/* Footer Logo Styling - Compact */
+.footer-logo {
+  width: 180px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer .maysecret-logo {
+  width: 180px;
+  height: 42px;
+  display: block;
+  object-fit: contain;
+  filter: none;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Mobile footer optimization */
+@media (max-width: 768px) {
+  .footer {
+    padding-top: 24px;
+    padding-bottom: 16px;
+  }
+}
+
+/* Safari iPhone Fix */
+@supports (-webkit-touch-callout: none) {
+  .maysecret-logo {
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 
 .brand-logo .brand-main {

@@ -20,6 +20,7 @@ import {
 import { getLoggedInUser, removeUserSession } from '../utils/auth';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
+import maysecretLogo from '../assets/images/maysecret_logo.png';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -86,16 +87,16 @@ const Header: React.FC = () => {
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-3">
               <motion.img 
-                src="/images/maysecret-logo.jpg" 
-                alt="MAY SECRET Logo"
-                className="h-10 w-auto hidden md:block"
+                src={maysecretLogo} 
+                alt="MAY SECRET"
+                className="maysecret-logo hidden md:block"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               />
               <motion.img 
-                src="/images/maysecret-logo.jpg" 
-                alt="MAY SECRET Logo"
-                className="h-8 w-auto md:hidden"
+                src={maysecretLogo} 
+                alt="MAY SECRET"
+                className="maysecret-logo md:hidden"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               />
@@ -220,9 +221,9 @@ const Header: React.FC = () => {
                 {/* Mobile Logo Section */}
                 <div className="flex items-center space-x-3 px-2 py-3 border-b border-gray-100 mb-2">
                   <img 
-                    src="/images/maysecret-logo.jpg" 
-                    alt="MAY SECRET Logo"
-                    className="h-8 w-auto"
+                    src={maysecretLogo} 
+                    alt="MAY SECRET"
+                    className="maysecret-logo"
                   />
                   <h2 className="text-xl font-bold text-black tracking-wide">MAY SECRET</h2>
                 </div>

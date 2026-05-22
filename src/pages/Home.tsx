@@ -40,7 +40,7 @@ const Home: React.FC = () => {
   }, []);
 
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
@@ -50,7 +50,7 @@ const Home: React.FC = () => {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 1, y: 0 },
     visible: {
       opacity: 1,
       y: 0,
@@ -139,7 +139,7 @@ const Home: React.FC = () => {
       {/* Hero Section moved below Featured Products to tighten layout */}
 
       {/* Featured Products */}
-      <section className="py-8 md:py-12 px-4 bg-gradient-to-br from-pink-50 to-white">
+      <section className="py-6 md:py-8 px-4 bg-gradient-to-br from-pink-50 to-white">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -162,10 +162,10 @@ const Home: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, ease: "easeOut" }}
-              className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-6"
+              className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-6"
             >
               <span className="inline-block">Featured Products</span>
-              <span className="inline-block ml-3 text-xl md:text-2xl lg:text-3xl font-medium text-pink-600" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>미래 제품</span>
+              <span className="inline-block text-xl md:text-2xl lg:text-3xl font-medium text-pink-600" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>미래 제품</span>
             </motion.h2>
             <p className="text-sm md:text-base lg:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Discover our most popular and effective skincare products
@@ -174,13 +174,9 @@ const Home: React.FC = () => {
 
           <motion.div 
             variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-5"
-            style={{
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))'
-            }}
+            initial={false}
+            animate="visible"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 px-0 py-4 sm:p-5"
           >
             {products && products.length > 0 && products.slice(0, 6).map((product: Product, index: number) => (
               <motion.div

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, ShoppingBag, Search, X, ChevronRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import maysecretLogo from '../assets/images/maysecret_logo.png';
 
 interface MobileHeaderProps {
   isMenuOpen: boolean;
@@ -33,7 +34,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({ isMenuOpen, onMenuToggle })
     <>
       {/* Mobile Header */}
       <header className="bg-white shadow-sm sticky top-0 z-40 lg:hidden">
-        <div className="flex justify-between items-center px-4 py-3">
+        <div className="flex justify-between items-center px-3 py-2">
           {/* Hamburger Menu */}
           <button
             onClick={onMenuToggle}
@@ -47,9 +48,9 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({ isMenuOpen, onMenuToggle })
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <Link to="/" className="flex items-center">
               <img
-                src="/images/Maysecret_logo.svg"
+                src={maysecretLogo}
                 alt="MAY SECRET"
-                className="h-10 w-auto object-contain"
+                className="maysecret-logo"
               />
             </Link>
           </div>

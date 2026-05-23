@@ -8,6 +8,7 @@ create sequence if not exists public.orders_order_number_seq start with 1001;
 
 alter table public.orders
   add column if not exists order_number bigint,
+  add column if not exists payment_id text,
   add column if not exists razorpay_order_id text,
   add column if not exists razorpay_signature text,
   add column if not exists payment_status text default 'pending',

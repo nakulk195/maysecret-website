@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useState, ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { User, Session } from '@supabase/supabase-js'
 import { profileService } from '../services/database'
@@ -36,12 +36,60 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState<any>(null)
 
+  const buildProfileFromUser = useCallback((authUser: User) => {
+    const metadata = authUser.user_metadata || {}
+    const fullName = metadata.full_name ||
+      metadata.name ||
+      `${metadata.first_name || ''} ${metadata.last_name || ''}`.trim() ||
+      authUser.email?.split('@')[0] ||
+      'User'
+
+    return {
+      fullName,
+      email: authUser.email || '',
+      phone: metadata.phone || metadata.phone_number || ''
+    }
+  }, [])
+
+  const ensureUserProfile = useCallback(async (authUser: User) => {
+    const fallback = buildProfileFromUser(authUser)
+    try {
+      const existingProfile = await profileService.getProfile(authUser.id)
+      if (!existingProfile) {
+        return await profileService.createProfile(
+          authUser.id,
+          fallback.fullName,
+          fallback.email,
+          fallback.phone
+        )
+      }
+
+      const needsBackfill = !existingProfile.email || !existingProfile.full_name
+      if (needsBackfill) {
+        return await profileService.updateProfile(authUser.id, {
+          full_name: existingProfile.full_name || fallback.fullName,
+          email: existingProfile.email || fallback.email,
+          phone: existingProfile.phone || fallback.phone
+        })
+      }
+
+      return existingProfile
+    } catch (error) {
+      console.error('Error ensuring profile:', error)
+      return null
+    }
+  }, [buildProfileFromUser])
+
   useEffect(() => {
     // Get initial session
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       setSession(session)
       setUser(session?.user ?? null)
+      if (session?.user) {
+        const ensuredProfile = await ensureUserProfile(session.user)
+        setProfile(ensuredProfile)
+      }
       setLoading(false)
     }
 
@@ -52,6 +100,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       async (event, session) => {
         setSession(session)
         setUser(session?.user ?? null)
+        if (session?.user) {
+          const ensuredProfile = await ensureUserProfile(session.user)
+          setProfile(ensuredProfile)
+        } else {
+          setProfile(null)
+        }
         setLoading(false)
         // Clear cart when user logs out to ensure clean state
         if (!session?.user) {
@@ -61,7 +115,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     )
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [ensureUserProfile])
 
   const signUp = async (email: string, password: string, firstName: string, lastName: string, phone: string) => {
     try {

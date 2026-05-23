@@ -4,11 +4,13 @@ import { motion } from 'framer-motion';
 import { ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import CartItemCard from '../components/CartItemCard';
 
 const Cart: React.FC = () => {
   const { cart, loading, updateQuantity, removeFromCart, getCartTotal, getCartCount } = useCart();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [updatingItem, setUpdatingItem] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -19,13 +21,23 @@ const Cart: React.FC = () => {
     setUpdatingItem(productId);
     try {
       await updateQuantity(productId, newQuantity);
+      showToast('Cart quantity updated', 'info');
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      showToast('Could not update quantity. Please try again.', 'error');
     } finally {
       setUpdatingItem(null);
     }
   };
 
   const handleRemoveItem = async (productId: string) => {
-    await removeFromCart(productId);
+    try {
+      await removeFromCart(productId);
+      showToast('Product removed from cart', 'info');
+    } catch (error) {
+      console.error('Error removing cart item:', error);
+      showToast('Could not remove product. Please try again.', 'error');
+    }
   };
 
   const handleCheckout = async () => {
@@ -81,7 +93,7 @@ const Cart: React.FC = () => {
           </p>
           <Link
             to="/shop"
-            className="inline-flex items-center bg-warm-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-warm-700 transition-colors"
+            className="inline-flex items-center bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black transition-colors"
           >
             Start Shopping
             <ArrowRight size={20} className="ml-2" />
@@ -92,15 +104,15 @@ const Cart: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-warm-50 via-white to-warm-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-warm-50 via-white to-warm-100 pb-20 md:pb-0">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
             Shopping Cart
           </h1>
           
@@ -115,7 +127,7 @@ const Cart: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-white rounded-2xl shadow-lg p-6"
+              className="bg-white rounded-2xl shadow-lg p-4 sm:p-6"
             >
               <h2 className="text-xl font-semibold text-gray-800 mb-6">
                 Your Cart Items
@@ -164,7 +176,7 @@ const Cart: React.FC = () => {
                     <p className="text-sm text-gray-500 mb-6">Looks like you haven't added any items to your cart yet.</p>
                     <Link
                       to="/shop"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-warm-600 hover:bg-warm-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-warm-500"
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700"
                     >
                       Continue Shopping
                     </Link>
@@ -215,7 +227,7 @@ const Cart: React.FC = () => {
                 className={`w-full flex items-center justify-center py-3 px-6 rounded-lg font-semibold text-white transition-colors ${
                   cart.length === 0 || isCheckingOut
                     ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-warm-600 hover:bg-warm-700'
+                    : 'bg-gray-900 hover:bg-black'
                 }`}
               >
                 {isCheckingOut ? (
@@ -235,7 +247,7 @@ const Cart: React.FC = () => {
               <div className="mt-6 text-center">
                 <Link
                   to="/"
-                  className="text-warm-600 hover:text-warm-700 font-medium transition-colors"
+                  className="text-gray-900 hover:text-black font-medium transition-colors"
                 >
                   ← Continue Shopping
                 </Link>

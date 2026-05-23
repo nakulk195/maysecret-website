@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingBag, Heart } from "lucide-react";
+import { Brain, Gift, Heart, Home, LogIn, LogOut, Mail, Package, ShoppingBag, ShoppingCart, User, X } from "lucide-react";
 import { useAuth } from '../contexts/AuthContext';
 
 interface MobileSidebarProps {
@@ -57,22 +57,22 @@ export const MobileSidebarClean: React.FC<MobileSidebarProps> = ({ isOpen, setIs
             {/* Links */}
             <nav className="flex flex-col gap-4 px-4">
               {[
-                { name: "Home", path: "/" },
-                { name: "Shop", path: "/shop" },
-                { name: "Cart", path: "/cart" },
-                { name: "Wishlist", path: "/wishlist" },
-                { name: "Orders", path: "/orders" },
-                { name: "Offers", path: "/offers" },
-                { name: "Gift Kit", path: "/giftkit" },
-                { name: "Quiz", path: "/quiz" },
-                { name: "Contact", path: "/contact" },
+                { name: "Home", path: "/", icon: Home },
+                { name: "Shop", path: "/shop", icon: ShoppingBag },
+                { name: "Cart", path: "/cart", icon: ShoppingCart },
+                { name: "Wishlist", path: "/wishlist", icon: Heart },
+                ...(user ? [{ name: "Orders", path: "/orders", icon: Package }] : []),
+                { name: "Gift Kit", path: "/giftkit", icon: Gift },
+                { name: "Quiz", path: "/quiz", icon: Brain },
+                { name: "Contact", path: "/contact", icon: Mail },
                 ...(user ? [
-                  { name: "User Info", path: "/user-info" },
-                  { name: "Logout", path: "#", isLogout: true }
+                  { name: "User Info", path: "/user-info", icon: User },
+                  { name: "Logout", path: "#", icon: LogOut, isLogout: true }
                 ] : [
-                  { name: "Login", path: "/login" }
+                  { name: "Login", path: "/login", icon: LogIn }
                 ]),
               ].map((item, index) => {
+                const Icon = item.icon;
                 if (item.isLogout) {
                   return (
                     <button
@@ -86,6 +86,7 @@ export const MobileSidebarClean: React.FC<MobileSidebarProps> = ({ isOpen, setIs
                       className="block w-full text-lg font-medium text-gray-700 hover:text-pink-600 transition-all text-left"
                     >
                       <div className="flex items-center gap-2">
+                        <Icon className="w-5 h-5" />
                         <span>{item.name}</span>
                       </div>
                     </button>
@@ -99,8 +100,7 @@ export const MobileSidebarClean: React.FC<MobileSidebarProps> = ({ isOpen, setIs
                       className="block text-lg font-medium text-gray-700 hover:text-pink-600 transition-all"
                     >
                       <div className="flex items-center gap-2">
-                        {item.name === "Cart" && <ShoppingBag className="w-5 h-5" />}
-                        {item.name === "Wishlist" && <Heart className="w-5 h-5" />}
+                        <Icon className="w-5 h-5" />
                         <span>{item.name}</span>
                       </div>
                     </Link>

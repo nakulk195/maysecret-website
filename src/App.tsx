@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { WishlistProvider } from './contexts/WishlistContext';
+import { ToastProvider } from './contexts/ToastContext';
 import AnnouncementBar from './components/AnnouncementBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -22,7 +23,6 @@ import OrderSuccess from './pages/OrderSuccess';
 import Orders from './pages/Orders';
 import Wishlist from './pages/Wishlist';
 import Contact from './pages/Contact';
-import Offer from './pages/Offer';
 import Search from './pages/Search';
 import RecentlyViewed from './pages/RecentlyViewed';
 import Quiz from './pages/Quiz';
@@ -40,9 +40,10 @@ function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <AuthProvider>
-      <CartProvider>
-        <WishlistProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <CartProvider>
+          <WishlistProvider>
           <Router>
             <ScrollToTop />
             <AnnouncementBar />
@@ -84,7 +85,6 @@ function App() {
                   } />
                   <Route path="/wishlist" element={<Wishlist />} />
                   <Route path="/contact" element={<Contact />} />
-                  <Route path="/offer" element={<Offer />} />
                   <Route path="/search" element={<Search />} />
                   <Route path="/recently-viewed" element={<RecentlyViewed />} />
                   <Route path="/quiz" element={<Quiz />} />
@@ -101,9 +101,10 @@ function App() {
             </div>
             <MobileSidebarClean isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
           </Router>
-        </WishlistProvider>
-      </CartProvider>
-    </AuthProvider>
+          </WishlistProvider>
+        </CartProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 

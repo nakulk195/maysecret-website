@@ -8,6 +8,7 @@ import { addToRecentlyViewed } from '../utils/storage';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 
 
 interface ProductCardProps {
@@ -19,9 +20,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [cartMessage, setCartMessage] = useState('');
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { showToast } = useToast();
   
   // Use WishlistContext
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -58,6 +59,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
 
     if (authLoading) return;
     if (!user) {
+      showToast('Please log in to use your wishlist', 'info');
       goToLogin();
       return;
     }
@@ -66,12 +68,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
       if (isWishlisted) {
         await removeFromWishlist(String(product.id));
         setIsWishlisted(false);
+        showToast('Product removed from wishlist', 'info');
       } else {
         await addToWishlist(product as any);
         setIsWishlisted(true);
+        showToast('Product added to wishlist');
       }
     } catch (error) {
       console.error('Error toggling wishlist:', error);
+      showToast('Wishlist update failed. Please try again.', 'error');
     }
   };
 
@@ -81,16 +86,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
 
     if (!product.stock || authLoading) return;
     if (!user) {
+      showToast('Please log in to add products to cart', 'info');
       goToLogin();
       return;
     }
     
     try {
       await addToCart(product, 1);
-      setCartMessage(`${product.name} added to cart`);
-      window.setTimeout(() => setCartMessage(''), 2500);
+      showToast('Product added to cart');
     } catch (error) {
       console.error('Error adding product to cart:', error);
+      showToast('Could not add product to cart. Please try again.', 'error');
     }
   };
 
@@ -113,16 +119,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {cartMessage && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-3 left-3 right-3 z-20 rounded-lg bg-gray-900 px-3 py-2 text-center text-xs font-semibold text-white shadow-lg"
-        >
-          {cartMessage}
-        </motion.div>
-      )}
-
       <Link to={`/product/${product.id}`} onClick={handleProductClick} className="block">
         <div className="relative overflow-hidden h-40 md:h-52 w-full bg-gray-50 flex items-center justify-center">
           {/* Loading placeholder */}
@@ -153,7 +149,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
           <div className={`absolute bottom-2 right-2 flex flex-col space-y-2 transition-opacity duration-300 ${
             isHovered ? 'md:opacity-100' : 'opacity-100 md:opacity-0'
           }`}>
-            <Heart size={16} fill={isWishlisted ? 'currentColor' : 'none'} />
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}

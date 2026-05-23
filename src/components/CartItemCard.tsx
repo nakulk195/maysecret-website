@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Trash2, Plus, Minus, Star } from 'lucide-react';
 import { CartItem } from '../contexts/CartContext';
-import { Product } from '../lib/supabase';
 import { getProductImage } from '../utils/productImages';
 
 interface CartItemCardProps {
@@ -20,6 +19,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
   updatingItem 
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const isUpdating = updatingItem === item.id || updatingItem === item.product_id;
 
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -41,9 +41,9 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
           <button
             onClick={handleRemove}
             className="text-red-500 hover:text-red-700 p-1"
-            disabled={updatingItem === item.id}
+            disabled={isUpdating}
           >
-            {updatingItem === item.id ? (
+            {isUpdating ? (
               <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-red-500"></div>
             ) : (
               <Trash2 size={18} />
@@ -55,7 +55,6 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
   }
 
   const price = Number(item.cartProduct?.price || 0);
-  const originalPrice = undefined; // No original_price since field doesn't exist
 
   return (
     <motion.div
@@ -64,18 +63,18 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
       exit={{ opacity: 0, y: -20 }}
       className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100"
     >
-      <div className="p-6">
-        <div className="flex items-start space-x-4">
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:space-x-4 sm:gap-0">
           {/* Product Image */}
           <div className="flex-shrink-0">
             <Link to={`/product/${item.product_id}`}>
-              <div className="relative w-24 h-24 rounded-lg overflow-hidden">
+              <div className="relative h-28 w-full rounded-lg overflow-hidden bg-gray-50 sm:h-24 sm:w-24">
                 {item.cartProduct?.image ? (
                   <>
                     <img
                       src={getProductImage(item.cartProduct?.image)}
                       alt={item.cartProduct?.name || 'Product'}
-                      className="w-24 h-24 object-cover rounded-lg"
+                      className="h-full w-full object-contain rounded-lg"
                       onLoad={() => setImageLoaded(true)}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -84,11 +83,11 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
                       }}
                     />
                     {!imageLoaded && (
-                      <div className="w-24 h-24 bg-gray-200 rounded-lg animate-pulse"></div>
+                      <div className="h-full w-full bg-gray-200 rounded-lg animate-pulse"></div>
                     )}
                   </>
                 ) : (
-                  <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <div className="h-28 w-full bg-gray-100 rounded-lg flex items-center justify-center sm:h-24 sm:w-24">
                     <span className="text-gray-400 text-xs text-center px-2">No image</span>
                   </div>
                 )}
@@ -97,9 +96,9 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
           </div>
 
           {/* Product Details */}
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <Link to={`/product/${item.product_id}`}>
-              <h3 className="text-lg font-semibold text-gray-800 hover:text-warm-700 transition-colors mb-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 hover:text-warm-700 transition-colors mb-2">
                 {item.cartProduct?.name || 'Product'}
               </h3>
             </Link>
@@ -139,25 +138,25 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
           </div>
 
           {/* Quantity Controls and Actions */}
-          <div className="flex flex-col items-end space-y-4">
+          <div className="flex flex-row items-center justify-between gap-3 border-t border-gray-100 pt-4 sm:flex-col sm:items-end sm:justify-start sm:space-y-4 sm:border-t-0 sm:pt-0">
             {/* Quantity Controls */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <button
                 onClick={() => handleQuantityChange(item.quantity - 1)}
-                disabled={updatingItem === item.id}
-                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50"
+                disabled={isUpdating || item.quantity <= 1}
+                className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 <Minus size={16} />
               </button>
               
               <span className="text-gray-800 font-medium min-w-[2rem] text-center">
-                {updatingItem === item.id ? '...' : item.quantity}
+                {isUpdating ? '...' : item.quantity}
               </span>
               
               <button
                 onClick={() => handleQuantityChange(item.quantity + 1)}
-                disabled={updatingItem === item.id}
-                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50"
+                disabled={isUpdating}
+                className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 <Plus size={16} />
               </button>
@@ -180,7 +179,8 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleRemove}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors p-2 rounded-lg"
+              disabled={isUpdating}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors p-2 rounded-lg disabled:opacity-50"
               title="Remove item"
             >
               <Trash2 size={18} />

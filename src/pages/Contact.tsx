@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Clock, Send, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { contactService } from '../services/database';
 
 const Contact: React.FC = () => {
   const { user } = useAuth();
@@ -63,6 +64,14 @@ const Contact: React.FC = () => {
     const waUrl = `https://wa.me/919075849555?text=${encodedMessage}`;
 
     try {
+      if (user) {
+        await contactService.saveMessage(user.id, {
+          full_name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message
+        });
+      }
       window.open(waUrl, '_blank');
       setSuccessMessage('WhatsApp opened. Please send the message to complete your inquiry.');
     } catch (error) {
@@ -204,7 +213,7 @@ const Contact: React.FC = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-warm-700 text-white py-4 px-6 rounded-lg font-semibold hover:bg-warm-800 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gray-900 text-white py-4 px-6 rounded-lg font-semibold hover:bg-black transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -279,7 +288,7 @@ const Contact: React.FC = () => {
                 <div>
                   <h4 className="font-semibold text-gray-800 mb-2">What is your return policy?</h4>
                   <p className="text-gray-600 text-sm">
-                    We offer a 30-day return policy for unused products in their original packaging.
+                    We offer a 7-day return policy for unused products in their original packaging.
                   </p>
                 </div>
                 <div>

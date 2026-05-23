@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShoppingBag, 
@@ -8,7 +8,6 @@ import {
   Search,
   Home as HomeIcon,
   Gift,
-  Percent,
   HelpCircle,
   Phone,
   ChevronRight,
@@ -33,6 +32,7 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { getCartCount } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
   const mobileProfileDropdownRef = useRef<HTMLDivElement>(null);
   const desktopProfileDropdownRef = useRef<HTMLDivElement>(null);
   const cartCount = getCartCount();
@@ -168,7 +168,6 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
               {[
                 { name: 'Home', path: '/', icon: HomeIcon },
                 { name: 'Shop', path: '/shop', icon: ShoppingBag },
-                { name: 'Offers', path: '/offers', icon: Percent },
                 { name: 'Gift Kit', path: '/giftkit', icon: Gift },
                 { name: 'Help', path: '/contact', icon: HelpCircle },
                 { name: 'Cart', path: '/cart', icon: ShoppingBag },

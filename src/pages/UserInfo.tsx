@@ -4,11 +4,13 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, User, Mail, Phone, Calendar, Shield, Edit, Package, Heart, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useToast } from '../contexts/ToastContext';
 import { profileService, addressService, orderService } from '../services/database';
 
 const UserInfo: React.FC = () => {
   const { user, signOut } = useAuth();
   const { getCartCount } = useCart();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -86,9 +88,7 @@ const UserInfo: React.FC = () => {
     try {
       const fullName = `${formData.firstName} ${formData.lastName}`.trim();
       await profileService.updateProfile(user.id, {
-        full_name: fullName,
-        email: formData.email,
-        phone: formData.phone
+        full_name: fullName
       });
       
       // Reload profile data
@@ -96,8 +96,10 @@ const UserInfo: React.FC = () => {
       setProfile(updatedProfile);
       
       setIsEditing(false);
+      showToast('Profile updated');
     } catch (error) {
       console.error('Error saving profile:', error);
+      showToast('Could not update profile. Please try again.', 'error');
     }
   };
 
@@ -161,16 +163,16 @@ const UserInfo: React.FC = () => {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-gray-800">
-                      {user?.user_metadata?.first_name || 'User'} {user?.user_metadata?.last_name || ''}
+                      {profile?.full_name || `${formData.firstName} ${formData.lastName}`.trim() || 'User'}
                     </h2>
                     <p className="text-gray-600">Member since {new Date(user?.created_at || '').toLocaleDateString()}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="rounded-lg bg-gray-900 p-2 text-white transition-colors hover:bg-black"
                 >
-                  <Edit className="w-5 h-5 text-gray-600" />
+                  <Edit className="w-5 h-5" />
                 </button>
               </div>
 
@@ -220,11 +222,8 @@ const UserInfo: React.FC = () => {
                       type="email"
                       name="email"
                       value={formData.email}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
-                      }`}
+                      disabled
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg border-gray-200 bg-gray-50 text-gray-500"
                     />
                   </div>
                 </div>
@@ -239,11 +238,8 @@ const UserInfo: React.FC = () => {
                       type="tel"
                       name="phone"
                       value={formData.phone}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-transparent transition-all ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
-                      }`}
+                      disabled
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg border-gray-200 bg-gray-50 text-gray-500"
                     />
                   </div>
                 </div>
@@ -321,12 +317,12 @@ const UserInfo: React.FC = () => {
                               </p>
                             </div>
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                              order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                              order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                              (order.order_status || order.status) === 'delivered' ? 'bg-green-100 text-green-800' :
+                              (order.order_status || order.status) === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                              (order.order_status || order.status) === 'processing' ? 'bg-yellow-100 text-yellow-800' :
                               'bg-gray-100 text-gray-800'
                             }`}>
-                              {order.status || 'pending'}
+                              {order.order_status || order.status || 'pending'}
                             </span>
                           </div>
                         </div>
@@ -342,7 +338,7 @@ const UserInfo: React.FC = () => {
                   <div className="flex space-x-4 pt-6">
                     <button
                       onClick={handleSave}
-                      className="flex-1 bg-warm-600 text-white py-3 rounded-lg font-semibold hover:bg-warm-700 transition-colors"
+                      className="flex-1 bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-black transition-colors"
                     >
                       Save Changes
                     </button>
@@ -406,7 +402,7 @@ const UserInfo: React.FC = () => {
                 <div className="space-y-3">
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="w-full flex items-center justify-center space-x-2 p-3 bg-warm-50 text-warm-700 rounded-lg hover:bg-warm-100 transition-colors"
+                    className="w-full flex items-center justify-center space-x-2 p-3 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors"
                   >
                     <Edit className="w-5 h-5" />
                     <span>Edit Profile</span>

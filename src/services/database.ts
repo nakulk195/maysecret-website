@@ -9,14 +9,14 @@ export const profileService = {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .insert([
+        .upsert([
           {
             id: userId,
             full_name: fullName,
             email: email,
             phone: phone
           }
-        ])
+        ], { onConflict: 'id' })
         .select()
         .maybeSingle();
 
@@ -146,14 +146,34 @@ export const wishlistService = {
   async addToWishlist(userId: string, productId: string) {
     try {
       const resolvedProductId = await resolveSupabaseProductIdFromValue(productId);
+      const { data: existingRows, error: existingError } = await supabase
+        .from('wishlist')
+        .select('id, user_id, product_id, created_at')
+        .eq('user_id', userId)
+        .eq('product_id', resolvedProductId)
+        .order('created_at', { ascending: true })
+        .limit(1);
+
+      if (existingError) {
+        console.error(
+          `[database.wishlistService] Error checking wishlist for product ${productId}:`,
+          existingError
+        );
+        throw existingError;
+      }
+
+      if (existingRows && existingRows.length > 0) {
+        return existingRows[0];
+      }
+
       const { data, error } = await supabase
         .from('wishlist')
-        .upsert([
+        .insert([
           {
             user_id: userId,
             product_id: resolvedProductId
           }
-        ], { onConflict: 'user_id,product_id' })
+        ])
         .select()
         .maybeSingle();
 
@@ -224,10 +244,10 @@ export const wishlistService = {
       const resolvedProductId = await resolveSupabaseProductIdFromValue(productId);
       const { data, error } = await supabase
         .from('wishlist')
-        .select('*')
+        .select('id')
         .eq('user_id', userId)
         .eq('product_id', resolvedProductId)
-        .maybeSingle();
+        .limit(1);
 
       if (error && error.code !== 'PGRST116') {
         console.error(
@@ -236,7 +256,7 @@ export const wishlistService = {
         );
         throw error;
       }
-      return !!data;
+      return Boolean(data && data.length > 0);
     } catch (error) {
       console.error(
         `[database.wishlistService] Failed to resolve or check wishlist product ${productId}:`,

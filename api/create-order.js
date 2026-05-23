@@ -26,16 +26,17 @@ module.exports = async (req, res) => {
 
   try {
     const { amount, currency = 'INR', receipt } = req.body;
+    const numericAmount = Number(amount);
 
     // Validate amount
-    if (!amount || amount <= 0) {
+    if (!numericAmount || numericAmount <= 0) {
       res.status(400).json({ error: 'Invalid amount' });
       return;
     }
 
     // Create Razorpay order
     const order = await razorpay.orders.create({
-      amount: amount * 100, // Convert to paise (Razorpay expects amount in smallest currency unit)
+      amount: Math.round(numericAmount * 100), // Convert rupees to paise
       currency: currency,
       receipt: receipt || `receipt_${Date.now()}`,
       payment_capture: 1, // Auto capture payment

@@ -1,27 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, CreditCard, Smartphone, Shield, Check } from 'lucide-react';
+import { ArrowLeft, CreditCard, Smartphone, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useToast } from '../contexts/ToastContext';
 import { getProductImage } from '../utils/productImages';
-import { supabase } from '../lib/supabase';
-import { resolveSupabaseProductIdFromValue } from '../utils/productIdResolver';
-
-// Razorpay script
-const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.async = true;
-    script.onload = () => resolve(true);
-    document.body.appendChild(script);
-  });
-};
+import { startRazorpayCheckout } from '../services/checkoutService';
 
 const Payment: React.FC = () => {
   const { user } = useAuth();
   const { cart, getCartTotal, clearCart } = useCart();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   
   const [isProcessing, setIsProcessing] = useState(false);
@@ -80,223 +70,32 @@ const Payment: React.FC = () => {
     }
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (paymentMethod === 'card') {
-      if (!cardDetails.number.replace(/\s/g, '').length) {
-        newErrors.number = 'Card number is required';
-      } else if (cardDetails.number.replace(/\s/g, '').length < 16) {
-        newErrors.number = 'Card number must be 16 digits';
-      }
-      
-      if (!cardDetails.name.trim()) {
-        newErrors.name = 'Cardholder name is required';
-      }
-      
-      if (!cardDetails.expiry.replace('/', '').length) {
-        newErrors.expiry = 'Expiry date is required';
-      } else if (cardDetails.expiry.replace('/', '').length !== 4) {
-        newErrors.expiry = 'Invalid expiry date';
-      }
-      
-      if (!cardDetails.cvv) {
-        newErrors.cvv = 'CVV is required';
-      } else if (cardDetails.cvv.length !== 3) {
-        newErrors.cvv = 'CVV must be 3 digits';
-      }
-    } else if (paymentMethod === 'upi') {
-      if (!upiId.trim()) {
-        newErrors.upiId = 'UPI ID is required';
-      } else if (!/^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$/.test(upiId)) {
-        newErrors.upiId = 'Invalid UPI ID format';
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const createRazorpayOrder = async () => {
-    try {
-      const response = await fetch('/api/create-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: getCartTotal(),
-          currency: 'INR',
-          receipt: `receipt_${Date.now()}`,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-      }
-
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to create order');
-      }
-
-      return data.order;
-    } catch (error) {
-      console.error('Error creating Razorpay order:', error);
-      throw error;
-    }
-  };
-
-  const saveOrderToSupabase = async (razorpayPaymentId: string, razorpayOrderId: string) => {
-    try {
-      if (!user || !address) return null;
-
-      // Create order in Supabase
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          total_amount: getCartTotal(),
-          payment_id: razorpayPaymentId,
-          razorpay_order_id: razorpayOrderId,
-          address_id: null, // Will be updated later
-          payment_status: 'completed',
-          order_status: 'processing',
-          shipping_address: address
-        })
-        .select()
-        .single();
-
-      if (orderError) {
-        console.error('[Payment] Supabase order insert error:', orderError);
-        throw orderError;
-      }
-
-      if (!orderData?.id) {
-        throw new Error('Order insertion returned no order id');
-      }
-
-      const isNumeric = (value: any): boolean => {
-        if (typeof value === 'number') return !Number.isNaN(value);
-        if (typeof value === 'string') return value.trim() !== '' && !Number.isNaN(Number(value));
-        return false;
-      };
-
-      const orderItems = await Promise.all(
-        cart.map(async item => {
-          const originalProductId = item.product_id;
-          const resolvedProductId = await resolveSupabaseProductIdFromValue(originalProductId);
-          const productNumber = isNumeric(originalProductId) ? Number(originalProductId) : undefined;
-
-          return {
-            order_id: orderData.id,
-            product_id: resolvedProductId,
-            ...(productNumber !== undefined ? { product_number: productNumber } : {}),
-            product_name: item.cartProduct?.name || '',
-            product_image: item.cartProduct?.image || '',
-            product_price: Number(item.cartProduct?.price || 0),
-            quantity: item.quantity,
-            price: Number(item.cartProduct?.price || 0)
-          } as any;
-        })
-      );
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) {
-        console.error('[Payment] Supabase order_items insert error:', itemsError);
-        throw itemsError;
-      }
-
-      return orderData;
-    } catch (error) {
-      console.error('[Payment] Error saving order to Supabase:', error);
-      throw error;
-    }
-  };
-
   const handlePayment = async () => {
-    if (!validateForm()) return;
+    if (!user) return;
+    if (!address) {
+      showToast('Please select a delivery address first', 'info');
+      navigate('/address');
+      return;
+    }
 
     setIsProcessing(true);
     try {
-      // Load Razorpay script
-      await loadRazorpayScript();
-
-      // Create Razorpay order from backend
-      const razorpayOrder = await createRazorpayOrder();
-
-      const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_live_SnfN5ldcu6oeYy',
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
-        name: 'MAY SECRET',
-        description: 'Purchase of premium skincare products',
-        order_id: razorpayOrder.id,
-        handler: async function(response: any) {
-          try {
-            // Payment successful
-            const orderData = await saveOrderToSupabase(
-              response.razorpay_payment_id,
-              response.razorpay_order_id
-            );
-
-            if (!orderData?.id) {
-              throw new Error('Order save returned invalid order id');
-            }
-
-            // Clear cart only after order and order_items successfully saved
-            await clearCart();
-
-            // Clear shipping address from localStorage
-            localStorage.removeItem('shipping_address');
-
-            // Redirect to order success page
-            navigate(`/order-success?orderId=${orderData.id}`);
-          } catch (error) {
-            console.error('[Payment] Error processing payment success:', error);
-            alert(
-              'Payment successful but failed to save order. Please contact support with order details.'
-            );
-          } finally {
-            setIsProcessing(false);
-          }
-        },
-        prefill: {
-          name: address?.fullName || user?.user_metadata?.first_name || 'Customer',
-          email: address?.emailAddress || user?.email || '',
-          contact: address?.mobileNumber || ''
-        },
-        theme: {
-          color: '#e91e63', // Pink color matching brand
-        },
-        modal: {
-          ondismiss: function() {
-            setIsProcessing(false);
-          },
-        },
-      };
-
-      const razorpay = new (window as any).Razorpay(options);
-      razorpay.open();
-
+      const order = await startRazorpayCheckout({
+        user,
+        cart,
+        totalAmount: getCartTotal(),
+        address,
+        clearCart,
+      });
+      showToast('Order successful');
+      navigate(`/orders?success=1&orderId=${order.id}`);
     } catch (error: any) {
       console.error('Payment error:', error);
-      setIsProcessing(false);
-      
-      // Show user-friendly error message
-      const errorMessage = error?.message || 'Unknown error occurred. Please try again or contact support.';
-      if (errorMessage.includes('Insufficient balance')) {
-        alert('Insufficient balance in your Razorpay account. Please add funds or try another payment method.');
-      } else if (errorMessage.includes('Payment cancelled')) {
-        // User cancelled - no error message needed
-      } else {
-        alert(`Payment failed: ${errorMessage}`);
+      if (error?.message !== 'Payment cancelled') {
+        showToast(error?.message || 'Payment failed. Please try again.', 'error');
       }
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -539,14 +338,14 @@ const Payment: React.FC = () => {
                     type="button"
                     onClick={handlePayment}
                     disabled={isProcessing}
-                    className="w-full bg-warm-600 text-white py-4 rounded-lg font-semibold hover:bg-warm-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isProcessing ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
                     ) : (
                       <>
                         <Shield className="mr-2" />
-                        Pay ₹{getCartTotal().toLocaleString()}
+                        Pay securely with Razorpay ₹{getCartTotal().toLocaleString()}
                       </>
                     )}
                   </button>

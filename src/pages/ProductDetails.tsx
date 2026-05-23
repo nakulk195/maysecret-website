@@ -21,9 +21,12 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { getProductById } from '../utils/productData';
-import { addToWishlist, removeFromWishlist, isInWishlist, addToRecentlyViewed } from '../utils/storage';
+import { addToRecentlyViewed } from '../utils/storage';
 import { getProductImage, getProductImages } from '../utils/productImages';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { Product as SupabaseProduct } from '../lib/supabase';
 import { ProductService } from '../services/productService';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
@@ -44,6 +47,9 @@ const ProductDetails: React.FC = () => {
   const [activeTab, setActiveTab] = useState('description');
   const [showInfo, setShowInfo] = useState(false);
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { user, loading: authLoading } = useAuth();
+  const { showToast } = useToast();
 
   const [product, setProduct] = useState<SupabaseProduct | null>(null);
   const [legacyProduct, setLegacyProduct] = useState<any>(null);
@@ -149,9 +155,13 @@ const ProductDetails: React.FC = () => {
       } : currentProduct;
       
       addToRecentlyViewed(storageProduct);
-      setIsWishlisted(isInWishlist(String(currentProduct.id)));
+      if (user) {
+        isInWishlist(String(currentProduct.id)).then(setIsWishlisted);
+      } else {
+        setIsWishlisted(false);
+      }
     }
-  }, [currentProduct, product]);
+  }, [currentProduct, product, user, isInWishlist]);
 
   if (loading) {
     return (
@@ -177,23 +187,51 @@ const ProductDetails: React.FC = () => {
     );
   }
 
-  const handleWishlistToggle = () => {
+  const goToLogin = () => {
+    localStorage.setItem('redirect_after_login', window.location.pathname);
+    navigate('/login');
+  };
+
+  const handleWishlistToggle = async () => {
     if (!currentProduct) return;
-    if (isWishlisted) {
-      removeFromWishlist(currentProduct.id);
-      setIsWishlisted(false);
-    } else {
-      addToWishlist(currentProduct);
-      setIsWishlisted(true);
+    if (authLoading) return;
+    if (!user) {
+      showToast('Please log in to use your wishlist', 'info');
+      goToLogin();
+      return;
+    }
+
+    try {
+      if (isWishlisted) {
+        await removeFromWishlist(String(currentProduct.id));
+        setIsWishlisted(false);
+        showToast('Product removed from wishlist', 'info');
+      } else {
+        await addToWishlist(currentProduct as any);
+        setIsWishlisted(true);
+        showToast('Product added to wishlist');
+      }
+    } catch (error) {
+      console.error('Error updating wishlist:', error);
+      showToast('Wishlist update failed. Please try again.', 'error');
     }
   };
 
   const handleAddToCart = async () => {
     if (!currentProduct) return;
+    if (authLoading) return;
+    if (!user) {
+      showToast('Please log in to add products to cart', 'info');
+      goToLogin();
+      return;
+    }
+
     try {
       await addToCart(currentProduct as any, quantity);
+      showToast('Product added to cart');
     } catch (error) {
       console.error('Error adding to cart:', error);
+      showToast('Could not add product to cart. Please try again.', 'error');
     }
   };
 

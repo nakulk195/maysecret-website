@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, MapPin, Phone, Mail, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CreditCard, MapPin, Phone, Mail, ShieldCheck, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useToast } from '../contexts/ToastContext';
 import { useAddresses } from '../hooks/useAddresses';
-import { addressService } from '../services/database';
+import { CheckoutAddress, startRazorpayCheckout } from '../services/checkoutService';
 
 // Indian states data
 const INDIAN_STATES = [
@@ -55,7 +56,8 @@ interface AddressFormData {
 
 const Address: React.FC = () => {
   const { user } = useAuth();
-  const { cart, getCartTotal } = useCart();
+  const { cart, getCartTotal, clearCart } = useCart();
+  const { showToast } = useToast();
   const { addresses, loading: addressesLoading, addAddress, updateAddress, deleteAddress } = useAddresses();
   const navigate = useNavigate();
   
@@ -79,6 +81,8 @@ const Address: React.FC = () => {
 
   const [errors, setErrors] = useState<Partial<AddressFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<CheckoutAddress | null>(null);
+  const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
   const [citySearch, setCitySearch] = useState('');
   const [filteredCities, setFilteredCities] = useState(INDIAN_CITIES);
 
@@ -139,15 +143,16 @@ const Address: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      let savedAddress: any = null;
       if (user) {
         if (isEditing && editingAddressId) {
           // Update existing address
-          await updateAddress(editingAddressId, {
+          savedAddress = await updateAddress(editingAddressId, {
             full_name: formData.fullName,
             phone: formData.mobileNumber,
             address_line_1: formData.houseNo,
-            address_line_2: formData.apartment,
-            landmark: formData.landmark,
+            address_line_2: [formData.apartment, formData.area].filter(Boolean).join(', '),
+            landmark: formData.landmark || formData.area,
             city: formData.city,
             state: formData.state,
             pincode: formData.pincode,
@@ -155,12 +160,12 @@ const Address: React.FC = () => {
           });
         } else {
           // Create new address
-          await addAddress({
+          savedAddress = await addAddress({
             full_name: formData.fullName,
             phone: formData.mobileNumber,
             address_line_1: formData.houseNo,
-            address_line_2: formData.apartment,
-            landmark: formData.landmark,
+            address_line_2: [formData.apartment, formData.area].filter(Boolean).join(', '),
+            landmark: formData.landmark || formData.area,
             city: formData.city,
             state: formData.state,
             pincode: formData.pincode,
@@ -170,7 +175,23 @@ const Address: React.FC = () => {
       }
 
       // Save address to localStorage for use in payment page
-      localStorage.setItem('shipping_address', JSON.stringify(formData));
+      const checkoutAddress: CheckoutAddress = {
+        id: savedAddress?.id || editingAddressId || undefined,
+        fullName: formData.fullName,
+        mobileNumber: formData.mobileNumber,
+        emailAddress: formData.emailAddress || user?.email || '',
+        houseNo: formData.houseNo,
+        apartment: formData.apartment,
+        area: formData.area,
+        landmark: formData.landmark,
+        pincode: formData.pincode,
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
+      };
+      localStorage.setItem('shipping_address', JSON.stringify(checkoutAddress));
+      setSelectedAddress(checkoutAddress);
+      showToast('Address saved. You can proceed to payment.', 'info');
       
       // Reset form and go back to address list
       resetForm();
@@ -230,22 +251,65 @@ const Address: React.FC = () => {
     }
   };
 
+  const buildCheckoutAddress = (address: any): CheckoutAddress => ({
+    id: address.id,
+    fullName: address.full_name,
+    mobileNumber: address.phone,
+    emailAddress: address.email || user?.email || '',
+    houseNo: address.address_line_1,
+    apartment: address.address_line_2 || '',
+    area: address.landmark || address.address_line_2 || '',
+    landmark: address.landmark || '',
+    pincode: address.pincode,
+    city: address.city,
+    state: address.state,
+    country: address.country || 'India'
+  });
+
   const handleSelectAddress = (address: any) => {
-    const addressFormData = {
-      fullName: address.full_name,
-      mobileNumber: address.phone,
-      emailAddress: address.email || user?.email || '',
-      houseNo: address.address_line_1,
-      apartment: address.address_line_2 || '',
-      area: address.landmark || '',
-      landmark: address.landmark || '',
-      pincode: address.pincode,
-      city: address.city,
-      state: address.state,
-      country: address.country
-    };
+    const addressFormData = buildCheckoutAddress(address);
     localStorage.setItem('shipping_address', JSON.stringify(addressFormData));
-    navigate('/payment');
+    setSelectedAddress(addressFormData);
+    showToast('Delivery address selected', 'info');
+  };
+
+  const handlePayNow = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    if (!selectedAddress) {
+      showToast('Please select an address first', 'info');
+      return;
+    }
+
+    if (!cart.length) {
+      showToast('Your cart is empty', 'error');
+      navigate('/cart');
+      return;
+    }
+
+    setIsPaymentProcessing(true);
+    try {
+      const order = await startRazorpayCheckout({
+        user,
+        cart,
+        totalAmount: getCartTotal(),
+        address: selectedAddress,
+        clearCart,
+      });
+
+      showToast('Order successful');
+      navigate(`/orders?success=1&orderId=${order.id}`);
+    } catch (error: any) {
+      if (error?.message !== 'Payment cancelled') {
+        console.error('Payment error:', error);
+        showToast(error?.message || 'Payment failed. Please try again.', 'error');
+      }
+    } finally {
+      setIsPaymentProcessing(false);
+    }
   };
 
   if (!user) {
@@ -263,7 +327,7 @@ const Address: React.FC = () => {
         >
           <Link
             to="/cart"
-            className="inline-flex items-center text-warm-600 hover:text-warm-700 mb-6 transition-colors"
+            className="inline-flex items-center text-gray-900 hover:text-black mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Cart
@@ -283,7 +347,7 @@ const Address: React.FC = () => {
             {!showAddressForm && (
               <button
                 onClick={() => setShowAddressForm(true)}
-                className="bg-warm-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-warm-700 transition-colors"
+                className="bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black transition-colors"
               >
                 Add New Address
               </button>
@@ -606,13 +670,13 @@ const Address: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-warm-600 text-white py-4 rounded-lg font-semibold hover:bg-warm-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isSubmitting ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
                     ) : (
                       <>
-                        Continue To Payment
+                        Save Address
                         <ArrowRight className="ml-2 w-5 h-5" />
                       </>
                     )}
@@ -680,7 +744,7 @@ const Address: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-lg font-semibold text-gray-800 pt-2 border-t border-gray-200">
                   <span>Total</span>
-                  <span className="text-warm-700">₹{getCartTotal().toLocaleString()}</span>
+                  <span className="text-gray-900">₹{getCartTotal().toLocaleString()}</span>
                 </div>
               </div>
             </motion.div>
@@ -706,7 +770,7 @@ const Address: React.FC = () => {
                     <p className="text-gray-600 mb-6">Add your first delivery address to get started</p>
                     <button
                       onClick={() => setShowAddressForm(true)}
-                      className="bg-warm-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-warm-700 transition-colors"
+                      className="bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black transition-colors"
                     >
                       Add Your First Address
                     </button>
@@ -718,7 +782,11 @@ const Address: React.FC = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:border-warm-300 transition-colors"
+                      className={`bg-white rounded-xl shadow-sm p-6 border transition-colors ${
+                        selectedAddress?.id === address.id
+                          ? 'border-gray-900 ring-2 ring-gray-900/10'
+                          : 'border-gray-100 hover:border-gray-400'
+                      }`}
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
@@ -747,7 +815,7 @@ const Address: React.FC = () => {
                         <div className="flex space-x-2">
                           <button
                             onClick={() => handleEditAddress(address)}
-                            className="text-warm-600 hover:text-warm-700 p-2 hover:bg-warm-50 rounded-lg transition-colors"
+                            className="text-gray-700 hover:text-black p-2 hover:bg-gray-100 rounded-lg transition-colors"
                           >
                             Edit
                           </button>
@@ -759,9 +827,9 @@ const Address: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleSelectAddress(address)}
-                            className="bg-warm-600 text-white px-4 py-2 rounded-lg hover:bg-warm-700 transition-colors"
+                            className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-black transition-colors"
                           >
-                            Use This
+                            {selectedAddress?.id === address.id ? 'Selected' : 'Use This'}
                           </button>
                         </div>
                       </div>
@@ -829,9 +897,42 @@ const Address: React.FC = () => {
                   </div>
                   <div className="flex justify-between text-lg font-semibold text-gray-800 pt-2 border-t border-gray-200">
                     <span>Total</span>
-                    <span className="text-warm-700">₹{getCartTotal().toLocaleString()}</span>
+                    <span className="text-gray-900">₹{getCartTotal().toLocaleString()}</span>
                   </div>
                 </div>
+
+                {selectedAddress && (
+                  <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <div className="flex items-start gap-3">
+                      <ShieldCheck className="mt-0.5 h-5 w-5 text-gray-900" />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">Selected delivery address</p>
+                        <p className="mt-1 text-sm text-gray-600">
+                          {selectedAddress.fullName}, {selectedAddress.city} - {selectedAddress.pincode}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handlePayNow}
+                  disabled={!selectedAddress || isPaymentProcessing || cart.length === 0}
+                  className="mt-5 flex w-full items-center justify-center rounded-lg bg-gray-900 px-5 py-4 font-semibold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isPaymentProcessing ? (
+                    <span className="flex items-center">
+                      <span className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Opening payment...
+                    </span>
+                  ) : (
+                    <>
+                      <CreditCard className="mr-2 h-5 w-5" />
+                      Pay ₹{getCartTotal().toLocaleString()}
+                    </>
+                  )}
+                </button>
               </motion.div>
             </div>
           </div>

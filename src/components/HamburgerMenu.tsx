@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import maysecretLogo from '../assets/images/maysecret_logo.png';
 
 const navLinks = [
-  { to: '/offer', label: 'Offer' },
   { to: '/shop', label: 'Shop' },
   { to: '/contact', label: 'Contact Us' },
   { to: '/cart', label: 'Cart' },

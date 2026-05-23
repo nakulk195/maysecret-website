@@ -5,7 +5,7 @@ import { Heart, ShoppingCart, Star, Trash2 } from 'lucide-react';
 import { Product } from '../lib/supabase';
 import { getProductImage } from '../utils/productImages';
 import { useCart } from '../contexts/CartContext';
-import { useWishlist } from '../contexts/WishlistContext';
+import { useToast } from '../contexts/ToastContext';
 
 interface WishlistCardProps {
   product: Product;
@@ -15,6 +15,7 @@ interface WishlistCardProps {
 const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const { addToCart } = useCart();
+  const { showToast } = useToast();
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -22,8 +23,10 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
     
     try {
       await addToCart(product, 1);
+      showToast('Product added to cart');
     } catch (error) {
       console.error('Error adding product to cart:', error);
+      showToast('Could not add product to cart. Please try again.', 'error');
     }
   };
 
@@ -31,6 +34,7 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
     e.preventDefault();
     e.stopPropagation();
     onRemove(product.id);
+    showToast('Product removed from wishlist', 'info');
   };
 
   const handleProductClick = () => {

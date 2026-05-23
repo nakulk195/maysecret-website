@@ -33,6 +33,20 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const normalizeWishlistProducts = (rows: any[]): Product[] => {
+    const byProduct = new Map<string, Product>();
+
+    for (const item of rows || []) {
+      if (!item?.products?.id) continue;
+      const productId = String(item.products.id);
+      if (!byProduct.has(productId)) {
+        byProduct.set(productId, item.products);
+      }
+    }
+
+    return Array.from(byProduct.values());
+  };
+
   // Load wishlist when user changes
   useEffect(() => {
     const loadWishlist = async () => {
@@ -71,12 +85,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         if (error) throw error;
         console.log('Fetched wishlist data:', data);
 
-        // Extract products from the relationship
-        const products = (data || [])
-          .map(item => item.products)
-          .filter(Boolean);
-
-        setWishlist(products);
+        setWishlist(normalizeWishlistProducts(data || []));
       } catch (error) {
         console.error('Error loading wishlist:', error);
         setWishlist([]);
@@ -120,6 +129,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       ));
     } catch (error) {
       console.error('Error adding to wishlist:', error);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -141,7 +151,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         );
       }
 
-      await wishlistService.removeFromWishlist(user.id, productId);
+      await wishlistService.removeFromWishlist(user.id, resolvedProductId);
       
       // Remove from local state
       setWishlist(prev => prev.filter(item =>
@@ -149,6 +159,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
       ));
     } catch (error) {
       console.error('Error removing from wishlist:', error);
+      throw error;
     } finally {
       setLoading(false);
     }

@@ -8,6 +8,7 @@ import { products as localProducts } from '../utils/productData';
 import { getProductImage } from '../utils/productImages';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'newest' | 'rating';
@@ -22,9 +23,9 @@ const Shop: React.FC = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [cartMessage, setCartMessage] = useState('');
   const { addToCart } = useCart();
   const { user, loading: authLoading } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   // Load products from local productData
@@ -114,6 +115,7 @@ const Shop: React.FC = () => {
     if (!product.stock || authLoading) return;
 
     if (!user) {
+      showToast('Please log in to add products to cart', 'info');
       localStorage.setItem('redirect_after_login', window.location.pathname);
       navigate('/login');
       return;
@@ -121,10 +123,10 @@ const Shop: React.FC = () => {
 
     try {
       await addToCart(product, 1);
-      setCartMessage(`${product.name} added to cart`);
-      window.setTimeout(() => setCartMessage(''), 2500);
+      showToast('Product added to cart');
     } catch (error) {
       console.error('Shop: Error adding to cart:', error);
+      showToast('Could not add product to cart. Please try again.', 'error');
     }
   };
 
@@ -132,12 +134,6 @@ const Shop: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 py-4 sm:py-8">
       {/* Floating Social Buttons */}
       <FloatingSocialButtons />
-      {cartMessage && (
-        <div className="fixed left-1/2 top-20 z-50 -translate-x-1/2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-lg">
-          {cartMessage}
-        </div>
-      )}
-      
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">

@@ -503,7 +503,6 @@ const ProductDetails: React.FC = () => {
                     </>
                   )}
                 </div>
-                <div className="text-sm text-gray-500 mt-2">(Inclusive of all taxes)</div>
               </motion.div>
 
               {/* Stock Status */}

@@ -218,7 +218,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
           </div>
           
           {/* Price */}
-          <div className="mb-4">
+          <div className="mb-3">
             <div className="flex items-baseline gap-3 flex-wrap">
               <span className="text-lg font-bold text-gray-900">
                 ₹{product.price.toLocaleString()}
@@ -229,7 +229,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
                 </span>
               )}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Inclusive of all taxes</div>
           </div>
         </div>
         

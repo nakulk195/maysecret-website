@@ -178,11 +178,53 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: none;
 }
 
+.social-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.social-icon:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 14px 28px rgba(17, 24, 39, 0.18);
+  filter: saturate(1.08);
+}
+
+.social-icon-instagram {
+  background: linear-gradient(135deg, #feda75 0%, #e1306c 45%, #833ab4 100%);
+}
+
+.social-icon-whatsapp {
+  background: #25d366;
+}
+
+.social-icon-facebook {
+  background: #1877f2;
+}
+
+.social-icon-youtube {
+  background: #ff0000;
+}
+
 /* Mobile footer optimization */
 @media (max-width: 768px) {
   .footer {
     padding-top: 24px;
     padding-bottom: 16px;
+  }
+
+  .social-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
   }
 }
 

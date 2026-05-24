@@ -1,8 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, MessageCircle, Facebook, Mail, CreditCard, Smartphone, Wallet } from 'lucide-react';
+import { Mail, CreditCard, Wallet } from 'lucide-react';
+import { FaFacebookF, FaInstagram, FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import maysecretLogo from '../assets/images/maysecret_logo.png';
 import { BRAND_NAME } from '../config/brand';
+
+const InstagramIcon = FaInstagram as unknown as React.ComponentType<{ className?: string }>;
+const WhatsappIcon = FaWhatsapp as unknown as React.ComponentType<{ className?: string }>;
+const FacebookIcon = FaFacebookF as unknown as React.ComponentType<{ className?: string }>;
+const YoutubeIcon = FaYoutube as unknown as React.ComponentType<{ className?: string }>;
 
 const Footer: React.FC = () => {
   return (
@@ -110,33 +116,42 @@ const Footer: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex space-x-4">
+            <div className="flex justify-center md:justify-start gap-3 sm:gap-4">
               <a 
                 href="https://www.instagram.com/maysecretskinandbeauty?igsh=MThqeHI2bTJ5ZmFkNw==" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-black hover:text-pink-500 transition duration-200"
+                className="social-icon social-icon-instagram"
                 aria-label="Instagram"
               >
-                <Instagram className="w-5 h-5" />
+                <InstagramIcon className="w-5 h-5" />
               </a>
               <a 
                 href="https://wa.me/919075849555" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-black hover:text-green-500 transition duration-200"
+                className="social-icon social-icon-whatsapp"
                 aria-label="WhatsApp"
               >
-                <MessageCircle className="w-5 h-5" />
+                <WhatsappIcon className="w-5 h-5" />
               </a>
               <a 
                 href="https://facebook.com/maysecret" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-black hover:text-blue-500 transition duration-200"
+                className="social-icon social-icon-facebook"
                 aria-label="Facebook"
               >
-                <Facebook className="w-5 h-5" />
+                <FacebookIcon className="w-5 h-5" />
+              </a>
+              <a
+                href="https://www.youtube.com/@MaySecretOfficial"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-icon social-icon-youtube"
+                aria-label="YouTube"
+              >
+                <YoutubeIcon className="w-5 h-5" />
               </a>
             </div>
           </div>

@@ -9,7 +9,6 @@ import FloatingSocialButtons from '../components/FloatingSocialButtons';
 import RotatingTagline from '../components/RotatingTagline';
 import SkincareTips from '../components/SkincareTips';
 import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
-import CustomerReviews from '../components/CustomerReviews';
 import Newsletter from '../components/Newsletter';
 import GlassSkinRoutine from '../components/GlassSkinRoutine';
 import { BRAND_NAME } from '../config/brand';
@@ -515,8 +514,6 @@ const Home: React.FC = () => {
       <WhyChooseMaySecret />
 
       <SkincareTips />
-
-      <CustomerReviews />
 
       {/* CTA Section */}
       <section className="py-20 px-4 bg-gradient-to-br from-pink-100 to-cream-200">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 // Load products from local productData
@@ -6,13 +6,6 @@ import { products as localProducts } from '../utils/productData';
 import type { Product } from '../utils/productData';
 import ProductCard from '../components/ProductCard';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
-import heroimg1 from '../assets/images/heroimg1.png';
-import heroimg2 from '../assets/images/heroimg2.png';
-import heroimg3 from '../assets/images/heroimg3.png';
-import heroimg4 from '../assets/images/heroimg4.png';
-import heroimg5 from '../assets/images/heroimg5.png';
-import combinedProduct from '../assets/images/combo.PNG';
-import combinedHorizontal from '../assets/images/Combined_horizontal.PNG';
 import RotatingTagline from '../components/RotatingTagline';
 import SkincareTips from '../components/SkincareTips';
 import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
@@ -61,77 +54,182 @@ const Home: React.FC = () => {
     },
   };
 
-  // Rotating banner setup
-  const heroImages = [heroimg1, heroimg2, heroimg3, heroimg4, heroimg5, combinedProduct, combinedHorizontal];
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const heroSlides = localProducts
+    .filter((product) => [1, 2, 3].includes(product.id))
+    .map((product) => {
+      const slideCopy: Record<number, { subtitle: string; gradient: string }> = {
+        1: {
+          subtitle: 'SPF 50 PA+++ protection with a feather-light glow finish.',
+          gradient: 'from-sky-50 via-white to-amber-100',
+        },
+        2: {
+          subtitle: 'Rice extract radiance for a smooth, bright glass-skin look.',
+          gradient: 'from-rose-50 via-white to-pink-100',
+        },
+        3: {
+          subtitle: 'Your complete daytime routine in one premium skincare set.',
+          gradient: 'from-emerald-50 via-white to-rose-100',
+        },
+      };
 
-  const showPreviousImage = () => {
-    setCurrentIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+      return {
+        id: product.id,
+        title: product.name,
+        subtitle: slideCopy[product.id]?.subtitle || product.description,
+        image: product.image,
+        gradient: slideCopy[product.id]?.gradient || 'from-pink-50 via-white to-orange-100',
+      };
+    });
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const heroTouchStartX = useRef<number | null>(null);
+  const heroTouchEndX = useRef<number | null>(null);
+  const currentSlide = heroSlides[currentIndex] || heroSlides[0];
+
+  const showPreviousSlide = () => {
+    if (heroSlides.length === 0) return;
+    setCurrentIndex((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
-  const showNextImage = () => {
-    setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+  const showNextSlide = () => {
+    if (heroSlides.length === 0) return;
+    setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
+  };
+
+  const handleHeroTouchStart = (event: React.TouchEvent<HTMLElement>) => {
+    heroTouchStartX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleHeroTouchMove = (event: React.TouchEvent<HTMLElement>) => {
+    heroTouchEndX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleHeroTouchEnd = () => {
+    if (heroTouchStartX.current === null || heroTouchEndX.current === null) {
+      heroTouchStartX.current = null;
+      heroTouchEndX.current = null;
+      return;
+    }
+
+    const distance = heroTouchStartX.current - heroTouchEndX.current;
+
+    if (Math.abs(distance) > 45) {
+      if (distance > 0) {
+        showNextSlide();
+      } else {
+        showPreviousSlide();
+      }
+    }
+
+    heroTouchStartX.current = null;
+    heroTouchEndX.current = null;
   };
 
   useEffect(() => {
+    if (heroSlides.length === 0) return;
+
     const id = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+      setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
     }, 5000); // 5 seconds per slide
     return () => clearInterval(id);
-  }, [heroImages.length]);
+  }, [heroSlides.length]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-cream-100 font-['Inter',sans-serif]">
       {/* Floating Social Buttons */}
       <FloatingSocialButtons />
 
-      {/* Rotating Banner (below header) */}
-      <section className="relative w-full overflow-hidden">
-        <div className="relative w-full flex items-center justify-center bg-black overflow-hidden border-b border-white/10 h-[260px] sm:h-[320px] md:h-[420px] lg:h-[520px]">
-          {heroImages.map((img, index) =>
-            img ? (
-              <img
-                key={index}
-                src={img}
-                alt="Hero"
-                className={`absolute inset-0 w-full h-full object-contain bg-black transition-opacity duration-700 ${
-                  index === currentIndex ? "opacity-100" : "opacity-0"
-                }`}
+      {/* Product Hero Slider */}
+      {currentSlide && (
+        <section
+          className={`relative w-full overflow-hidden bg-gradient-to-br ${currentSlide.gradient}`}
+          onTouchStart={handleHeroTouchStart}
+          onTouchMove={handleHeroTouchMove}
+          onTouchEnd={handleHeroTouchEnd}
+        >
+          <div className="relative mx-auto grid h-[260px] max-w-7xl grid-cols-[1.08fr_0.92fr] items-center gap-3 px-5 sm:h-[340px] sm:px-8 md:h-[430px] lg:h-[500px] lg:grid-cols-2 lg:px-12">
+            <div className="z-10 max-w-xl">
+              <motion.p
+                key={`eyebrow-${currentSlide.id}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45 }}
+                className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-rose-500 sm:text-sm"
+              >
+                MAY SECRET
+              </motion.p>
+              <motion.h1
+                key={`title-${currentSlide.id}`}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-2 text-2xl font-bold leading-tight text-gray-950 sm:text-4xl lg:text-5xl"
+              >
+                {currentSlide.title}
+              </motion.h1>
+              <motion.p
+                key={`subtitle-${currentSlide.id}`}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.05 }}
+                className="mb-5 max-w-md text-sm leading-relaxed text-gray-600 sm:text-base lg:text-lg"
+              >
+                {currentSlide.subtitle}
+              </motion.p>
+              <button
+                type="button"
+                onClick={() => window.location.href = `/product/${currentSlide.id}`}
+                className="rounded-full bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:bg-rose-600 sm:px-7 sm:py-3"
+              >
+                Shop Now
+              </button>
+            </div>
+
+            <div className="relative flex h-full min-w-0 items-center justify-center">
+              <motion.img
+                key={`image-${currentSlide.id}`}
+                src={currentSlide.image}
+                alt={currentSlide.title}
+                initial={{ opacity: 0, scale: 0.96, x: 18 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="max-h-[220px] w-full object-contain drop-shadow-2xl transition-all duration-500 ease-in-out sm:max-h-[300px] md:max-h-[390px] lg:max-h-[455px]"
               />
-            ) : null
-          )}
+            </div>
 
-          <button
-            type="button"
-            onClick={showPreviousImage}
-            className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 text-gray-900 shadow-md p-2 md:left-6 md:p-3 hover:bg-white z-20"
-            aria-label="Previous image"
-          >
-            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
+            <button
+              type="button"
+              onClick={showPreviousSlide}
+              className="absolute left-3 top-1/2 z-20 hidden -translate-y-1/2 rounded-full bg-white/85 p-3 text-gray-900 shadow-md transition-all duration-300 hover:bg-white md:flex"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
 
-          <button
-            type="button"
-            onClick={showNextImage}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 text-gray-900 shadow-md p-2 md:right-6 md:p-3 hover:bg-white z-20"
-            aria-label="Next image"
-          >
-            <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
+            <button
+              type="button"
+              onClick={showNextSlide}
+              className="absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 rounded-full bg-white/85 p-3 text-gray-900 shadow-md transition-all duration-300 hover:bg-white md:flex"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
 
-          {/* Dots Indicator */}
-          <div className="absolute bottom-4 w-full flex justify-center gap-2">
-            {heroImages.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                  index === currentIndex ? "bg-white" : "bg-white/50"
-                }`}
-              />
-            ))}
+            <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2">
+              {heroSlides.map((slide, index) => (
+                <button
+                  key={slide.id}
+                  type="button"
+                  onClick={() => setCurrentIndex(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === currentIndex ? 'w-7 bg-gray-950' : 'w-2 bg-gray-950/30'
+                  }`}
+                  aria-label={`Go to ${slide.title}`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* New Rotating Tagline Below Hero Images */}
       <RotatingTagline />
@@ -468,4 +566,3 @@ const Home: React.FC = () => {
 };
 
 export default Home; 
-

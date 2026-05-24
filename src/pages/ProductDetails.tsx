@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -51,6 +51,8 @@ const ProductDetails: React.FC = () => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { user, loading: authLoading } = useAuth();
   const { showToast } = useToast();
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
 
   const [product, setProduct] = useState<SupabaseProduct | null>(null);
   const [legacyProduct, setLegacyProduct] = useState<any>(null);
@@ -125,7 +127,7 @@ const ProductDetails: React.FC = () => {
   };
 
   // Get images array (single image for Supabase, multiple for legacy)
-  const getImages = () => {
+  const images = useMemo(() => {
     if (product) {
       return getProductImages([product.image]);
     }
@@ -135,7 +137,7 @@ const ProductDetails: React.FC = () => {
         : getProductImages([legacyProduct.image]);
     }
     return [];
-  };
+  }, [product, legacyProduct]);
 
   useEffect(() => {
     if (currentProduct) {
@@ -163,6 +165,10 @@ const ProductDetails: React.FC = () => {
       }
     }
   }, [currentProduct, product, user, isInWishlist]);
+
+  useEffect(() => {
+    setSelectedImage(0);
+  }, [currentProduct?.id]);
 
   if (loading) {
     return (
@@ -236,17 +242,45 @@ const ProductDetails: React.FC = () => {
     }
   };
 
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    touchEndX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current === null || touchEndX.current === null) {
+      touchStartX.current = null;
+      touchEndX.current = null;
+      return;
+    }
+
+    const distance = touchStartX.current - touchEndX.current;
+    const swipeThreshold = 40;
+
+    if (Math.abs(distance) > swipeThreshold) {
+      if (distance > 0) {
+        nextImage();
+      } else {
+        prevImage();
+      }
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   const nextImage = () => {
-    const images = getImages();
+    if (images.length === 0) return;
     setSelectedImage((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = () => {
-    const images = getImages();
+    if (images.length === 0) return;
     setSelectedImage((prev) => (prev - 1 + images.length) % images.length);
   };
-
-  const images = getImages();
 
   // @ts-ignore
   const discountPercentage = currentProduct?.originalPrice || currentProduct?.original_price 
@@ -278,11 +312,16 @@ const ProductDetails: React.FC = () => {
             className="space-y-4"
           >
             {/* Main Image */}
-            <div className="relative aspect-square bg-white rounded-3xl shadow-2xl overflow-hidden group">
+            <div
+              className="relative aspect-square bg-white rounded-3xl shadow-2xl overflow-hidden group product-main-image"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
               <motion.img
                 src={images[selectedImage]}
                 alt={currentProduct?.name || 'Product'}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                className="w-full h-full object-contain transition-all duration-300 ease-in-out"
                 whileHover={{ scale: 1.05 }}
               />
               
@@ -293,7 +332,8 @@ const ProductDetails: React.FC = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/50"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full items-center justify-center shadow-lg border border-white/50"
+                    aria-label="Previous image"
                   >
                     <ChevronLeft size={20} />
                   </motion.button>
@@ -301,7 +341,8 @@ const ProductDetails: React.FC = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/50"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full items-center justify-center shadow-lg border border-white/50"
+                    aria-label="Next image"
                   >
                     <ChevronRight size={20} />
                   </motion.button>
@@ -311,16 +352,17 @@ const ProductDetails: React.FC = () => {
 
             {/* Thumbnail Images */}
             {images.length > 1 && (
-              <div className="flex space-x-3 justify-center">
+              <div className="thumbnail-strip flex gap-3 overflow-x-auto py-2 px-1 md:justify-center">
                 {images.map((image, index) => (
                   <motion.button
                     key={index}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setSelectedImage(index)}
-                    className={`w-16 h-16 rounded-2xl overflow-hidden border-2 transition-all ${
+                    aria-label={`View image ${index + 1}`}
+                    className={`w-16 h-16 min-w-[4rem] rounded-2xl overflow-hidden border-2 transition-all duration-300 ${
                       selectedImage === index
-                        ? 'border-rose-400 shadow-lg scale-105'
+                        ? 'active-thumbnail'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >

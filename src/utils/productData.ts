@@ -2,7 +2,10 @@ import { ProductService } from '../services/productService';
 import { Product as SupabaseProduct } from '../lib/supabase';
 
 import brighteningSerumImg from "../assets/images/brightening-serum.PNG";
+import brighteningSerum2Img from "../assets/images/brightening-serum2.PNG";
+import brighteningSerum3Img from "../assets/images/brightening-serum3.PNG";
 import sunscreenSprayImg from "../assets/images/sunscreen-spray.PNG";
+import sunscreenSpray2Img from "../assets/images/sunscreen-spray2.jpeg";
 import comboImg from "../assets/images/combo.PNG";
 
 // Category type and available product categories
@@ -63,7 +66,8 @@ export const products: Product[] = [
     originalPrice: 999,
     image: sunscreenSprayImg,
     images: [
-      sunscreenSprayImg
+      sunscreenSprayImg,
+      sunscreenSpray2Img
     ],
     description: "Introducing our new sunscreen spray, fortified with advanced sun protection technology. Formulated with Suncat DE, Uvinul A Plus, and other powerful sunscreen agents, it provides broad-spectrum protection against both UVA and UVB rays. With its lightweight and non-greasy formula, it is perfect for daily use, keeping your skin safe and healthy under the sun.",
     benefits: [
@@ -136,7 +140,9 @@ export const products: Product[] = [
     originalPrice: 1499,
     image: brighteningSerumImg,
     images: [
-      brighteningSerumImg
+      brighteningSerumImg,
+      brighteningSerum2Img,
+      brighteningSerum3Img
     ],
     description: "A powerful brightening serum enriched with Rice Extract, Niacinamide and Sepiwhite designed to improve skin tone, reduce pigmentation and give a radiant glass glow skin effect.",
     benefits: [

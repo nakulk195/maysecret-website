@@ -274,3 +274,24 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 0.1em;
   }
 }
+
+.product-main-image img {
+  transition: all 0.3s ease;
+  object-fit: contain;
+}
+
+.active-thumbnail {
+  border: 2px solid #111;
+  transform: scale(1.03);
+}
+
+.thumbnail-strip {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.thumbnail-strip::-webkit-scrollbar {
+  display: none;
+}

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Mail, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { safeGetItem, safeRemoveItem } from '../utils/safeStorage';
 
 interface FormData {
   firstName: string;
@@ -88,9 +89,9 @@ const Login: React.FC = () => {
           setShowSuccess(true);
           setTimeout(() => {
             // Check for redirect path after login
-            const redirectPath = localStorage.getItem('redirect_after_login');
+            const redirectPath = safeGetItem('redirect_after_login');
             if (redirectPath) {
-              localStorage.removeItem('redirect_after_login');
+              safeRemoveItem('redirect_after_login');
               navigate(redirectPath);
             } else {
               navigate('/');

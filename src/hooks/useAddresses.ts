@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { addressService } from '../services/database';
 import { Address } from '../lib/supabase';
+import { getErrorMessage, withTimeout } from '../utils/safeAsync';
 
 export const useAddresses = () => {
   const { user } = useAuth();
@@ -11,25 +12,64 @@ export const useAddresses = () => {
 
   // Fetch addresses when user changes
   useEffect(() => {
-    if (user) {
-      fetchAddresses();
-    } else {
-      setAddresses([]);
-    }
+    let isActive = true;
+
+    const load = async () => {
+      if (!user) {
+        if (isActive) {
+          setAddresses([]);
+          setLoading(false);
+          setError(null);
+        }
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await withTimeout(
+          addressService.getUserAddresses(user.id),
+          10000,
+          'Address load timed out'
+        );
+        if (isActive) setAddresses(data);
+      } catch (err: any) {
+        if (isActive) {
+          setError(getErrorMessage(err));
+          setAddresses([]);
+        }
+      } finally {
+        if (isActive) setLoading(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      isActive = false;
+    };
   }, [user]);
 
   const fetchAddresses = async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const data = await addressService.getUserAddresses(user.id);
-      setAddresses(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
+    if (user) {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await withTimeout(
+          addressService.getUserAddresses(user.id),
+          10000,
+          'Address load timed out'
+        );
+        setAddresses(data);
+      } catch (err: any) {
+        setError(getErrorMessage(err));
+        setAddresses([]);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setAddresses([]);
       setLoading(false);
     }
   };
@@ -41,11 +81,15 @@ export const useAddresses = () => {
     setError(null);
     
     try {
-      const data = await addressService.createAddress(user.id, addressData);
+      const data = await withTimeout(
+        addressService.createAddress(user.id, addressData),
+        10000,
+        'Address save timed out'
+      );
       setAddresses(prev => [data, ...prev]);
       return data;
     } catch (err: any) {
-      setError(err.message);
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setLoading(false);
@@ -57,11 +101,15 @@ export const useAddresses = () => {
     setError(null);
     
     try {
-      const data = await addressService.updateAddress(addressId, updates);
+      const data = await withTimeout(
+        addressService.updateAddress(addressId, updates),
+        10000,
+        'Address update timed out'
+      );
       setAddresses(prev => prev.map(addr => addr.id === addressId ? data : addr));
       return data;
     } catch (err: any) {
-      setError(err.message);
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setLoading(false);
@@ -73,10 +121,14 @@ export const useAddresses = () => {
     setError(null);
     
     try {
-      await addressService.deleteAddress(addressId);
+      await withTimeout(
+        addressService.deleteAddress(addressId),
+        10000,
+        'Address delete timed out'
+      );
       setAddresses(prev => prev.filter(addr => addr.id !== addressId));
     } catch (err: any) {
-      setError(err.message);
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setLoading(false);

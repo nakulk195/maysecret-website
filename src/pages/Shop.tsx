@@ -10,6 +10,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
+import { safeSetItem } from '../utils/safeStorage';
 
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'newest' | 'rating';
 
@@ -116,7 +117,7 @@ const Shop: React.FC = () => {
 
     if (!user) {
       showToast('Please log in to add products to cart', 'info');
-      localStorage.setItem('redirect_after_login', window.location.pathname);
+      safeSetItem('redirect_after_login', window.location.pathname);
       navigate('/login');
       return;
     }

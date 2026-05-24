@@ -3,6 +3,8 @@ import { CartItem } from '../contexts/CartContext';
 import { supabase } from '../lib/supabase';
 import { resolveSupabaseProductIdFromValue } from '../utils/productIdResolver';
 import { loadRazorpay } from '../utils/razorpay';
+import { getErrorMessage, withTimeout } from '../utils/safeAsync';
+import { safeRemoveItem } from '../utils/safeStorage';
 
 export interface CheckoutAddress {
   id?: string;
@@ -28,17 +30,21 @@ interface CheckoutParams {
 }
 
 const createRazorpayOrder = async (amount: number) => {
-  const response = await fetch('/api/create-order', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      amount,
-      currency: 'INR',
-      receipt: `receipt_${Date.now()}`,
+  const response = await withTimeout(
+    fetch('/api/create-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount,
+        currency: 'INR',
+        receipt: `receipt_${Date.now()}`,
+      }),
     }),
-  });
+    10000,
+    'Payment order creation timed out'
+  );
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -54,13 +60,17 @@ const createRazorpayOrder = async (amount: number) => {
 };
 
 const verifyPayment = async (response: any) => {
-  const verifyResponse = await fetch('/api/verify-payment', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(response),
-  });
+  const verifyResponse = await withTimeout(
+    fetch('/api/verify-payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(response),
+    }),
+    10000,
+    'Payment verification timed out'
+  );
 
   const data = await verifyResponse.json();
   if (!verifyResponse.ok || !data.success) {
@@ -88,11 +98,14 @@ const saveOrderToSupabase = async (
     shipping_address: address,
   };
 
-  const { data: orderData, error: orderError } = await supabase
+  const { data: orderData, error: orderError } = await withTimeout(supabase
     .from('orders')
     .insert(orderPayload)
     .select()
-    .single();
+    .single(),
+    10000,
+    'Order save timed out'
+  );
 
   if (orderError) {
     console.error('[checkoutService] Supabase order insert error:', orderError);
@@ -119,9 +132,12 @@ const saveOrderToSupabase = async (
     })
   );
 
-  const { error: itemsError } = await supabase
+  const { error: itemsError } = await withTimeout(supabase
     .from('order_items')
-    .insert(orderItems);
+    .insert(orderItems),
+    10000,
+    'Order items save timed out'
+  );
 
   if (itemsError) {
     console.error('[checkoutService] Supabase order_items insert error:', itemsError);
@@ -165,10 +181,15 @@ export const startRazorpayCheckout = async ({
         try {
           await verifyPayment(response);
           const orderData = await saveOrderToSupabase(user, cart, totalAmount, address, response);
-          await clearCart();
-          localStorage.removeItem('shipping_address');
+          try {
+            await clearCart();
+          } catch (cartError) {
+            console.error('[checkoutService] Order saved but cart clear failed:', getErrorMessage(cartError));
+          }
+          safeRemoveItem('shipping_address');
           resolve(orderData);
         } catch (error) {
+          console.error('[checkoutService] Payment completed but checkout finalization failed:', getErrorMessage(error));
           reject(error);
         }
       },

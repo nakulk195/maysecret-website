@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { wishlistService } from '../services/database';
 import { supabase, Product } from '../lib/supabase';
 import { resolveSupabaseProductId } from '../utils/productIdResolver';
+import { getErrorMessage, withTimeout } from '../utils/safeAsync';
 
 interface WishlistContextType {
   wishlist: Product[];
@@ -52,14 +53,14 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     const loadWishlist = async () => {
       if (!user) {
         setWishlist([]);
+        setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
-        console.log('Fetching wishlist from Supabase for user:', user.id);
         // Load wishlist with product relationships
-        const { data, error } = await supabase
+        const { data, error } = await withTimeout(supabase
           .from('wishlist')
           .select(`
             *,
@@ -80,14 +81,16 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
             )
           `)
           .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false }),
+          10000,
+          'Wishlist load timed out'
+        );
 
         if (error) throw error;
-        console.log('Fetched wishlist data:', data);
 
         setWishlist(normalizeWishlistProducts(data || []));
       } catch (error) {
-        console.error('Error loading wishlist:', error);
+        console.error('Error loading wishlist:', getErrorMessage(error));
         setWishlist([]);
       } finally {
         setLoading(false);
@@ -97,11 +100,9 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     loadWishlist();
   }, [user]);
 
-  const addToWishlist = async (product: Product) => {
+  const addToWishlist = useCallback(async (product: Product) => {
     if (!user) {
-      // Redirect to login for guest users
-      window.location.href = '/login';
-      return;
+      throw new Error('Please log in to use your wishlist.');
     }
 
     try {
@@ -119,7 +120,11 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         throw resolveError;
       }
 
-      await wishlistService.addToWishlist(user.id, resolvedProductId);
+      await withTimeout(
+        wishlistService.addToWishlist(user.id, resolvedProductId),
+        10000,
+        'Wishlist add timed out'
+      );
       
       // Add to local state
       setWishlist(prev => (
@@ -128,14 +133,14 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
           : [...prev, product]
       ));
     } catch (error) {
-      console.error('Error adding to wishlist:', error);
+      console.error('Error adding to wishlist:', getErrorMessage(error));
       throw error;
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const removeFromWishlist = async (productId: string) => {
+  const removeFromWishlist = useCallback(async (productId: string) => {
     if (!user) return;
 
     try {
@@ -151,47 +156,59 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         );
       }
 
-      await wishlistService.removeFromWishlist(user.id, resolvedProductId);
+      await withTimeout(
+        wishlistService.removeFromWishlist(user.id, resolvedProductId),
+        10000,
+        'Wishlist remove timed out'
+      );
       
       // Remove from local state
       setWishlist(prev => prev.filter(item =>
         String(item.id) !== productId && String(item.id) !== resolvedProductId
       ));
     } catch (error) {
-      console.error('Error removing from wishlist:', error);
+      console.error('Error removing from wishlist:', getErrorMessage(error));
       throw error;
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const isInWishlist = async (productId: string) => {
+  const isInWishlist = useCallback(async (productId: string) => {
     if (!user) return false;
     
     try {
-      return await wishlistService.isInWishlist(user.id, productId);
+      return await withTimeout(
+        wishlistService.isInWishlist(user.id, productId),
+        10000,
+        'Wishlist check timed out'
+      );
     } catch (error) {
-      console.error('Error checking wishlist:', error);
+      console.error('Error checking wishlist:', getErrorMessage(error));
       return false;
     }
-  };
+  }, [user]);
 
-  const clearWishlist = async () => {
+  const clearWishlist = useCallback(async () => {
     if (!user) return;
 
     try {
       setLoading(true);
       // Clear all items for user
       for (const item of wishlist) {
-        await wishlistService.removeFromWishlist(user.id, String(item.id));
+        await withTimeout(
+          wishlistService.removeFromWishlist(user.id, String(item.id)),
+          10000,
+          'Wishlist clear timed out'
+        );
       }
       setWishlist([]);
     } catch (error) {
-      console.error('Error clearing wishlist:', error);
+      console.error('Error clearing wishlist:', getErrorMessage(error));
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, wishlist]);
 
   const getWishlistCount = () => wishlist.length;
 

@@ -6,6 +6,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import CartItemCard from '../components/CartItemCard';
+import { safeSetItem } from '../utils/safeStorage';
 
 const Cart: React.FC = () => {
   const { cart, loading, updateQuantity, removeFromCart, getCartTotal, getCartCount } = useCart();
@@ -48,7 +49,7 @@ const Cart: React.FC = () => {
       // Check if user is authenticated
       if (!user) {
         // Store redirect path for after login
-        localStorage.setItem('redirect_after_login', '/address');
+        safeSetItem('redirect_after_login', '/address');
         navigate('/login');
         return;
       }

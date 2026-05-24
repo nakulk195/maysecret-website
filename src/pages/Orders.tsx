@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { supabase } from '../lib/supabase';
 import { getProductImage } from '../utils/productImages';
+import { getErrorMessage, withTimeout } from '../utils/safeAsync';
 
 const Orders: React.FC = () => {
   const { user } = useAuth();
@@ -22,11 +23,15 @@ const Orders: React.FC = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      if (!user) return;
+      if (!user) {
+        setOrders([]);
+        setIsLoading(false);
+        return;
+      }
 
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
+        const { data, error } = await withTimeout(supabase
           .from('orders')
           .select(`
             *,
@@ -46,12 +51,16 @@ const Orders: React.FC = () => {
             )
           `)
           .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false }),
+          10000,
+          'Orders load timed out'
+        );
 
         if (error) throw error;
         setOrders(data || []);
       } catch (error) {
-        console.error('Error fetching orders:', error);
+        console.error('Error fetching orders:', getErrorMessage(error));
+        setOrders([]);
         showToast('Could not load orders. Please try again.', 'error');
       } finally {
         setIsLoading(false);

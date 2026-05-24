@@ -4,6 +4,8 @@ import { CartProvider } from './contexts/CartContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { WishlistProvider } from './contexts/WishlistContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { AppErrorBoundary } from './components/AppErrorBoundary';
+import { GlobalErrorHandler } from './components/GlobalErrorHandler';
 import AnnouncementBar from './components/AnnouncementBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -41,10 +43,12 @@ function App() {
 
   return (
     <ToastProvider>
-      <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-          <Router>
+      <GlobalErrorHandler />
+      <AppErrorBoundary>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+            <Router>
             <ScrollToTop />
             <AnnouncementBar />
             <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
@@ -100,10 +104,11 @@ function App() {
               <MobileBottomNav />
             </div>
             <MobileSidebarClean isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
-          </Router>
-          </WishlistProvider>
-        </CartProvider>
-      </AuthProvider>
+            </Router>
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
+      </AppErrorBoundary>
     </ToastProvider>
   );
 }

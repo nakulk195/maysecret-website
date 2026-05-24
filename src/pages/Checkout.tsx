@@ -4,6 +4,7 @@ import { useCart } from '../contexts/CartContext';
 import { CheckCircle, Plus, Loader2, CreditCard, Smartphone } from 'lucide-react';
 import { getLoggedInUser } from '../utils/auth';
 import { OrderService } from '../services/orderService';
+import { safeGetItem, safeSetItem } from '../utils/safeStorage';
 
 // Types
 interface Address {
@@ -48,12 +49,16 @@ const Checkout: React.FC = () => {
 
   // Load addresses on mount
   useEffect(() => {
-    const savedAddresses = localStorage.getItem('guest_addresses');
-    if (savedAddresses) {
+    const savedAddresses = safeGetItem('guest_addresses');
+    if (!savedAddresses) return;
+
+    try {
       const parsed = JSON.parse(savedAddresses);
       setAddresses(parsed);
       const defaultAddr = parsed.find((a: Address) => a.isDefault);
       if (defaultAddr) setSelectedAddress(defaultAddr);
+    } catch {
+      setAddresses([]);
     }
   }, []);
 
@@ -73,7 +78,7 @@ const Checkout: React.FC = () => {
     };
 
     const updatedAddresses = [...addresses, addressToAdd];
-    localStorage.setItem('guest_addresses', JSON.stringify(updatedAddresses));
+    safeSetItem('guest_addresses', JSON.stringify(updatedAddresses));
     setAddresses(updatedAddresses);
     setSelectedAddress(addressToAdd);
     setShowAddressForm(false);

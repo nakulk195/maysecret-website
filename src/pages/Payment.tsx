@@ -7,6 +7,7 @@ import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { getProductImage } from '../utils/productImages';
 import { startRazorpayCheckout } from '../services/checkoutService';
+import { safeGetItem } from '../utils/safeStorage';
 
 const Payment: React.FC = () => {
   const { user } = useAuth();
@@ -35,9 +36,13 @@ const Payment: React.FC = () => {
   // Get address from localStorage
   const [address, setAddress] = useState<any>(null);
   useEffect(() => {
-    const savedAddress = localStorage.getItem('shipping_address');
-    if (savedAddress) {
+    const savedAddress = safeGetItem('shipping_address');
+    if (!savedAddress) return;
+
+    try {
       setAddress(JSON.parse(savedAddress));
+    } catch {
+      setAddress(null);
     }
   }, []);
 

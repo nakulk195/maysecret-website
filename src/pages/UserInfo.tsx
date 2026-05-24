@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { profileService, addressService, orderService } from '../services/database';
+import { getErrorMessage, withTimeout } from '../utils/safeAsync';
 
 const UserInfo: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -39,8 +40,13 @@ const UserInfo: React.FC = () => {
       try {
         setLoading(true);
         
-        // Load profile
-        const userProfile = await profileService.getProfile(user.id);
+        const [profileResult, addressesResult, ordersResult] = await Promise.allSettled([
+          withTimeout(profileService.getProfile(user.id), 10000, 'Profile load timed out'),
+          withTimeout(addressService.getUserAddresses(user.id), 10000, 'Address load timed out'),
+          withTimeout(orderService.getUserOrders(user.id), 10000, 'Orders load timed out'),
+        ]);
+
+        const userProfile = profileResult.status === 'fulfilled' ? profileResult.value : null;
         if (userProfile) {
           setProfile(userProfile);
           setFormData({
@@ -59,23 +65,36 @@ const UserInfo: React.FC = () => {
           });
         }
 
-        // Load addresses
-        const userAddresses = await addressService.getUserAddresses(user.id);
-        setAddresses(userAddresses);
+        if (profileResult.status === 'rejected') {
+          console.error('Error loading profile:', getErrorMessage(profileResult.reason));
+        }
 
-        // Load orders
-        const userOrders = await orderService.getUserOrders(user.id);
-        setOrders(userOrders);
+        if (addressesResult.status === 'fulfilled') {
+          setAddresses(addressesResult.value);
+        } else {
+          console.error('Error loading addresses:', getErrorMessage(addressesResult.reason));
+          setAddresses([]);
+        }
+
+        if (ordersResult.status === 'fulfilled') {
+          setOrders(ordersResult.value);
+        } else {
+          console.error('Error loading orders:', getErrorMessage(ordersResult.reason));
+          setOrders([]);
+        }
         
       } catch (error) {
-        console.error('Error loading user data:', error);
+        console.error('Error loading user data:', getErrorMessage(error));
+        setAddresses([]);
+        setOrders([]);
+        showToast('Could not load all profile data. Please try again.', 'error');
       } finally {
         setLoading(false);
       }
     };
 
     loadUserData();
-  }, [user]);
+  }, [user, showToast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -87,25 +106,40 @@ const UserInfo: React.FC = () => {
     
     try {
       const fullName = `${formData.firstName} ${formData.lastName}`.trim();
-      await profileService.updateProfile(user.id, {
-        full_name: fullName
-      });
+      await withTimeout(
+        profileService.updateProfile(user.id, {
+          full_name: fullName
+        }),
+        10000,
+        'Profile update timed out'
+      );
       
       // Reload profile data
-      const updatedProfile = await profileService.getProfile(user.id);
+      const updatedProfile = await withTimeout(
+        profileService.getProfile(user.id),
+        10000,
+        'Profile refresh timed out'
+      );
       setProfile(updatedProfile);
       
       setIsEditing(false);
       showToast('Profile updated');
     } catch (error) {
-      console.error('Error saving profile:', error);
+      console.error('Error saving profile:', getErrorMessage(error));
       showToast('Could not update profile. Please try again.', 'error');
     }
   };
 
   const handleLogout = async () => {
-    await signOut();
-    navigate('/');
+    try {
+      await signOut();
+    } finally {
+      setProfile(null);
+      setAddresses([]);
+      setOrders([]);
+      setLoading(false);
+      navigate('/');
+    }
   };
 
   if (!user) {

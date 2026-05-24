@@ -1,3 +1,5 @@
+import { isBrowser, safeGetItem, safeRemoveItem, safeSetItem } from './safeStorage';
+
 export interface UserSession {
   firstName: string;
   lastName: string;
@@ -6,13 +8,16 @@ export interface UserSession {
 }
 
 export const getLoggedInUser = (): UserSession | null => {
-  if (typeof window === 'undefined') return null;
-  const user = localStorage.getItem('user_session');
-  return user ? JSON.parse(user) : null;
+  const user = safeGetItem('user_session');
+  try {
+    return user ? JSON.parse(user) : null;
+  } catch {
+    return null;
+  }
 };
 
 export const setUserSession = (user: Omit<UserSession, 'loggedIn'>) => {
-  localStorage.setItem(
+  safeSetItem(
     'user_session',
     JSON.stringify({
       ...user,
@@ -22,8 +27,10 @@ export const setUserSession = (user: Omit<UserSession, 'loggedIn'>) => {
 };
 
 export const removeUserSession = () => {
-  localStorage.removeItem('user_session');
-  window.dispatchEvent(new Event('storage')); // Trigger storage event for other tabs
+  safeRemoveItem('user_session');
+  if (isBrowser()) {
+    window.dispatchEvent(new Event('storage')); // Trigger storage event for other tabs
+  }
 };
 
 export const isAuthenticated = (): boolean => {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { wishlistService } from '../services/database';
 import { WishlistItem } from '../types';
+import { getErrorMessage, withTimeout } from '../utils/safeAsync';
 
 export const useWishlist = () => {
   const { user } = useAuth();
@@ -11,24 +12,64 @@ export const useWishlist = () => {
 
   // Fetch wishlist when user changes
   useEffect(() => {
-    if (user) {
-      fetchWishlist();
-    } else {
-      setWishlist([]);
-    }
+    let isActive = true;
+
+    const load = async () => {
+      if (!user) {
+        if (isActive) {
+          setWishlist([]);
+          setLoading(false);
+          setError(null);
+        }
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await withTimeout(
+          wishlistService.getUserWishlist(user.id),
+          10000,
+          'Wishlist load timed out'
+        );
+        if (isActive) setWishlist(data);
+      } catch (err: any) {
+        if (isActive) {
+          setError(getErrorMessage(err));
+          setWishlist([]);
+        }
+      } finally {
+        if (isActive) setLoading(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      isActive = false;
+    };
   }, [user]);
 
   const fetchWishlist = async () => {
-    if (!user) return;
-    
+    if (!user) {
+      setWishlist([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
-    
+
     try {
-      const data = await wishlistService.getUserWishlist(user.id);
+      const data = await withTimeout(
+        wishlistService.getUserWishlist(user.id),
+        10000,
+        'Wishlist load timed out'
+      );
       setWishlist(data);
     } catch (err: any) {
-      setError(err.message);
+      setError(getErrorMessage(err));
+      setWishlist([]);
     } finally {
       setLoading(false);
     }
@@ -41,10 +82,14 @@ export const useWishlist = () => {
     setError(null);
     
     try {
-      await wishlistService.addToWishlist(user.id, productId);
+      await withTimeout(
+        wishlistService.addToWishlist(user.id, productId),
+        10000,
+        'Wishlist add timed out'
+      );
       await fetchWishlist(); // Refresh wishlist
     } catch (err: any) {
-      setError(err.message);
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setLoading(false);
@@ -58,10 +103,14 @@ export const useWishlist = () => {
     setError(null);
     
     try {
-      await wishlistService.removeFromWishlist(user.id, productId);
+      await withTimeout(
+        wishlistService.removeFromWishlist(user.id, productId),
+        10000,
+        'Wishlist remove timed out'
+      );
       await fetchWishlist(); // Refresh wishlist
     } catch (err: any) {
-      setError(err.message);
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setLoading(false);
@@ -72,9 +121,13 @@ export const useWishlist = () => {
     if (!user) return false;
     
     try {
-      return await wishlistService.isInWishlist(user.id, productId);
+      return await withTimeout(
+        wishlistService.isInWishlist(user.id, productId),
+        10000,
+        'Wishlist check timed out'
+      );
     } catch (err: any) {
-      console.error('Error checking wishlist:', err);
+      console.error('Error checking wishlist:', getErrorMessage(err));
       return false;
     }
   };

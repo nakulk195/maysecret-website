@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { orderService } from '../services/database';
 import { Order, OrderItem } from '../lib/supabase';
+import { getErrorMessage, withTimeout } from '../utils/safeAsync';
 
 export interface OrderWithItems extends Order {
   order_items: (OrderItem & {
@@ -22,25 +23,64 @@ export const useOrders = () => {
 
   // Fetch orders when user changes
   useEffect(() => {
-    if (user) {
-      fetchOrders();
-    } else {
-      setOrders([]);
-    }
+    let isActive = true;
+
+    const load = async () => {
+      if (!user) {
+        if (isActive) {
+          setOrders([]);
+          setLoading(false);
+          setError(null);
+        }
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await withTimeout(
+          orderService.getUserOrders(user.id),
+          10000,
+          'Orders load timed out'
+        );
+        if (isActive) setOrders(data);
+      } catch (err: any) {
+        if (isActive) {
+          setError(getErrorMessage(err));
+          setOrders([]);
+        }
+      } finally {
+        if (isActive) setLoading(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      isActive = false;
+    };
   }, [user]);
 
   const fetchOrders = async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const data = await orderService.getUserOrders(user.id);
-      setOrders(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
+    if (user) {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await withTimeout(
+          orderService.getUserOrders(user.id),
+          10000,
+          'Orders load timed out'
+        );
+        setOrders(data);
+      } catch (err: any) {
+        setError(getErrorMessage(err));
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setOrders([]);
       setLoading(false);
     }
   };
@@ -52,11 +92,15 @@ export const useOrders = () => {
     setError(null);
     
     try {
-      const result = await orderService.createOrder(user.id, orderData, orderItems);
+      const result = await withTimeout(
+        orderService.createOrder(user.id, orderData, orderItems),
+        10000,
+        'Order save timed out'
+      );
       await fetchOrders(); // Refresh orders
       return result;
     } catch (err: any) {
-      setError(err.message);
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setLoading(false);
@@ -70,10 +114,14 @@ export const useOrders = () => {
     setError(null);
     
     try {
-      const data = await orderService.getOrderById(orderId, user.id);
+      const data = await withTimeout(
+        orderService.getOrderById(orderId, user.id),
+        10000,
+        'Order load timed out'
+      );
       return data;
     } catch (err: any) {
-      setError(err.message);
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setLoading(false);
@@ -85,11 +133,15 @@ export const useOrders = () => {
     setError(null);
     
     try {
-      const data = await orderService.updateOrderStatus(orderId, status);
+      const data = await withTimeout(
+        orderService.updateOrderStatus(orderId, status),
+        10000,
+        'Order update timed out'
+      );
       setOrders(prev => prev.map(order => order.id === orderId ? data : order));
       return data;
     } catch (err: any) {
-      setError(err.message);
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setLoading(false);

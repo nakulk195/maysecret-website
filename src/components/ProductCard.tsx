@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, Eye } from 'lucide-react';
 import { Product } from '../utils/productData';
@@ -9,6 +9,7 @@ import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
+import { safeSetItem } from '../utils/safeStorage';
 
 
 interface ProductCardProps {
@@ -21,6 +22,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading: authLoading } = useAuth();
   const { showToast } = useToast();
   
@@ -49,7 +51,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
   }, [product.id, isInWishlist]);
 
   const goToLogin = () => {
-    localStorage.setItem('redirect_after_login', window.location.pathname);
+    safeSetItem('redirect_after_login', location.pathname);
     navigate('/login');
   };
 

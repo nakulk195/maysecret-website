@@ -7,6 +7,8 @@ import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { useAddresses } from '../hooks/useAddresses';
 import { CheckoutAddress, startRazorpayCheckout } from '../services/checkoutService';
+import { getErrorMessage } from '../utils/safeAsync';
+import { safeSetItem } from '../utils/safeStorage';
 
 // Indian states data
 const INDIAN_STATES = [
@@ -58,7 +60,7 @@ const Address: React.FC = () => {
   const { user } = useAuth();
   const { cart, getCartTotal, clearCart } = useCart();
   const { showToast } = useToast();
-  const { addresses, loading: addressesLoading, addAddress, updateAddress, deleteAddress } = useAddresses();
+  const { addresses, loading: addressesLoading, error: addressesError, addAddress, updateAddress, deleteAddress } = useAddresses();
   const navigate = useNavigate();
   
   const [isEditing, setIsEditing] = useState(false);
@@ -189,7 +191,7 @@ const Address: React.FC = () => {
         state: formData.state,
         country: formData.country,
       };
-      localStorage.setItem('shipping_address', JSON.stringify(checkoutAddress));
+      safeSetItem('shipping_address', JSON.stringify(checkoutAddress));
       setSelectedAddress(checkoutAddress);
       showToast('Address saved. You can proceed to payment.', 'info');
       
@@ -199,7 +201,8 @@ const Address: React.FC = () => {
       setIsEditing(false);
       setEditingAddressId(null);
     } catch (error) {
-      console.error('Error saving address:', error);
+      console.error('Error saving address:', getErrorMessage(error));
+      showToast('Could not save address. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -246,7 +249,8 @@ const Address: React.FC = () => {
       try {
         await deleteAddress(addressId);
       } catch (error) {
-        console.error('Error deleting address:', error);
+        console.error('Error deleting address:', getErrorMessage(error));
+        showToast('Could not delete address. Please try again.', 'error');
       }
     }
   };
@@ -268,7 +272,7 @@ const Address: React.FC = () => {
 
   const handleSelectAddress = (address: any) => {
     const addressFormData = buildCheckoutAddress(address);
-    localStorage.setItem('shipping_address', JSON.stringify(addressFormData));
+    safeSetItem('shipping_address', JSON.stringify(addressFormData));
     setSelectedAddress(addressFormData);
     showToast('Delivery address selected', 'info');
   };
@@ -759,6 +763,22 @@ const Address: React.FC = () => {
                   <div className="flex justify-center py-12">
                     <div className="animate-spin rounded-full h-8 w-8 border-2 border-warm-600 border-t-transparent"></div>
                   </div>
+                ) : addressesError ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-12 bg-white rounded-xl shadow-sm"
+                  >
+                    <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Could not load addresses</h3>
+                    <p className="text-gray-600 mb-6">Please try again or add a new delivery address.</p>
+                    <button
+                      onClick={() => setShowAddressForm(true)}
+                      className="bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black transition-colors"
+                    >
+                      Add New Address
+                    </button>
+                  </motion.div>
                 ) : addresses.length === 0 ? (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}

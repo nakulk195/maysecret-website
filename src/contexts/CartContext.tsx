@@ -2,6 +2,8 @@ import React, { createContext, useCallback, useContext, useEffect, useState, Rea
 import { supabase, Product } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 import { resolveSupabaseProductId } from '../utils/productIdResolver';
+import { getErrorMessage, withTimeout } from '../utils/safeAsync';
+import { safeRemoveItem } from '../utils/safeStorage';
 
 // Types
 export interface CartItem {
@@ -76,12 +78,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setLoading(true);
     try {
       if (!user) {
-        localStorage.removeItem('guest_cart');
+        safeRemoveItem('guest_cart');
         setCart([]);
         return;
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await withTimeout(supabase
         .from('cart')
         .select(`
           *,
@@ -102,12 +104,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           )
         `)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: true }),
+        10000,
+        'Cart load timed out'
+      );
 
       if (error) throw error;
       setCart(normalizeCartRows(data || []));
     } catch (error) {
-      console.error('Error loading cart:', error);
+      console.error('Error loading cart:', getErrorMessage(error));
       setCart([]);
     } finally {
       setLoading(false);
@@ -135,13 +140,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           throw resolveError;
         }
 
-        const { data: existingRows, error: queryError } = await supabase
+        const { data: existingRows, error: queryError } = await withTimeout(supabase
           .from('cart')
           .select('id, quantity')
           .eq('user_id', user.id)
           .eq('product_id', resolvedProductId)
           .order('created_at', { ascending: true })
-          .limit(1);
+          .limit(1),
+          10000,
+          'Cart update timed out'
+        );
 
         if (queryError) {
           console.error(
@@ -155,11 +163,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
         if (existingItem) {
           const newQuantity = Math.max(1, Number(existingItem.quantity || 1) + quantity);
-          const { error: updateError } = await supabase
+          const { error: updateError } = await withTimeout(supabase
             .from('cart')
             .update({ quantity: newQuantity })
             .eq('id', existingItem.id)
-            .eq('user_id', user.id);
+            .eq('user_id', user.id),
+            10000,
+            'Cart update timed out'
+          );
 
           if (updateError) {
             console.error(
@@ -169,7 +180,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             throw updateError;
           }
         } else {
-          const { error: insertError } = await supabase
+          const { error: insertError } = await withTimeout(supabase
             .from('cart')
             .insert({
               user_id: user.id,
@@ -178,7 +189,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
               product_image: product.image,
               product_price: product.price,
               quantity: quantity
-            });
+            }),
+            10000,
+            'Cart add timed out'
+          );
 
           if (insertError) {
             console.error(
@@ -237,11 +251,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           throw resolveError;
         }
 
-        const { error } = await supabase
+        const { error } = await withTimeout(supabase
           .from('cart')
           .delete()
           .eq('user_id', user.id)
-          .eq('product_id', resolvedProductId);
+          .eq('product_id', resolvedProductId),
+          10000,
+          'Cart remove timed out'
+        );
 
         if (error) {
           console.error(
@@ -280,13 +297,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         }
 
         const safeQuantity = Math.max(1, Number(newQuantity || 1));
-        const { data: existingRows, error: queryError } = await supabase
+        const { data: existingRows, error: queryError } = await withTimeout(supabase
           .from('cart')
           .select('id')
           .eq('user_id', user.id)
           .eq('product_id', resolvedProductId)
           .order('created_at', { ascending: true })
-          .limit(1);
+          .limit(1),
+          10000,
+          'Cart quantity update timed out'
+        );
 
         if (queryError) {
           console.error(
@@ -302,11 +322,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           return;
         }
 
-        const { error } = await supabase
+        const { error } = await withTimeout(supabase
           .from('cart')
           .update({ quantity: safeQuantity })
           .eq('id', existingItem.id)
-          .eq('user_id', user.id);
+          .eq('user_id', user.id),
+          10000,
+          'Cart quantity update timed out'
+        );
 
         if (error) {
           console.error(
@@ -338,14 +361,17 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const clearCart = async () => {
     try {
       if (user) {
-        const { error } = await supabase
+        const { error } = await withTimeout(supabase
           .from('cart')
           .delete()
-          .eq('user_id', user.id);
+          .eq('user_id', user.id),
+          10000,
+          'Cart clear timed out'
+        );
 
         if (error) throw error;
       } else {
-        localStorage.removeItem('guest_cart');
+        safeRemoveItem('guest_cart');
       }
       setCart([]);
     } catch (error) {

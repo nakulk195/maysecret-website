@@ -7,6 +7,10 @@ begin;
 create sequence if not exists public.orders_order_number_seq start with 1001;
 
 alter table public.orders
+  add column if not exists user_id uuid references auth.users(id) on delete cascade,
+  add column if not exists total_amount numeric default 0,
+  add column if not exists status text default 'pending',
+  add column if not exists shipping_address jsonb,
   add column if not exists order_number bigint,
   add column if not exists payment_id text,
   add column if not exists razorpay_order_id text,
@@ -21,6 +25,7 @@ where order_number is null;
 
 alter table public.orders
   alter column order_number set default nextval('public.orders_order_number_seq'),
+  alter column status set default 'pending',
   alter column payment_status set default 'pending',
   alter column order_status set default 'processing';
 
@@ -28,9 +33,24 @@ create unique index if not exists orders_order_number_key
 on public.orders(order_number);
 
 alter table public.order_items
+  add column if not exists order_id uuid references public.orders(id) on delete cascade,
+  add column if not exists product_id uuid references public.products(id) on delete set null,
+  add column if not exists quantity integer default 1,
+  add column if not exists price numeric default 0,
   add column if not exists product_name text,
   add column if not exists product_image text,
   add column if not exists product_price numeric;
+
+grant usage on schema public to anon, authenticated;
+grant select on public.products to anon, authenticated;
+grant select, insert, update, delete on public.cart to authenticated;
+grant select, insert, update, delete on public.wishlist to authenticated;
+grant select, insert, update, delete on public.addresses to authenticated;
+grant select, insert, update on public.profiles to authenticated;
+grant select, insert, update on public.orders to authenticated;
+grant select, insert on public.order_items to authenticated;
+grant select, insert on public.contact_messages to authenticated;
+grant usage, select on sequence public.orders_order_number_seq to authenticated;
 
 -- Helpful profile columns for OAuth users.
 alter table public.profiles

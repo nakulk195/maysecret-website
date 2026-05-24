@@ -31,6 +31,7 @@ import { Product as SupabaseProduct } from '../lib/supabase';
 import { ProductService } from '../services/productService';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 import { BRAND_NAME } from '../config/brand';
+import { safeSetItem } from '../utils/safeStorage';
 
 // Helper: Check if string is a valid UUID
 const isValidUUID = (id: string): boolean => {
@@ -188,7 +189,7 @@ const ProductDetails: React.FC = () => {
   }
 
   const goToLogin = () => {
-    localStorage.setItem('redirect_after_login', window.location.pathname);
+    safeSetItem('redirect_after_login', window.location.pathname);
     navigate('/login');
   };
 

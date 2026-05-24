@@ -136,7 +136,7 @@ const Footer: React.FC = () => {
                 <WhatsappIcon className="w-5 h-5" />
               </a>
               <a 
-                href="https://facebook.com/maysecret" 
+                href="https://www.facebook.com/profile.php?id=61590062924530" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="social-icon social-icon-facebook"

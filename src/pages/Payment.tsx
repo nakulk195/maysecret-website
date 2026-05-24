@@ -7,6 +7,8 @@ import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { getProductImage } from '../utils/productImages';
 import { startRazorpayCheckout } from '../services/checkoutService';
+import CouponBox from '../components/CouponBox';
+import { AppliedCoupon } from '../services/couponService';
 import { safeGetItem } from '../utils/safeStorage';
 
 const Payment: React.FC = () => {
@@ -25,6 +27,10 @@ const Payment: React.FC = () => {
     cvv: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const cartTotal = getCartTotal();
+  const couponDiscount = appliedCoupon?.discountAmount || 0;
+  const payableTotal = Math.max(0, cartTotal - couponDiscount);
 
   // Auth protection
   useEffect(() => {
@@ -88,7 +94,7 @@ const Payment: React.FC = () => {
       const order = await startRazorpayCheckout({
         user,
         cart,
-        totalAmount: getCartTotal(),
+        totalAmount: payableTotal,
         address,
         clearCart,
       });
@@ -350,7 +356,7 @@ const Payment: React.FC = () => {
                     ) : (
                       <>
                         <Shield className="mr-2" />
-                        Pay securely with Razorpay ₹{getCartTotal().toLocaleString()}
+                        Pay securely with Razorpay ₹{payableTotal.toLocaleString()}
                       </>
                     )}
                   </button>
@@ -419,18 +425,30 @@ const Payment: React.FC = () => {
               </div>
 
               {/* Totals */}
+              <CouponBox
+                subtotal={cartTotal}
+                appliedCoupon={appliedCoupon}
+                onCouponChange={setAppliedCoupon}
+              />
+
               <div className="border-t border-gray-200 pt-4 space-y-2">
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Subtotal</span>
-                  <span>₹{getCartTotal().toLocaleString()}</span>
+                  <span>₹{cartTotal.toLocaleString()}</span>
                 </div>
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-green-700">
+                    <span>Coupon Discount</span>
+                    <span>-₹{couponDiscount.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Shipping</span>
                   <span>FREE</span>
                 </div>
                 <div className="flex justify-between text-lg font-semibold text-gray-800 pt-2 border-t border-gray-200">
                   <span>Total</span>
-                  <span className="text-warm-700">₹{getCartTotal().toLocaleString()}</span>
+                  <span className="text-warm-700">₹{payableTotal.toLocaleString()}</span>
                 </div>
               </div>
 

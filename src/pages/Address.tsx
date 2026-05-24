@@ -7,6 +7,8 @@ import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { useAddresses } from '../hooks/useAddresses';
 import { CheckoutAddress, startRazorpayCheckout } from '../services/checkoutService';
+import CouponBox from '../components/CouponBox';
+import { AppliedCoupon } from '../services/couponService';
 import { getErrorMessage } from '../utils/safeAsync';
 import { safeSetItem } from '../utils/safeStorage';
 
@@ -87,6 +89,10 @@ const Address: React.FC = () => {
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
   const [citySearch, setCitySearch] = useState('');
   const [filteredCities, setFilteredCities] = useState(INDIAN_CITIES);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const cartTotal = getCartTotal();
+  const couponDiscount = appliedCoupon?.discountAmount || 0;
+  const payableTotal = Math.max(0, cartTotal - couponDiscount);
 
   // Auth protection
   useEffect(() => {
@@ -299,7 +305,7 @@ const Address: React.FC = () => {
       const order = await startRazorpayCheckout({
         user,
         cart,
-        totalAmount: getCartTotal(),
+        totalAmount: payableTotal,
         address: selectedAddress,
         clearCart,
       });
@@ -736,19 +742,33 @@ const Address: React.FC = () => {
                 ))}
               </div>
 
+              <div className="mt-5">
+                <CouponBox
+                  subtotal={cartTotal}
+                  appliedCoupon={appliedCoupon}
+                  onCouponChange={setAppliedCoupon}
+                />
+              </div>
+
               {/* Totals */}
               <div className="border-t border-gray-200 pt-4 space-y-2">
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Subtotal</span>
-                  <span>₹{getCartTotal().toLocaleString()}</span>
+                  <span>₹{cartTotal.toLocaleString()}</span>
                 </div>
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-green-700">
+                    <span>Coupon Discount</span>
+                    <span>-₹{couponDiscount.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Shipping</span>
                   <span>FREE</span>
                 </div>
                 <div className="flex justify-between text-lg font-semibold text-gray-800 pt-2 border-t border-gray-200">
                   <span>Total</span>
-                  <span className="text-gray-900">₹{getCartTotal().toLocaleString()}</span>
+                  <span className="text-gray-900">₹{payableTotal.toLocaleString()}</span>
                 </div>
               </div>
             </motion.div>
@@ -905,19 +925,33 @@ const Address: React.FC = () => {
                   ))}
                 </div>
 
+                <div className="mt-5">
+                  <CouponBox
+                    subtotal={cartTotal}
+                    appliedCoupon={appliedCoupon}
+                    onCouponChange={setAppliedCoupon}
+                  />
+                </div>
+
                 {/* Totals */}
                 <div className="border-t border-gray-200 pt-4 space-y-2">
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Subtotal</span>
-                    <span>₹{getCartTotal().toLocaleString()}</span>
+                    <span>₹{cartTotal.toLocaleString()}</span>
                   </div>
+                  {couponDiscount > 0 && (
+                    <div className="flex justify-between text-sm text-green-700">
+                      <span>Coupon Discount</span>
+                      <span>-₹{couponDiscount.toLocaleString()}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Shipping</span>
                     <span>FREE</span>
                   </div>
                   <div className="flex justify-between text-lg font-semibold text-gray-800 pt-2 border-t border-gray-200">
                     <span>Total</span>
-                    <span className="text-gray-900">₹{getCartTotal().toLocaleString()}</span>
+                    <span className="text-gray-900">₹{payableTotal.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -949,7 +983,7 @@ const Address: React.FC = () => {
                   ) : (
                     <>
                       <CreditCard className="mr-2 h-5 w-5" />
-                      Pay ₹{getCartTotal().toLocaleString()}
+                      Pay ₹{payableTotal.toLocaleString()}
                     </>
                   )}
                 </button>

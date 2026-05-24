@@ -4,6 +4,8 @@ import { useCart } from '../contexts/CartContext';
 import { CheckCircle, Plus, Loader2, CreditCard, Smartphone } from 'lucide-react';
 import { getLoggedInUser } from '../utils/auth';
 import { OrderService } from '../services/orderService';
+import CouponBox from '../components/CouponBox';
+import { AppliedCoupon } from '../services/couponService';
 import { safeGetItem, safeSetItem } from '../utils/safeStorage';
 
 // Types
@@ -46,6 +48,7 @@ const Checkout: React.FC = () => {
   const [upiId, setUpiId] = useState<string>('9890314682@apl');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [orderId, setOrderId] = useState<string>('');
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
 
   // Load addresses on mount
   useEffect(() => {
@@ -115,7 +118,7 @@ const Checkout: React.FC = () => {
       // Prepare order data for Supabase
       const orderData = {
         user_id: (currentUser as any)?.id || 'guest-' + Date.now(),
-        total_amount: Number(getCartTotal() || 0),
+        total_amount: payableTotal,
         shipping_address: {
           name: selectedAddress.name,
           phone: selectedAddress.phone,
@@ -163,7 +166,7 @@ const Checkout: React.FC = () => {
           },
           price: Number(item.cartProduct?.price || 0)
         })),
-        total: Number(getCartTotal() || 0),
+        total: payableTotal,
         address: selectedAddress,
         paymentMethod: paymentMethod || 'UPI / Card',
         status: 'Successful',
@@ -203,6 +206,8 @@ const Checkout: React.FC = () => {
 
   // Calculate cart total
   const cartTotal = getCartTotal();
+  const couponDiscount = appliedCoupon?.discountAmount || 0;
+  const payableTotal = Math.max(0, cartTotal - couponDiscount);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -542,17 +547,28 @@ const Checkout: React.FC = () => {
               })}
             </div>
             <div className="border-t border-gray-200 mt-6 pt-4">
+              <CouponBox
+                subtotal={cartTotal}
+                appliedCoupon={appliedCoupon}
+                onCouponChange={setAppliedCoupon}
+              />
               <div className="flex justify-between mb-2">
                 <span className="text-gray-600">Subtotal</span>
-                <span>₹{cartTotal}</span>
+                <span>₹{cartTotal.toLocaleString()}</span>
               </div>
+              {couponDiscount > 0 && (
+                <div className="flex justify-between mb-2 text-green-700">
+                  <span>Coupon Discount</span>
+                  <span>-₹{couponDiscount.toLocaleString()}</span>
+                </div>
+              )}
               <div className="flex justify-between mb-2">
                 <span className="text-gray-600">Shipping</span>
                 <span className="text-green-600">Free</span>
               </div>
               <div className="flex justify-between font-bold text-lg mt-4 pt-2 border-t border-gray-200">
                 <span>Total</span>
-                <span>₹{cartTotal}</span>
+                <span>₹{payableTotal.toLocaleString()}</span>
               </div>
             </div>
           </div>

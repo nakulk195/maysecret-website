@@ -27,7 +27,7 @@ export class OrderService {
         .insert({
           user_id: orderData.user_id,
           total_amount: orderData.total_amount,
-          shipping_address: orderData.shipping_address,
+          address: JSON.stringify(orderData.shipping_address),
           payment_id: orderData.payment_id,
           status: 'pending'
         })

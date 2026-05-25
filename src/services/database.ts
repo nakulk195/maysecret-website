@@ -322,7 +322,7 @@ export const orderService = {
             user_id: userId,
             total_amount: orderData.total_amount,
             status: 'pending',
-            shipping_address: orderData.shipping_address,
+            address: JSON.stringify(orderData.shipping_address),
             payment_id: orderData.payment_id
           }
         ])

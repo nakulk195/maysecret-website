@@ -1,11 +1,5 @@
 const Razorpay = require('razorpay');
 
-// Initialize Razorpay
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -25,6 +19,11 @@ module.exports = async (req, res) => {
   }
 
   try {
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      res.status(500).json({ success: false, error: 'Razorpay keys are not configured' });
+      return;
+    }
+
     const { amount, currency = 'INR', receipt } = req.body;
     const numericAmount = Number(amount);
 
@@ -33,6 +32,11 @@ module.exports = async (req, res) => {
       res.status(400).json({ error: 'Invalid amount' });
       return;
     }
+
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
 
     // Create Razorpay order
     const order = await razorpay.orders.create({

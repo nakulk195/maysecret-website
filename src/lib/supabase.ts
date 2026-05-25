@@ -93,59 +93,83 @@ export interface Database {
       orders: {
         Row: {
           id: string
-          user_id: string
+          user_id?: string
           total_amount: number
-          status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-          shipping_address: any
+          payment_status?: string
+          order_status?: string
+          address?: string
+          order_number?: number
+          razorpay_order_id?: string
+          razorpay_signature?: string
+          address_id?: string
           payment_id?: string
+          status?: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
           created_at: string
-          updated_at: string
         }
         Insert: {
           id?: string
-          user_id: string
+          user_id?: string
           total_amount: number
-          status?: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-          shipping_address: any
+          payment_status?: string
+          order_status?: string
+          address?: string
+          order_number?: number
+          razorpay_order_id?: string
+          razorpay_signature?: string
+          address_id?: string
           payment_id?: string
+          status?: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
           created_at?: string
-          updated_at?: string
         }
         Update: {
           id?: string
           user_id?: string
           total_amount?: number
-          status?: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-          shipping_address?: any
+          payment_status?: string
+          order_status?: string
+          address?: string
+          order_number?: number
+          razorpay_order_id?: string
+          razorpay_signature?: string
+          address_id?: string
           payment_id?: string
+          status?: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
           created_at?: string
-          updated_at?: string
         }
       }
       order_items: {
         Row: {
           id: string
-          order_id: string
-          product_id: string
-          quantity: number
-          price: number
-          created_at: string
+          order_id?: string
+          quantity?: number
+          price?: number
+          product_id?: string
+          product_number?: number
+          product_name?: string
+          product_image?: string
+          product_price?: number
         }
         Insert: {
           id?: string
-          order_id: string
-          product_id: string
-          quantity: number
-          price: number
-          created_at?: string
+          order_id?: string
+          quantity?: number
+          price?: number
+          product_id?: string
+          product_number?: number
+          product_name?: string
+          product_image?: string
+          product_price?: number
         }
         Update: {
           id?: string
           order_id?: string
-          product_id?: string
           quantity?: number
           price?: number
-          created_at?: string
+          product_id?: string
+          product_number?: number
+          product_name?: string
+          product_image?: string
+          product_price?: number
         }
       }
       profiles: {

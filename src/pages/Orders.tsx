@@ -8,6 +8,18 @@ import { supabase } from '../lib/supabase';
 import { getProductImage } from '../utils/productImages';
 import { getErrorMessage, withTimeout } from '../utils/safeAsync';
 
+const getOrderAddress = (order: any) => {
+  if (order.shipping_address) return order.shipping_address;
+  if (!order.address) return {};
+  if (typeof order.address !== 'string') return order.address;
+
+  try {
+    return JSON.parse(order.address);
+  } catch {
+    return { address_line_1: order.address };
+  }
+};
+
 const Orders: React.FC = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -118,7 +130,7 @@ const Orders: React.FC = () => {
             {orders.map((order: any) => {
               const orderStatus = getOrderStatus(order);
               const paymentStatus = getPaymentStatus(order);
-              const address = order.shipping_address || {};
+              const address = getOrderAddress(order);
 
               return (
                 <motion.div

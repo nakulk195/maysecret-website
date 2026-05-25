@@ -21,6 +21,7 @@ interface Order {
   id: string;
   user_id: string;
   total_amount: number;
+  address?: string | Record<string, any>;
   payment_id?: string;
   razorpay_order_id?: string;
   payment_status?: string;
@@ -40,6 +41,18 @@ interface Order {
   created_at?: string;
   order_items?: OrderItem[];
 }
+
+const getOrderAddress = (order: Order) => {
+  if (order.shipping_address) return order.shipping_address;
+  if (!order.address) return {};
+  if (typeof order.address !== 'string') return order.address;
+
+  try {
+    return JSON.parse(order.address);
+  } catch {
+    return { address_line_1: order.address };
+  }
+};
 
 const OrderSuccess: React.FC = () => {
   const navigate = useNavigate();
@@ -117,6 +130,8 @@ const OrderSuccess: React.FC = () => {
       </div>
     );
   }
+
+  const deliveryAddress = getOrderAddress(order);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -215,24 +230,24 @@ const OrderSuccess: React.FC = () => {
               <h2 className="text-lg font-medium text-gray-900 mb-4">Delivery Address</h2>
               <div className="bg-gray-50 p-6 rounded-xl">
                 <p className="font-semibold text-gray-900">
-                  {order.shipping_address?.fullName || order.shipping_address?.address_line_1 || 'N/A'}
+                  {deliveryAddress.fullName || deliveryAddress.address_line_1 || 'N/A'}
                 </p>
                 <p className="text-gray-600 mt-1">
-                  {order.shipping_address?.mobileNumber || ''}
+                  {deliveryAddress.mobileNumber || deliveryAddress.phone || ''}
                 </p>
                 <p className="text-gray-600 mt-2">
-                  {order.shipping_address?.houseNo || ''}
-                  {order.shipping_address?.houseNo && order.shipping_address?.address_line_1 ? ', ' : ''}
-                  {order.shipping_address?.address_line_1 || ''}
+                  {deliveryAddress.houseNo || ''}
+                  {deliveryAddress.houseNo && deliveryAddress.address_line_1 ? ', ' : ''}
+                  {deliveryAddress.address_line_1 || ''}
                 </p>
                 <p className="text-gray-600">
-                  {order.shipping_address?.area || order.shipping_address?.landmark || ''}
+                  {deliveryAddress.area || deliveryAddress.landmark || ''}
                 </p>
                 <p className="text-gray-600">
-                  {order.shipping_address?.city || ''}, {order.shipping_address?.state || ''} {order.shipping_address?.pincode || ''}
+                  {deliveryAddress.city || ''}, {deliveryAddress.state || ''} {deliveryAddress.pincode || ''}
                 </p>
-                {order.shipping_address?.emailAddress && (
-                  <p className="text-gray-600">Email: {order.shipping_address.emailAddress}</p>
+                {deliveryAddress.emailAddress && (
+                  <p className="text-gray-600">Email: {deliveryAddress.emailAddress}</p>
                 )}
               </div>
             </div>

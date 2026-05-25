@@ -34,7 +34,7 @@ export class PaymentService {
       }
 
       return new (window as any).Razorpay({
-        key_id: process.env.REACT_APP_RAZORPAY_KEY_ID,
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID,
       });
     } catch (error) {
       console.error('Error initializing Razorpay:', error);
@@ -45,15 +45,13 @@ export class PaymentService {
   // Create payment order
   static async createOrder(amount: number): Promise<{ id: string; amount: number; currency: string }> {
     try {
-      // This would typically be done on your backend server
-      // For now, we'll create a mock order
-      const response = await fetch('/api/create-razorpay-order', {
+      const response = await fetch('/api/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: amount * 100, // Razorpay expects amount in paise
+          amount,
           currency: 'INR',
         }),
       });
@@ -65,12 +63,7 @@ export class PaymentService {
       return await response.json();
     } catch (error) {
       console.error('Error creating payment order:', error);
-      // Fallback to mock order for development
-      return {
-        id: `order_${Date.now()}`,
-        amount: amount * 100,
-        currency: 'INR',
-      };
+      throw error;
     }
   }
 

@@ -88,14 +88,14 @@ const saveOrderToSupabase = async (
   const orderPayload: any = {
     user_id: user.id,
     total_amount: totalAmount,
-    status: 'processing',
+    status: 'pending',
     payment_id: razorpayResponse.razorpay_payment_id,
     razorpay_order_id: razorpayResponse.razorpay_order_id,
     razorpay_signature: razorpayResponse.razorpay_signature,
     payment_status: 'completed',
     order_status: 'processing',
     address_id: address.id || null,
-    shipping_address: address,
+    address: JSON.stringify(address),
   };
 
   const { data: orderData, error: orderError } = await withTimeout(supabase
@@ -168,10 +168,15 @@ export const startRazorpayCheckout = async ({
   }
 
   const razorpayOrder = await createRazorpayOrder(totalAmount);
+  const razorpayKeyId = process.env.REACT_APP_RAZORPAY_KEY_ID;
+
+  if (!razorpayKeyId) {
+    throw new Error('Razorpay key is not configured');
+  }
 
   return new Promise<any>((resolve, reject) => {
     const options = {
-      key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_SrbR7WTdpF2t42',
+      key: razorpayKeyId,
       amount: razorpayOrder.amount,
       currency: razorpayOrder.currency,
       name: 'MAY SECRET',

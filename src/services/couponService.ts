@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { withTimeout } from '../utils/safeAsync';
 
-export type CouponDiscountType = 'fixed' | 'percentage' | 'free_shipping';
+export type CouponDiscountType = 'fixed' | 'percentage' | 'free_shipping' | 'final_price';
 
 export interface CouponRow {
   id: string;
@@ -32,6 +32,11 @@ const calculateDiscount = (coupon: CouponRow, subtotal: number) => {
   if (coupon.discount_type === 'percentage') {
     const percentage = Math.max(0, Number(coupon.discount_value || 0));
     return Math.min(Math.round((subtotal * percentage) / 100), subtotal);
+  }
+
+  if (coupon.discount_type === 'final_price') {
+    const finalPrice = Math.max(0, Number(coupon.discount_value || 0));
+    return Math.max(0, subtotal - finalPrice);
   }
 
   return 0;

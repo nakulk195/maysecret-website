@@ -12,6 +12,11 @@ import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
 import Newsletter from '../components/Newsletter';
 import GlassSkinRoutine from '../components/GlassSkinRoutine';
 import { BRAND_NAME } from '../config/brand';
+import heroImg1 from '../assets/images/heroimg1.JPG';
+import heroImg2 from '../assets/images/heroimg2.JPG';
+import heroImg3 from '../assets/images/heroimg3.JPG';
+import heroImg4 from '../assets/images/heroimg4.JPG';
+import heroImg5 from '../assets/images/heroimg5.PNG';
 
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -53,32 +58,48 @@ const Home: React.FC = () => {
     },
   };
 
-  const heroSlides = localProducts
-    .filter((product) => [1, 2, 3].includes(product.id))
-    .map((product) => {
-      const slideCopy: Record<number, { subtitle: string; gradient: string }> = {
-        1: {
-          subtitle: 'SPF 50 PA+++ protection with a feather-light glow finish.',
-          gradient: 'from-sky-50 via-white to-amber-100',
-        },
-        2: {
-          subtitle: 'Rice extract radiance for a smooth, bright glass-skin look.',
-          gradient: 'from-rose-50 via-white to-pink-100',
-        },
-        3: {
-          subtitle: 'Your complete daytime routine in one premium skincare set.',
-          gradient: 'from-emerald-50 via-white to-rose-100',
-        },
-      };
-
-      return {
-        id: product.id,
-        title: product.name,
-        subtitle: slideCopy[product.id]?.subtitle || product.description,
-        image: product.image,
-        gradient: slideCopy[product.id]?.gradient || 'from-pink-50 via-white to-orange-100',
-      };
-    });
+  const heroSlides = [
+    {
+      id: 'hero-1',
+      title: 'MAY SECRET',
+      subtitle: 'Premium skincare made for a bright, confident glow.',
+      image: heroImg1,
+      gradient: 'from-sky-50 via-white to-rose-100',
+      ctaHref: '/shop',
+    },
+    {
+      id: 'hero-2',
+      title: 'Glow With MAY SECRET',
+      subtitle: 'A radiant beauty routine crafted for everyday care.',
+      image: heroImg2,
+      gradient: 'from-rose-50 via-white to-pink-100',
+      ctaHref: '/shop',
+    },
+    {
+      id: 'hero-3',
+      title: 'K-Beauty Inspired Care',
+      subtitle: 'Brightening, protection, and glow in one refined routine.',
+      image: heroImg3,
+      gradient: 'from-emerald-50 via-white to-rose-100',
+      ctaHref: '/shop',
+    },
+    {
+      id: 'hero-4',
+      title: 'Your Daily Glow Ritual',
+      subtitle: 'Skincare essentials designed for soft, luminous skin.',
+      image: heroImg4,
+      gradient: 'from-purple-50 via-white to-pink-100',
+      ctaHref: '/shop',
+    },
+    {
+      id: 'hero-5',
+      title: 'Beauty That Feels Effortless',
+      subtitle: 'Fresh formulas, clean textures, and a polished glow.',
+      image: heroImg5,
+      gradient: 'from-amber-50 via-white to-sky-100',
+      ctaHref: '/shop',
+    },
+  ];
   const [currentIndex, setCurrentIndex] = useState(0);
   const heroTouchStartX = useRef<number | null>(null);
   const heroTouchEndX = useRef<number | null>(null);
@@ -176,7 +197,7 @@ const Home: React.FC = () => {
               </motion.p>
               <button
                 type="button"
-                onClick={() => window.location.href = `/product/${currentSlide.id}`}
+                onClick={() => window.location.href = currentSlide.ctaHref}
                 className="rounded-full bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:bg-rose-600 sm:px-7 sm:py-3"
               >
                 Shop Now

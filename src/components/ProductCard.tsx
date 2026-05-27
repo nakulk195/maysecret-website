@@ -229,6 +229,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
                 </span>
               )}
             </div>
+            <p className="mt-1 text-xs font-medium text-gray-500">
+              Inclusive of taxes
+            </p>
           </div>
         </div>
         

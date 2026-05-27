@@ -4,8 +4,16 @@ import { Product as SupabaseProduct } from '../lib/supabase';
 import brighteningSerumImg from "../assets/images/brightening-serum.PNG";
 import brighteningSerum2Img from "../assets/images/brightening-serum2.PNG";
 import brighteningSerum3Img from "../assets/images/brightening-serum3.PNG";
+import brighteningSerum4Img from "../assets/images/brightening-serum4.JPG";
+import brighteningSerum5Img from "../assets/images/brightening-serum5.JPG";
+import brighteningSerum6Img from "../assets/images/brightening-serum6.JPG";
+import brighteningSerum7Img from "../assets/images/brightening-serum7.JPG";
+import brighteningSerum8Img from "../assets/images/brightening-serum8.PNG";
 import sunscreenSprayImg from "../assets/images/sunscreen-spray.PNG";
 import sunscreenSpray2Img from "../assets/images/sunscreen-spray2.jpeg";
+import sunscreenSpray3Img from "../assets/images/sunscreen-spray3.PNG";
+import sunscreenSpray4Img from "../assets/images/sunscreen-spray4.JPG";
+import sunscreenSpray5Img from "../assets/images/sunscreen-spray5.PNG";
 import comboImg from "../assets/images/combo.PNG";
 
 // Category type and available product categories
@@ -67,7 +75,10 @@ export const products: Product[] = [
     image: sunscreenSprayImg,
     images: [
       sunscreenSprayImg,
-      sunscreenSpray2Img
+      sunscreenSpray2Img,
+      sunscreenSpray3Img,
+      sunscreenSpray4Img,
+      sunscreenSpray5Img
     ],
     description: "Introducing our new sunscreen spray, fortified with advanced sun protection technology. Formulated with Suncat DE, Uvinul A Plus, and other powerful sunscreen agents, it provides broad-spectrum protection against both UVA and UVB rays. With its lightweight and non-greasy formula, it is perfect for daily use, keeping your skin safe and healthy under the sun.",
     benefits: [
@@ -142,7 +153,12 @@ export const products: Product[] = [
     images: [
       brighteningSerumImg,
       brighteningSerum2Img,
-      brighteningSerum3Img
+      brighteningSerum3Img,
+      brighteningSerum4Img,
+      brighteningSerum5Img,
+      brighteningSerum6Img,
+      brighteningSerum7Img,
+      brighteningSerum8Img
     ],
     description: "A powerful brightening serum enriched with Rice Extract, Niacinamide and Sepiwhite designed to improve skin tone, reduce pigmentation and give a radiant glass glow skin effect.",
     benefits: [

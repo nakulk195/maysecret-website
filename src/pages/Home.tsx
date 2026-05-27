@@ -16,7 +16,7 @@ import heroImg1 from '../assets/images/heroimg1.JPG';
 import heroImg2 from '../assets/images/heroimg2.JPG';
 import heroImg3 from '../assets/images/heroimg3.JPG';
 import heroImg4 from '../assets/images/heroimg4.JPG';
-import heroImg5 from '../assets/images/heroimg5.PNG';
+import heroImg5 from '../assets/images/heroimg5.png';
 
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);

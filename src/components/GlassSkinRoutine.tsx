@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles, Droplets, Shield } from 'lucide-react';
 import serumImg from '../assets/images/brightening-serum.PNG';
-import sunscreenImg from '../assets/images/sunscreen-spray.PNG';
+import sunscreenImg from '../assets/images/sunscreen-spray.jpeg';
 import glowImg from '../assets/images/combo.PNG';
 import { BRAND_NAME } from '../config/brand';
 

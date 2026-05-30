@@ -3,18 +3,15 @@ import { Product as SupabaseProduct } from '../lib/supabase';
 
 import brighteningSerumImg from "../assets/images/brightening-serum.PNG";
 import brighteningSerum2Img from "../assets/images/brightening-serum2.PNG";
-import brighteningSerum3Img from "../assets/images/brightening-serum3.PNG";
-import brighteningSerum4Img from "../assets/images/brightening-serum4.JPG";
-import brighteningSerum5Img from "../assets/images/brightening-serum5.JPG";
-import brighteningSerum6Img from "../assets/images/brightening-serum6.JPG";
-import brighteningSerum7Img from "../assets/images/brightening-serum7.JPG";
-import brighteningSerum8Img from "../assets/images/brightening-serum8.PNG";
-import sunscreenSprayImg from "../assets/images/sunscreen-spray.PNG";
-import sunscreenSpray2Img from "../assets/images/sunscreen-spray2.jpeg";
-import sunscreenSpray3Img from "../assets/images/sunscreen-spray3.PNG";
+import brighteningSerum3Img from "../assets/images/brightening-serum3.JPG";
+import brighteningSerum4Img from "../assets/images/brightening-serum4.PNG";
+import sunscreenSprayImg from "../assets/images/sunscreen-spray.jpeg";
+import sunscreenSpray2Img from "../assets/images/sunscreen-spray2.PNG";
+import sunscreenSpray3Img from "../assets/images/sunscreen-spray3.JPG";
 import sunscreenSpray4Img from "../assets/images/sunscreen-spray4.JPG";
-import sunscreenSpray5Img from "../assets/images/sunscreen-spray5.PNG";
 import comboImg from "../assets/images/combo.PNG";
+import combo2Img from "../assets/images/combo2.JPG";
+import combo3Img from "../assets/images/combo3.JPG";
 
 // Category type and available product categories
 export interface Category {
@@ -77,8 +74,7 @@ export const products: Product[] = [
       sunscreenSprayImg,
       sunscreenSpray2Img,
       sunscreenSpray3Img,
-      sunscreenSpray4Img,
-      sunscreenSpray5Img
+      sunscreenSpray4Img
     ],
     description: "Introducing our new sunscreen spray, fortified with advanced sun protection technology. Formulated with Suncat DE, Uvinul A Plus, and other powerful sunscreen agents, it provides broad-spectrum protection against both UVA and UVB rays. With its lightweight and non-greasy formula, it is perfect for daily use, keeping your skin safe and healthy under the sun.",
     benefits: [
@@ -154,11 +150,7 @@ export const products: Product[] = [
       brighteningSerumImg,
       brighteningSerum2Img,
       brighteningSerum3Img,
-      brighteningSerum4Img,
-      brighteningSerum5Img,
-      brighteningSerum6Img,
-      brighteningSerum7Img,
-      brighteningSerum8Img
+      brighteningSerum4Img
     ],
     description: "A powerful brightening serum enriched with Rice Extract, Niacinamide and Sepiwhite designed to improve skin tone, reduce pigmentation and give a radiant glass glow skin effect.",
     benefits: [
@@ -247,7 +239,9 @@ export const products: Product[] = [
     originalPrice: 2498,
     image: comboImg,
     images: [
-      comboImg
+      comboImg,
+      combo2Img,
+      combo3Img
     ],
     description: "Complete daily skin protection and brightening routine in one pack! Get our premium Sunscreen Spray (100 ml) and Rice Brightening Serum (30 ml) at an incredible value.",
     benefits: [

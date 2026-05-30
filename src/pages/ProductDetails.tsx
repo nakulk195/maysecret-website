@@ -504,7 +504,7 @@ const ProductDetails: React.FC = () => {
                   )}
                 </div>
                 <p className="mt-2 text-sm font-medium text-gray-500">
-                  Inclusive of taxes
+                  Inclusive all taxes
                 </p>
               </motion.div>
 

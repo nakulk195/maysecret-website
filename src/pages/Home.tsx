@@ -12,10 +12,10 @@ import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
 import Newsletter from '../components/Newsletter';
 import GlassSkinRoutine from '../components/GlassSkinRoutine';
 import { BRAND_NAME } from '../config/brand';
-import heroImg1 from '../assets/images/heroimg1.JPG';
-import heroImg2 from '../assets/images/heroimg2.JPG';
-import heroImg3 from '../assets/images/heroimg3.JPG';
-import heroImg4 from '../assets/images/heroimg4.JPG';
+import heroImg1 from '../assets/images/heroimg1.PNG';
+import heroImg2 from '../assets/images/heroimg2.PNG';
+import heroImg3 from '../assets/images/heroimg3.PNG';
+import heroImg4 from '../assets/images/heroimg4.PNG';
 import heroImg5 from '../assets/images/heroimg5.png';
 
 const Home: React.FC = () => {
@@ -320,7 +320,7 @@ const Home: React.FC = () => {
                   y: -3,
                   transition: { duration: 0.2 }
                 }}
-                className="relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full min-h-[500px]"
+                className="relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full"
               >
               {/* Image Area */}
               <div className="relative overflow-hidden h-40 md:h-52 w-full">

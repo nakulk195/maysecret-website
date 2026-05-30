@@ -117,7 +117,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
-      className={`relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 group flex flex-col h-full min-h-[500px] ${className}`}
+      className={`relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 group flex flex-col h-full ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -190,8 +190,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
       </Link>
 
       {/* Product Info */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col">
-        <div className="flex-1">
+      <div className="p-4 sm:p-5 flex flex-col">
+        <div>
           {/* Product Name with ellipsis */}
           <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2 line-clamp-2 overflow-hidden" 
               style={{ 
@@ -230,13 +230,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
               )}
             </div>
             <p className="mt-1 text-xs font-medium text-gray-500">
-              Inclusive of taxes
+              Inclusive all taxes
             </p>
           </div>
         </div>
         
-        {/* Stock Status and Add to Cart - Always at bottom */}
-        <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
+        {/* Stock Status and Add to Cart */}
+        <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
           <span className={`text-xs px-2 py-1 rounded-full ${
             product.stock > 0 
               ? 'bg-green-100 text-green-700' 

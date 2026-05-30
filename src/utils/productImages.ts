@@ -1,11 +1,13 @@
 import brighteningSerumImg from '../assets/images/brightening-serum.PNG';
 import comboImg from '../assets/images/combo.PNG';
-import sunscreenSprayImg from '../assets/images/sunscreen-spray.PNG';
+import sunscreenSprayImg from '../assets/images/sunscreen-spray.jpeg';
 
 const productImages: Record<string, string> = {
   'brightening-serum.png': brighteningSerumImg,
   'combo.png': comboImg,
   'sunscreen-spray.png': sunscreenSprayImg,
+  'sunscreen-spray.jpeg': sunscreenSprayImg,
+  'sunscreen-spray.jpg': sunscreenSprayImg,
 };
 
 export const getProductImage = (image?: string | null): string => {

@@ -4,6 +4,7 @@ import { wishlistService } from '../services/database';
 import { supabase, Product } from '../lib/supabase';
 import { resolveSupabaseProductId } from '../utils/productIdResolver';
 import { getErrorMessage, withTimeout } from '../utils/safeAsync';
+import { safeGetItem, safeRemoveItem, safeSetItem } from '../utils/safeStorage';
 
 interface WishlistContextType {
   wishlist: Product[];
@@ -34,6 +35,19 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const readGuestWishlist = (): Product[] => {
+    try {
+      const stored = safeGetItem('guest_wishlist');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const saveGuestWishlist = (items: Product[]) => {
+    safeSetItem('guest_wishlist', JSON.stringify(items));
+  };
+
   const normalizeWishlistProducts = (rows: any[]): Product[] => {
     const byProduct = new Map<string, Product>();
 
@@ -52,13 +66,30 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   useEffect(() => {
     const loadWishlist = async () => {
       if (!user) {
-        setWishlist([]);
+        setWishlist(readGuestWishlist());
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
+        const guestWishlist = readGuestWishlist();
+        if (guestWishlist.length > 0) {
+          for (const product of guestWishlist) {
+            try {
+              const resolvedProductId = await resolveSupabaseProductId(product);
+              await withTimeout(
+                wishlistService.addToWishlist(user.id, resolvedProductId),
+                10000,
+                'Wishlist sync timed out'
+              );
+            } catch (syncError) {
+              console.error('Error syncing guest wishlist item:', getErrorMessage(syncError));
+            }
+          }
+          safeRemoveItem('guest_wishlist');
+        }
+
         // Load wishlist with product relationships
         const { data, error } = await withTimeout(supabase
           .from('wishlist')
@@ -101,13 +132,21 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   }, [user]);
 
   const addToWishlist = useCallback(async (product: Product) => {
-    if (!user) {
-      throw new Error('Please log in to use your wishlist.');
-    }
-
     try {
       setLoading(true);
       const productId = String(product.id);
+
+      if (!user) {
+        setWishlist(prev => {
+          const nextWishlist = prev.some(item => String(item.id) === productId)
+            ? prev
+            : [...prev, product];
+          saveGuestWishlist(nextWishlist);
+          return nextWishlist;
+        });
+        return;
+      }
+
       let resolvedProductId: string;
 
       try {
@@ -141,10 +180,18 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   }, [user]);
 
   const removeFromWishlist = useCallback(async (productId: string) => {
-    if (!user) return;
-
     try {
       setLoading(true);
+
+      if (!user) {
+        setWishlist(prev => {
+          const nextWishlist = prev.filter(item => String(item.id) !== productId);
+          saveGuestWishlist(nextWishlist);
+          return nextWishlist;
+        });
+        return;
+      }
+
       let resolvedProductId = productId;
 
       try {
@@ -175,11 +222,20 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   }, [user]);
 
   const isInWishlist = useCallback(async (productId: string) => {
-    if (!user) return false;
+    if (!user) {
+      return readGuestWishlist().some(item => String(item.id) === productId);
+    }
     
     try {
+      let resolvedProductId = productId;
+      try {
+        resolvedProductId = await resolveSupabaseProductId({ id: productId });
+      } catch {
+        resolvedProductId = productId;
+      }
+
       return await withTimeout(
-        wishlistService.isInWishlist(user.id, productId),
+        wishlistService.isInWishlist(user.id, resolvedProductId),
         10000,
         'Wishlist check timed out'
       );
@@ -190,10 +246,14 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   }, [user]);
 
   const clearWishlist = useCallback(async () => {
-    if (!user) return;
-
     try {
       setLoading(true);
+      if (!user) {
+        safeRemoveItem('guest_wishlist');
+        setWishlist([]);
+        return;
+      }
+
       // Clear all items for user
       for (const item of wishlist) {
         await withTimeout(

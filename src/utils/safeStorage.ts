@@ -1,5 +1,7 @@
 const APP_STORAGE_KEYS = [
   'guest_cart',
+  'guest_wishlist',
+  'buy_now_checkout',
   'redirect_after_login',
   'shipping_address',
   'maysecret_cart',

@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { safeSetItem } from '../utils/safeStorage';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -14,6 +15,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const intendedPath = `${location.pathname}${location.search}${location.hash}`;
 
   // Show loading spinner while checking auth state
   if (loading) {
@@ -30,6 +32,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Redirect to login if not authenticated
   if (!user) {
+    safeSetItem('redirect_after_login', intendedPath);
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 

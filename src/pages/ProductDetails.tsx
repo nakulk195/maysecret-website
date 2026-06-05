@@ -158,11 +158,7 @@ const ProductDetails: React.FC = () => {
       } : currentProduct;
       
       addToRecentlyViewed(storageProduct);
-      if (user) {
-        isInWishlist(String(currentProduct.id)).then(setIsWishlisted);
-      } else {
-        setIsWishlisted(false);
-      }
+      isInWishlist(String(currentProduct.id)).then(setIsWishlisted);
     }
   }, [currentProduct, product, user, isInWishlist]);
 
@@ -202,11 +198,6 @@ const ProductDetails: React.FC = () => {
   const handleWishlistToggle = async () => {
     if (!currentProduct) return;
     if (authLoading) return;
-    if (!user) {
-      showToast('Please log in to use your wishlist', 'info');
-      goToLogin();
-      return;
-    }
 
     try {
       if (isWishlisted) {
@@ -227,11 +218,6 @@ const ProductDetails: React.FC = () => {
   const handleAddToCart = async () => {
     if (!currentProduct) return;
     if (authLoading) return;
-    if (!user) {
-      showToast('Please log in to add products to cart', 'info');
-      goToLogin();
-      return;
-    }
 
     try {
       await addToCart(currentProduct as any, quantity);
@@ -240,6 +226,30 @@ const ProductDetails: React.FC = () => {
       console.error('Error adding to cart:', error);
       showToast('Could not add product to cart. Please try again.', 'error');
     }
+  };
+
+  const handleBuyNow = () => {
+    if (!currentProduct) return;
+    if (!currentProduct.stock || authLoading) return;
+
+    const buyNowItem = {
+      id: `buy_now_${Date.now()}_${currentProduct.id}`,
+      user_id: user?.id || 'guest',
+      product_id: String(currentProduct.id),
+      quantity,
+      cartProduct: currentProduct,
+    };
+
+    safeSetItem('buy_now_checkout', JSON.stringify([buyNowItem]));
+    safeSetItem('redirect_after_login', '/address');
+
+    if (!user) {
+      showToast('Please log in to continue checkout', 'info');
+      navigate('/login');
+      return;
+    }
+
+    navigate('/address');
   };
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
@@ -561,24 +571,34 @@ const ProductDetails: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
-                className="flex space-x-4 mb-8"
+                className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto] sm:gap-4 mb-8"
               >
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleAddToCart}
                   disabled={!currentProduct?.stock}
-                  className="flex-1 bg-gradient-to-r from-pink-500 to-orange-400 text-white py-4 px-6 rounded-2xl font-medium hover:from-pink-600 hover:to-orange-500 transition-all disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg"
+                  className="h-14 bg-gradient-to-r from-pink-500 to-orange-400 text-white px-6 rounded-2xl font-medium hover:from-pink-600 hover:to-orange-500 transition-all disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg"
                 >
                   <ShoppingCart size={20} />
                   <span>Add to Cart</span>
                 </motion.button>
 
                 <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleBuyNow}
+                  disabled={!currentProduct?.stock || authLoading}
+                  className="h-14 rounded-2xl border border-gray-950 bg-gray-950 px-6 font-semibold text-white shadow-lg transition-all hover:bg-black disabled:border-gray-400 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  Buy Now
+                </motion.button>
+
+                <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleWishlistToggle}
-                  className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-center ${
+                  className={`h-14 rounded-2xl border-2 px-4 transition-all flex items-center justify-center ${
                     isWishlisted
                       ? 'border-rose-400 bg-rose-50 text-rose-600'
                       : 'border-gray-300 text-gray-600 hover:border-rose-400 hover:bg-rose-50 hover:text-rose-600'

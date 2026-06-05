@@ -3,7 +3,7 @@ import { supabase, Product } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 import { resolveSupabaseProductId } from '../utils/productIdResolver';
 import { getErrorMessage, withTimeout } from '../utils/safeAsync';
-import { safeRemoveItem } from '../utils/safeStorage';
+import { safeGetItem, safeRemoveItem, safeSetItem } from '../utils/safeStorage';
 
 // Types
 export interface CartItem {
@@ -44,6 +44,20 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const readGuestCart = (): CartItem[] => {
+    try {
+      const stored = safeGetItem('guest_cart');
+      const parsed = stored ? JSON.parse(stored) : [];
+      return normalizeCartRows(parsed);
+    } catch {
+      return [];
+    }
+  };
+
+  const saveGuestCart = (items: CartItem[]) => {
+    safeSetItem('guest_cart', JSON.stringify(items));
+  };
+
   const normalizeCartRows = (rows: any[]): CartItem[] => {
     const byProduct = new Map<string, CartItem>();
 
@@ -74,13 +88,76 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     return Array.from(byProduct.values());
   };
 
+  const upsertUserCartItem = useCallback(async (product: Product, quantity: number = 1) => {
+    if (!user) {
+      throw new Error('User is required to update Supabase cart.');
+    }
+
+    const resolvedProductId = await resolveSupabaseProductId(product);
+    const { data: existingRows, error: queryError } = await withTimeout(supabase
+      .from('cart')
+      .select('id, quantity')
+      .eq('user_id', user.id)
+      .eq('product_id', resolvedProductId)
+      .order('created_at', { ascending: true })
+      .limit(1),
+      10000,
+      'Cart update timed out'
+    );
+
+    if (queryError) throw queryError;
+
+    const existingItem = existingRows?.[0];
+
+    if (existingItem) {
+      const newQuantity = Math.max(1, Number(existingItem.quantity || 1) + quantity);
+      const { error: updateError } = await withTimeout(supabase
+        .from('cart')
+        .update({ quantity: newQuantity })
+        .eq('id', existingItem.id)
+        .eq('user_id', user.id),
+        10000,
+        'Cart update timed out'
+      );
+
+      if (updateError) throw updateError;
+    } else {
+      const { error: insertError } = await withTimeout(supabase
+        .from('cart')
+        .insert({
+          user_id: user.id,
+          product_id: resolvedProductId,
+          product_name: product.name,
+          product_image: product.image,
+          product_price: product.price,
+          quantity
+        }),
+        10000,
+        'Cart add timed out'
+      );
+
+      if (insertError) throw insertError;
+    }
+
+    return resolvedProductId;
+  }, [user]);
+
   const loadCart = useCallback(async () => {
     setLoading(true);
     try {
       if (!user) {
-        safeRemoveItem('guest_cart');
-        setCart([]);
+        setCart(readGuestCart());
         return;
+      }
+
+      const guestCart = readGuestCart();
+      if (guestCart.length > 0) {
+        for (const item of guestCart) {
+          if (item.cartProduct) {
+            await upsertUserCartItem(item.cartProduct, item.quantity);
+          }
+        }
+        safeRemoveItem('guest_cart');
       }
 
       const { data, error } = await withTimeout(supabase
@@ -117,7 +194,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, upsertUserCartItem]);
 
   useEffect(() => {
     loadCart();
@@ -128,80 +205,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     try {
       if (user) {
-        // Resolve product UUID for Supabase operations
-        let resolvedProductId: string;
-        try {
-          resolvedProductId = await resolveSupabaseProductId(product);
-        } catch (resolveError) {
-          console.error(
-            `[CartContext] Failed to resolve product UUID for local product_id ${localProductId}:`,
-            resolveError instanceof Error ? resolveError.message : resolveError
-          );
-          throw resolveError;
-        }
-
-        const { data: existingRows, error: queryError } = await withTimeout(supabase
-          .from('cart')
-          .select('id, quantity')
-          .eq('user_id', user.id)
-          .eq('product_id', resolvedProductId)
-          .order('created_at', { ascending: true })
-          .limit(1),
-          10000,
-          'Cart update timed out'
-        );
-
-        if (queryError) {
-          console.error(
-            `[CartContext] Supabase query error for product ${resolvedProductId}:`,
-            queryError
-          );
-          throw queryError;
-        }
-
-        const existingItem = existingRows?.[0];
-
-        if (existingItem) {
-          const newQuantity = Math.max(1, Number(existingItem.quantity || 1) + quantity);
-          const { error: updateError } = await withTimeout(supabase
-            .from('cart')
-            .update({ quantity: newQuantity })
-            .eq('id', existingItem.id)
-            .eq('user_id', user.id),
-            10000,
-            'Cart update timed out'
-          );
-
-          if (updateError) {
-            console.error(
-              `[CartContext] Supabase update error for product ${resolvedProductId}:`,
-              updateError
-            );
-            throw updateError;
-          }
-        } else {
-          const { error: insertError } = await withTimeout(supabase
-            .from('cart')
-            .insert({
-              user_id: user.id,
-              product_id: resolvedProductId,
-              product_name: product.name,
-              product_image: product.image,
-              product_price: product.price,
-              quantity: quantity
-            }),
-            10000,
-            'Cart add timed out'
-          );
-
-          if (insertError) {
-            console.error(
-              `[CartContext] Supabase insert error for product ${resolvedProductId}:`,
-              insertError
-            );
-            throw insertError;
-          }
-        }
+        const resolvedProductId = await upsertUserCartItem(product, quantity);
 
         setCart(prev => {
           const existingIndex = prev.findIndex(item => item.product_id === resolvedProductId);
@@ -225,7 +229,28 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           ];
         });
       } else {
-        throw new Error('Please log in to add products to cart.');
+        setCart(prev => {
+          const existingIndex = prev.findIndex(item => item.product_id === localProductId);
+          const nextCart = existingIndex >= 0
+            ? prev.map((item, index) =>
+                index === existingIndex
+                  ? { ...item, quantity: item.quantity + quantity, cartProduct: item.cartProduct || product }
+                  : item
+              )
+            : [
+                ...prev,
+                {
+                  id: `guest_cart_${Date.now()}_${localProductId}`,
+                  user_id: 'guest',
+                  product_id: localProductId,
+                  quantity,
+                  cartProduct: product
+                }
+              ];
+
+          saveGuestCart(nextCart);
+          return nextCart;
+        });
       }
     } catch (error) {
       console.error(
@@ -270,7 +295,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
         setCart(prev => prev.filter(item => item.product_id !== resolvedProductId));
       } else {
-        setCart([]);
+        setCart(prev => {
+          const nextCart = prev.filter(item => item.product_id !== productId);
+          saveGuestCart(nextCart);
+          return nextCart;
+        });
       }
     } catch (error) {
       console.error(
@@ -347,7 +376,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           )
         );
       } else {
-        throw new Error('Please log in to update your cart.');
+        const safeQuantity = Math.max(1, Number(newQuantity || 1));
+        setCart(prev => {
+          const nextCart = prev.map(item =>
+            item.product_id === productId
+              ? { ...item, quantity: safeQuantity }
+              : item
+          );
+          saveGuestCart(nextCart);
+          return nextCart;
+        });
       }
     } catch (error) {
       console.error(

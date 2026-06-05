@@ -7,9 +7,7 @@ import { getProductImage } from '../utils/productImages';
 import { addToRecentlyViewed } from '../utils/storage';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
-import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { safeSetItem } from '../utils/safeStorage';
 
 
 interface ProductCardProps {
@@ -22,8 +20,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { user, loading: authLoading } = useAuth();
   const { showToast } = useToast();
   
   // Use WishlistContext
@@ -50,21 +46,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
     checkWishlist();
   }, [product.id, isInWishlist]);
 
-  const goToLogin = () => {
-    safeSetItem('redirect_after_login', location.pathname);
-    navigate('/login');
-  };
-
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (authLoading) return;
-    if (!user) {
-      showToast('Please log in to use your wishlist', 'info');
-      goToLogin();
-      return;
-    }
     
     try {
       if (isWishlisted) {
@@ -86,12 +70,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
     e.preventDefault();
     e.stopPropagation();
 
-    if (!product.stock || authLoading) return;
-    if (!user) {
-      showToast('Please log in to add products to cart', 'info');
-      goToLogin();
-      return;
-    }
+    if (!product.stock) return;
     
     try {
       await addToCart(product, 1);

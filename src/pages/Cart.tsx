@@ -6,7 +6,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import CartItemCard from '../components/CartItemCard';
-import { safeSetItem } from '../utils/safeStorage';
+import { safeRemoveItem, safeSetItem } from '../utils/safeStorage';
 
 const Cart: React.FC = () => {
   const { cart, loading, updateQuantity, removeFromCart, getCartTotal, getCartCount } = useCart();
@@ -48,12 +48,16 @@ const Cart: React.FC = () => {
     try {
       // Check if user is authenticated
       if (!user) {
+        safeRemoveItem('buy_now_checkout');
+        safeSetItem('pending_checkout_cart', JSON.stringify(cart));
         // Store redirect path for after login
         safeSetItem('redirect_after_login', '/address');
         navigate('/login');
         return;
       }
       
+      safeRemoveItem('buy_now_checkout');
+      safeRemoveItem('pending_checkout_cart');
       // User is authenticated, proceed to address page
       navigate('/address');
     } catch (error) {

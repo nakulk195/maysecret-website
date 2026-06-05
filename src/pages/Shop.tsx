@@ -7,10 +7,8 @@ import { Product } from '../utils/productData';
 import { products as localProducts } from '../utils/productData';
 import { getProductImage } from '../utils/productImages';
 import { useCart } from '../contexts/CartContext';
-import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
-import { safeSetItem } from '../utils/safeStorage';
 
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'newest' | 'rating';
 
@@ -25,9 +23,7 @@ const Shop: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { addToCart } = useCart();
-  const { user, loading: authLoading } = useAuth();
   const { showToast } = useToast();
-  const navigate = useNavigate();
 
   // Load products from local productData
   useEffect(() => {
@@ -113,14 +109,7 @@ const Shop: React.FC = () => {
   };
 
   const handleAddToCart = async (product: any) => {
-    if (!product.stock || authLoading) return;
-
-    if (!user) {
-      showToast('Please log in to add products to cart', 'info');
-      safeSetItem('redirect_after_login', window.location.pathname);
-      navigate('/login');
-      return;
-    }
+    if (!product.stock) return;
 
     try {
       await addToCart(product, 1);

@@ -10,7 +10,7 @@ import { CheckoutAddress, startRazorpayCheckout } from '../services/checkoutServ
 import CouponBox from '../components/CouponBox';
 import { AppliedCoupon } from '../services/couponService';
 import { getErrorMessage } from '../utils/safeAsync';
-import { safeSetItem } from '../utils/safeStorage';
+import { safeGetItem, safeRemoveItem, safeSetItem } from '../utils/safeStorage';
 
 // Indian states data
 const INDIAN_STATES = [
@@ -64,6 +64,8 @@ const Address: React.FC = () => {
   const { showToast } = useToast();
   const { addresses, loading: addressesLoading, error: addressesError, addAddress, updateAddress, deleteAddress } = useAddresses();
   const navigate = useNavigate();
+  const [buyNowItems, setBuyNowItems] = useState<any[]>([]);
+  const [pendingCheckoutItems, setPendingCheckoutItems] = useState<any[]>([]);
   
   const [isEditing, setIsEditing] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
@@ -90,16 +92,55 @@ const Address: React.FC = () => {
   const [citySearch, setCitySearch] = useState('');
   const [filteredCities, setFilteredCities] = useState(INDIAN_CITIES);
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
-  const cartTotal = getCartTotal();
+  const checkoutItems = buyNowItems.length > 0
+    ? buyNowItems
+    : cart.length > 0
+      ? cart
+      : pendingCheckoutItems;
+  const cartTotal = checkoutItems.length > 0
+    ? checkoutItems.reduce((total, item) => {
+        const price = Number(item.cartProduct?.price || 0);
+        return total + price * Number(item.quantity || 1);
+      }, 0)
+    : getCartTotal();
   const couponDiscount = appliedCoupon?.discountAmount || 0;
   const payableTotal = Math.max(0, cartTotal - couponDiscount);
+  const clearCheckoutItems = async () => {
+    if (buyNowItems.length > 0) {
+      safeRemoveItem('buy_now_checkout');
+      setBuyNowItems([]);
+      return;
+    }
+
+    safeRemoveItem('pending_checkout_cart');
+    await clearCart();
+  };
 
   // Auth protection
   useEffect(() => {
     if (!user) {
+      safeSetItem('redirect_after_login', '/address');
       navigate('/login');
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    try {
+      const storedBuyNow = safeGetItem('buy_now_checkout');
+      const parsedBuyNow = storedBuyNow ? JSON.parse(storedBuyNow) : [];
+      setBuyNowItems(Array.isArray(parsedBuyNow) ? parsedBuyNow : []);
+    } catch {
+      setBuyNowItems([]);
+    }
+
+    try {
+      const storedPendingCart = safeGetItem('pending_checkout_cart');
+      const parsedPendingCart = storedPendingCart ? JSON.parse(storedPendingCart) : [];
+      setPendingCheckoutItems(Array.isArray(parsedPendingCart) ? parsedPendingCart : []);
+    } catch {
+      setPendingCheckoutItems([]);
+    }
+  }, []);
 
   // City search functionality
   useEffect(() => {
@@ -285,6 +326,7 @@ const Address: React.FC = () => {
 
   const handlePayNow = async () => {
     if (!user) {
+      safeSetItem('redirect_after_login', '/address');
       navigate('/login');
       return;
     }
@@ -294,7 +336,7 @@ const Address: React.FC = () => {
       return;
     }
 
-    if (!cart.length) {
+    if (!checkoutItems.length) {
       showToast('Your cart is empty', 'error');
       navigate('/cart');
       return;
@@ -304,10 +346,10 @@ const Address: React.FC = () => {
     try {
       const order = await startRazorpayCheckout({
         user,
-        cart,
+        cart: checkoutItems,
         totalAmount: payableTotal,
         address: selectedAddress,
-        clearCart,
+        clearCart: clearCheckoutItems,
       });
 
       showToast('Order successful');
@@ -708,7 +750,7 @@ const Address: React.FC = () => {
               </h2>
               
               <div className="space-y-4">
-                {cart.map((item, index) => (
+                {checkoutItems.map((item, index) => (
                   <div key={`summary-${item.id}-${index}`} className="flex items-center space-x-4 pb-4 border-b border-gray-100 last:border-0">
                     {/* Product Image */}
                     <div className="flex-shrink-0">
@@ -891,7 +933,7 @@ const Address: React.FC = () => {
                 </h2>
                 
                 <div className="space-y-4">
-                  {cart.map((item, index) => (
+                  {checkoutItems.map((item, index) => (
                     <div key={`summary-${item.id}-${index}`} className="flex items-center space-x-4 pb-4 border-b border-gray-100 last:border-0">
                       {/* Product Image */}
                       <div className="flex-shrink-0">
@@ -972,7 +1014,7 @@ const Address: React.FC = () => {
                 <button
                   type="button"
                   onClick={handlePayNow}
-                  disabled={!selectedAddress || isPaymentProcessing || cart.length === 0}
+                  disabled={!selectedAddress || isPaymentProcessing || checkoutItems.length === 0}
                   className="mt-5 flex w-full items-center justify-center rounded-lg bg-gray-900 px-5 py-4 font-semibold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isPaymentProcessing ? (

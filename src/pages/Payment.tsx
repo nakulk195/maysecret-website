@@ -9,7 +9,7 @@ import { getProductImage } from '../utils/productImages';
 import { startRazorpayCheckout } from '../services/checkoutService';
 import CouponBox from '../components/CouponBox';
 import { AppliedCoupon } from '../services/couponService';
-import { safeGetItem } from '../utils/safeStorage';
+import { safeGetItem, safeRemoveItem } from '../utils/safeStorage';
 
 const Payment: React.FC = () => {
   const { user } = useAuth();
@@ -31,6 +31,11 @@ const Payment: React.FC = () => {
   const cartTotal = getCartTotal();
   const couponDiscount = appliedCoupon?.discountAmount || 0;
   const payableTotal = Math.max(0, cartTotal - couponDiscount);
+  const clearPaymentCart = async () => {
+    safeRemoveItem('buy_now_checkout');
+    safeRemoveItem('pending_checkout_cart');
+    await clearCart();
+  };
 
   // Auth protection
   useEffect(() => {
@@ -96,7 +101,7 @@ const Payment: React.FC = () => {
         cart,
         totalAmount: payableTotal,
         address,
-        clearCart,
+        clearCart: clearPaymentCart,
       });
       showToast('Order successful');
       navigate(`/orders?success=1&orderId=${order.id}`);

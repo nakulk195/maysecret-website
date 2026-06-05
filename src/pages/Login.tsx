@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Mail, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -29,7 +29,25 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [googleLoading, setGoogleLoading] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { signUp, signIn, signInWithGoogle } = useAuth();
+  const location = useLocation();
+  const { user, loading: authLoading, signUp, signIn, signInWithGoogle } = useAuth();
+
+  const navigateAfterAuth = () => {
+    const redirectPath = safeGetItem('redirect_after_login');
+    if (redirectPath) {
+      safeRemoveItem('redirect_after_login');
+      navigate(redirectPath);
+    } else {
+      const fromPath = (location.state as any)?.from;
+      navigate(fromPath ? `${fromPath.pathname || '/'}${fromPath.search || ''}${fromPath.hash || ''}` : '/');
+    }
+  };
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigateAfterAuth();
+    }
+  }, [authLoading, user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -87,16 +105,6 @@ const Login: React.FC = () => {
           setError(error.message);
         } else {
           setShowSuccess(true);
-          setTimeout(() => {
-            // Check for redirect path after login
-            const redirectPath = safeGetItem('redirect_after_login');
-            if (redirectPath) {
-              safeRemoveItem('redirect_after_login');
-              navigate(redirectPath);
-            } else {
-              navigate('/');
-            }
-          }, 2000);
         }
       } else {
         // Signup with Supabase
@@ -111,9 +119,6 @@ const Login: React.FC = () => {
           setError(error.message);
         } else {
           setShowSuccess(true);
-          setTimeout(() => {
-            navigate('/');
-          }, 2000);
         }
       }
     } catch (err) {

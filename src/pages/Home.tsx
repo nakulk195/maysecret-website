@@ -12,11 +12,10 @@ import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
 import Newsletter from '../components/Newsletter';
 import GlassSkinRoutine from '../components/GlassSkinRoutine';
 import { BRAND_NAME } from '../config/brand';
-import heroImg1 from '../assets/images/heroimg1.png';
-import heroImg2 from '../assets/images/heroimg2.png';
-import heroImg3 from '../assets/images/heroimg3.png';
-import heroImg4 from '../assets/images/heroimg4.png';
-import heroImg5 from '../assets/images/heroimg5.png';
+import heroImg1 from '../assets/images/heroimg1.PNG';
+import heroVideo2 from '../assets/images/heroimg2.MOV';
+import heroVideo3 from '../assets/images/heroimg3.MOV';
+import heroImg4 from '../assets/images/heroimg4.PNG';
 
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -61,44 +60,44 @@ const Home: React.FC = () => {
   const heroSlides = [
     {
       id: 'hero-1',
-      title: 'MAY SECRET',
-      subtitle: 'Premium skincare made for a bright, confident glow.',
-      image: heroImg1,
+      title: 'From Courtroom Clarity to Skincare Confidence',
+      subtitle: 'Meet the Founder of May Secret Skin & Beauty',
+      description: 'Adv. PRASANNA',
+      media: heroImg1,
+      mediaType: 'image',
       gradient: 'from-sky-50 via-white to-rose-100',
       ctaHref: '/shop',
     },
     {
       id: 'hero-2',
-      title: 'Glow With MAY SECRET',
-      subtitle: 'A radiant beauty routine crafted for everyday care.',
-      image: heroImg2,
+      title: 'Unlock the Secret of Korean Glass Skin',
+      subtitle: 'with May Secret',
+      description: 'RICE BRIGHTENING SERUM',
+      media: heroVideo2,
+      mediaType: 'video',
       gradient: 'from-rose-50 via-white to-pink-100',
       ctaHref: '/shop',
     },
     {
       id: 'hero-3',
-      title: 'K-Beauty Inspired Care',
-      subtitle: 'Brightening, protection, and glow in one refined routine.',
-      image: heroImg3,
+      title: 'Just Spray',
+      subtitle: 'Shield Your Skin and Shine Brighter',
+      description: 'With Every Single Spray',
+      media: heroVideo3,
+      mediaType: 'video',
       gradient: 'from-emerald-50 via-white to-rose-100',
       ctaHref: '/shop',
     },
     {
       id: 'hero-4',
-      title: 'Your Daily Glow Ritual',
-      subtitle: 'Skincare essentials designed for soft, luminous skin.',
-      image: heroImg4,
+      title: 'Elevate Your Daily Glow',
+      subtitle: 'with our ultimate radiance duo',
+      description: 'SUNSCREEN SPRAY & RICE BRIGHTENING SERUM',
+      media: heroImg4,
+      mediaType: 'image',
       gradient: 'from-purple-50 via-white to-pink-100',
       ctaHref: '/shop',
-    },
-    {
-      id: 'hero-5',
-      title: 'Beauty That Feels Effortless',
-      subtitle: 'Fresh formulas, clean textures, and a polished glow.',
-      image: heroImg5,
-      gradient: 'from-amber-50 via-white to-sky-100',
-      ctaHref: '/shop',
-    },
+    }
   ];
   const [currentIndex, setCurrentIndex] = useState(0);
   const heroTouchStartX = useRef<number | null>(null);
@@ -191,9 +190,18 @@ const Home: React.FC = () => {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.05 }}
-                className="mb-5 max-w-md text-sm leading-relaxed text-gray-600 sm:text-base lg:text-lg"
+                className="mb-2 max-w-md text-sm leading-relaxed text-gray-600 sm:text-base lg:text-lg"
               >
                 {currentSlide.subtitle}
+              </motion.p>
+              <motion.p
+                key={`description-${currentSlide.id}`}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-gray-800 sm:text-sm"
+              >
+                {currentSlide.description}
               </motion.p>
               <button
                 type="button"
@@ -205,15 +213,30 @@ const Home: React.FC = () => {
             </div>
 
             <div className="relative flex h-full min-w-0 items-center justify-center">
-              <motion.img
-                key={`image-${currentSlide.id}`}
-                src={currentSlide.image}
-                alt={currentSlide.title}
-                initial={{ opacity: 0, scale: 0.96, x: 18 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="max-h-[220px] w-full object-contain drop-shadow-2xl transition-all duration-500 ease-in-out sm:max-h-[300px] md:max-h-[390px] lg:max-h-[455px]"
-              />
+              {currentSlide.mediaType === 'video' ? (
+                <motion.video
+                  key={`video-${currentSlide.id}`}
+                  src={currentSlide.media}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  initial={{ opacity: 0, scale: 0.96, x: 18 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  className="max-h-[220px] w-full object-contain drop-shadow-2xl transition-all duration-500 ease-in-out sm:max-h-[300px] md:max-h-[390px] lg:max-h-[455px]"
+                />
+              ) : (
+                <motion.img
+                  key={`image-${currentSlide.id}`}
+                  src={currentSlide.media}
+                  alt={currentSlide.title}
+                  initial={{ opacity: 0, scale: 0.96, x: 18 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  className="max-h-[220px] w-full object-contain drop-shadow-2xl transition-all duration-500 ease-in-out sm:max-h-[300px] md:max-h-[390px] lg:max-h-[455px]"
+                />
+              )}
             </div>
 
             <button

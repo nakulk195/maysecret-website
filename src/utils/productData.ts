@@ -6,7 +6,7 @@ import brighteningSerum2Img from "../assets/images/brightening-serum2.PNG";
 import brighteningSerum3Img from "../assets/images/brightening-serum3.JPG";
 import brighteningSerum4Img from "../assets/images/brightening-serum4.PNG";
 import sunscreenSprayImg from "../assets/images/sunscreen-spray.jpeg";
-import sunscreenSpray2Img from "../assets/images/sunscreen-spray2.PNG";
+import sunscreenSpray2Img from "../assets/images/sunscreen-spray2.JPG";
 import sunscreenSpray3Img from "../assets/images/sunscreen-spray3.JPG";
 import sunscreenSpray4Img from "../assets/images/sunscreen-spray4.JPG";
 import comboImg from "../assets/images/combo.PNG";

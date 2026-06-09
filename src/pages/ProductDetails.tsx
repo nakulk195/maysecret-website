@@ -456,10 +456,12 @@ const ProductDetails: React.FC = () => {
                     </div>
                   </>
                 )}
-                <div className="flex items-center gap-1.5 bg-gradient-to-r from-rose-100 to-pink-100 text-rose-800 px-4 py-2 rounded-full text-sm font-medium border border-rose-200">
-                  <Sparkles size={14} />
-                  K-Beauty Inspired
-                </div>
+                {currentProduct?.category !== 'sunscreen' && (
+                  <div className="flex items-center gap-1.5 bg-gradient-to-r from-rose-100 to-pink-100 text-rose-800 px-4 py-2 rounded-full text-sm font-medium border border-rose-200">
+                    <Sparkles size={14} />
+                    K-Beauty Inspired
+                  </div>
+                )}
                 <div className="flex items-center gap-1.5 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium border border-green-200">
                   <Leaf size={14} />
                   Skin Friendly

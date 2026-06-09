@@ -34,3 +34,8 @@ declare module '*.svg' {
   const src: string;
   export default src;
 }
+
+declare module '*.MOV' {
+  const src: string;
+  export default src;
+}

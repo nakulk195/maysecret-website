@@ -148,7 +148,7 @@ const Home: React.FC = () => {
 
     const id = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
-    }, 5000); // 5 seconds per slide
+    }, 10000); // 10 seconds per slide
     return () => clearInterval(id);
   }, [heroSlides.length]);
 

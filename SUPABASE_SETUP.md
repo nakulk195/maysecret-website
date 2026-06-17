@@ -1,5 +1,10 @@
 # Supabase Database Setup Guide
 
+> Current project note: for switching to a new Supabase account, use
+> `SUPABASE_ACCOUNT_MIGRATION.md` and `supabase/new_project_setup.sql`.
+> This older guide is kept for reference and does not include every current
+> checkout/cart/wishlist/order column.
+
 This guide will help you set up the Supabase database for your MAY SECRET ecommerce website.
 
 ## 1. Create Supabase Project

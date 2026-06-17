@@ -1,14 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Use fallback credentials if environment variables are missing
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://vhagoajwgolskffqkmqd.supabase.co'
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoYWdvYWp3Z29sc2tmZnFrbXFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzAwNjAsImV4cCI6MjA5MzgwNjA2MH0.iCpoEEUj2b2fQ8__4qB7Hxd18U1GUGnWalU0FS5-Kpk'
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
 
-// Log warning if using fallbacks
-if (!process.env.REACT_APP_SUPABASE_URL || !process.env.REACT_APP_SUPABASE_ANON_KEY) {
-  console.warn('Using fallback Supabase credentials. Please set up your .env file with:')
-  console.warn('REACT_APP_SUPABASE_URL=https://vhagoajwgolskffqkmqd.supabase.co')
-  console.warn('REACT_APP_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoYWdvYWp3Z29sc2tmZnFrbXFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzAwNjAsImV4cCI6MjA5MzgwNjA2MH0.iCpoEEUj2b2fQ8__4qB7Hxd18U1GUGnWalU0FS5-Kpk')
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables. Set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY.')
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)

@@ -83,7 +83,9 @@ const Orders: React.FC = () => {
   }, [user, showToast]);
 
   const getOrderStatus = (order: any) => order.order_status || order.status || 'processing';
-  const getPaymentStatus = (order: any) => order.payment_status || (order.payment_id ? 'completed' : 'pending');
+  const getPaymentStatus = (order: any) => order.payment_status || (order.payment_id ? 'Paid' : 'Pending');
+  const getPaymentMethod = (order: any) => order.payment_method || (order.payment_id ? 'Razorpay' : 'COD');
+  const isPaidStatus = (status: string) => ['paid', 'completed', 'success', 'successful'].includes(status.toLowerCase());
 
   if (isLoading) {
     return (
@@ -130,6 +132,8 @@ const Orders: React.FC = () => {
             {orders.map((order: any) => {
               const orderStatus = getOrderStatus(order);
               const paymentStatus = getPaymentStatus(order);
+              const paymentMethod = getPaymentMethod(order);
+              const paymentPaid = isPaidStatus(paymentStatus);
               const address = getOrderAddress(order);
 
               return (
@@ -156,8 +160,10 @@ const Orders: React.FC = () => {
                           <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
                           {orderStatus}
                         </span>
-                        <span className="inline-flex items-center rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-100">
-                          {paymentStatus === 'completed' ? 'Payment Successful' : 'Payment Pending'}
+                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
+                          paymentPaid ? 'bg-green-500/20 text-green-100' : 'bg-yellow-500/20 text-yellow-100'
+                        }`}>
+                          {paymentPaid ? 'Payment Successful' : 'Payment Pending'}
                         </span>
                       </div>
                     </div>
@@ -238,10 +244,18 @@ const Orders: React.FC = () => {
                       </h4>
                       <div className="space-y-3">
                         <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-                          <p className="text-sm text-gray-600 mb-1">Payment ID</p>
-                          <p className="text-xs font-medium text-gray-800 break-all">
-                            {order.payment_id || 'N/A'}
+                          <p className="text-sm text-gray-600 mb-1">Payment Method</p>
+                          <p className="text-base font-semibold text-gray-900">
+                            {paymentMethod}
                           </p>
+                          <p className="mt-1 text-xs font-medium text-gray-600">
+                            Status: {paymentStatus}
+                          </p>
+                          {order.payment_id && (
+                            <p className="mt-2 text-xs font-medium text-gray-800 break-all">
+                              Payment ID: {order.payment_id}
+                            </p>
+                          )}
                         </div>
                         <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
                           <p className="text-sm text-gray-600 mb-1">Order Total</p>

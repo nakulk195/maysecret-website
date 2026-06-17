@@ -45,6 +45,9 @@ export interface Order {
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   shipping_address: any;
   payment_id?: string;
+  payment_method?: string;
+  payment_status?: string;
+  order_status?: string;
   created_at: string;
   updated_at: string;
 }

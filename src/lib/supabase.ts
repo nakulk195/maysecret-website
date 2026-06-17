@@ -95,6 +95,7 @@ export interface Database {
           id: string
           user_id?: string
           total_amount: number
+          payment_method?: string
           payment_status?: string
           order_status?: string
           address?: string
@@ -110,6 +111,7 @@ export interface Database {
           id?: string
           user_id?: string
           total_amount: number
+          payment_method?: string
           payment_status?: string
           order_status?: string
           address?: string
@@ -125,6 +127,7 @@ export interface Database {
           id?: string
           user_id?: string
           total_amount?: number
+          payment_method?: string
           payment_status?: string
           order_status?: string
           address?: string

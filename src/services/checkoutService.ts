@@ -29,6 +29,13 @@ interface CheckoutParams {
   clearCart: () => Promise<void>;
 }
 
+interface SaveOrderOptions {
+  paymentMethod: 'Razorpay' | 'COD';
+  paymentStatus: 'Paid' | 'Pending';
+  orderStatus: 'Confirmed';
+  razorpayResponse?: any;
+}
+
 const createRazorpayOrder = async (amount: number) => {
   const response = await withTimeout(
     fetch('/api/create-order', {
@@ -83,17 +90,19 @@ const saveOrderToSupabase = async (
   cart: CartItem[],
   totalAmount: number,
   address: CheckoutAddress,
-  razorpayResponse: any
+  options: SaveOrderOptions
 ) => {
+  const razorpayResponse = options.razorpayResponse || {};
   const orderPayload: any = {
     user_id: user.id,
     total_amount: totalAmount,
-    status: 'pending',
-    payment_id: razorpayResponse.razorpay_payment_id,
-    razorpay_order_id: razorpayResponse.razorpay_order_id,
-    razorpay_signature: razorpayResponse.razorpay_signature,
-    payment_status: 'completed',
-    order_status: 'processing',
+    status: 'processing',
+    payment_id: razorpayResponse.razorpay_payment_id || null,
+    razorpay_order_id: razorpayResponse.razorpay_order_id || null,
+    razorpay_signature: razorpayResponse.razorpay_signature || null,
+    payment_method: options.paymentMethod,
+    payment_status: options.paymentStatus,
+    order_status: options.orderStatus,
     address_id: address.id || null,
     address: JSON.stringify(address),
   };
@@ -147,6 +156,37 @@ const saveOrderToSupabase = async (
   return orderData;
 };
 
+export const createCashOnDeliveryOrder = async ({
+  user,
+  cart,
+  totalAmount,
+  address,
+  clearCart,
+}: CheckoutParams) => {
+  if (!cart.length) {
+    throw new Error('Your cart is empty');
+  }
+
+  if (!address) {
+    throw new Error('Please select a delivery address');
+  }
+
+  const orderData = await saveOrderToSupabase(user, cart, totalAmount, address, {
+    paymentMethod: 'COD',
+    paymentStatus: 'Pending',
+    orderStatus: 'Confirmed',
+  });
+
+  try {
+    await clearCart();
+  } catch (cartError) {
+    console.error('[checkoutService] COD order saved but cart clear failed:', getErrorMessage(cartError));
+  }
+
+  safeRemoveItem('shipping_address');
+  return orderData;
+};
+
 export const startRazorpayCheckout = async ({
   user,
   cart,
@@ -185,7 +225,12 @@ export const startRazorpayCheckout = async ({
       handler: async (response: any) => {
         try {
           await verifyPayment(response);
-          const orderData = await saveOrderToSupabase(user, cart, totalAmount, address, response);
+          const orderData = await saveOrderToSupabase(user, cart, totalAmount, address, {
+            paymentMethod: 'Razorpay',
+            paymentStatus: 'Paid',
+            orderStatus: 'Confirmed',
+            razorpayResponse: response,
+          });
           try {
             await clearCart();
           } catch (cartError) {

@@ -15,6 +15,7 @@ alter table public.orders
   add column if not exists payment_id text,
   add column if not exists razorpay_order_id text,
   add column if not exists razorpay_signature text,
+  add column if not exists payment_method text default 'Razorpay',
   add column if not exists payment_status text default 'pending',
   add column if not exists order_status text default 'processing',
   add column if not exists address_id uuid references public.addresses(id) on delete set null;
@@ -26,6 +27,7 @@ where order_number is null;
 alter table public.orders
   alter column order_number set default nextval('public.orders_order_number_seq'),
   alter column status set default 'pending',
+  alter column payment_method set default 'Razorpay',
   alter column payment_status set default 'pending',
   alter column order_status set default 'processing';
 

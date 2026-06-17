@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { useAddresses } from '../hooks/useAddresses';
-import { CheckoutAddress, startRazorpayCheckout } from '../services/checkoutService';
+import { CheckoutAddress, createCashOnDeliveryOrder, startRazorpayCheckout } from '../services/checkoutService';
 import CouponBox from '../components/CouponBox';
 import { AppliedCoupon } from '../services/couponService';
 import { getErrorMessage } from '../utils/safeAsync';
@@ -58,6 +58,8 @@ interface AddressFormData {
   country: string;
 }
 
+type PaymentMethod = 'online' | 'cod';
+
 const Address: React.FC = () => {
   const { user } = useAuth();
   const { cart, getCartTotal, clearCart } = useCart();
@@ -89,6 +91,7 @@ const Address: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<CheckoutAddress | null>(null);
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('online');
   const [citySearch, setCitySearch] = useState('');
   const [filteredCities, setFilteredCities] = useState(INDIAN_CITIES);
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
@@ -324,6 +327,63 @@ const Address: React.FC = () => {
     showToast('Delivery address selected', 'info');
   };
 
+  const renderPaymentMethodSection = () => (
+    <div className="mt-5 rounded-lg border border-gray-200 bg-white p-4">
+      <h3 className="mb-3 text-sm font-semibold text-gray-900">Payment Method</h3>
+      <div className="space-y-3">
+        <label
+          className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
+            paymentMethod === 'online'
+              ? 'border-gray-900 bg-gray-50'
+              : 'border-gray-200 hover:border-gray-400'
+          }`}
+        >
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="online"
+            checked={paymentMethod === 'online'}
+            onChange={() => setPaymentMethod('online')}
+            className="mt-1 h-4 w-4 text-gray-900 focus:ring-gray-900"
+          />
+          <span>
+            <span className="block text-sm font-semibold text-gray-900">
+              Online Payment
+            </span>
+            <span className="block text-xs text-gray-600">
+              UPI, card, netbanking, and wallet through Razorpay.
+            </span>
+          </span>
+        </label>
+
+        <label
+          className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
+            paymentMethod === 'cod'
+              ? 'border-gray-900 bg-gray-50'
+              : 'border-gray-200 hover:border-gray-400'
+          }`}
+        >
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="cod"
+            checked={paymentMethod === 'cod'}
+            onChange={() => setPaymentMethod('cod')}
+            className="mt-1 h-4 w-4 text-gray-900 focus:ring-gray-900"
+          />
+          <span>
+            <span className="block text-sm font-semibold text-gray-900">
+              Cash on Delivery (COD)
+            </span>
+            <span className="block text-xs text-gray-600">
+              Pay in cash when your order is delivered.
+            </span>
+          </span>
+        </label>
+      </div>
+    </div>
+  );
+
   const handlePayNow = async () => {
     if (!user) {
       safeSetItem('redirect_after_login', '/address');
@@ -344,20 +404,31 @@ const Address: React.FC = () => {
 
     setIsPaymentProcessing(true);
     try {
-      const order = await startRazorpayCheckout({
+      const checkoutPayload = {
         user,
         cart: checkoutItems,
         totalAmount: payableTotal,
         address: selectedAddress,
         clearCart: clearCheckoutItems,
-      });
+      };
 
+      if (paymentMethod === 'cod') {
+        const order = await createCashOnDeliveryOrder(checkoutPayload);
+        showToast('Your Cash on Delivery order has been placed successfully.');
+        navigate(`/order-success?orderId=${order.id}&payment=cod`);
+        return;
+      }
+
+      const order = await startRazorpayCheckout(checkoutPayload);
       showToast('Order successful');
       navigate(`/orders?success=1&orderId=${order.id}`);
     } catch (error: any) {
       if (error?.message !== 'Payment cancelled') {
-        console.error('Payment error:', error);
-        showToast(error?.message || 'Payment failed. Please try again.', 'error');
+        console.error('Checkout error:', error);
+        showToast(
+          error?.message || (paymentMethod === 'cod' ? 'Could not place COD order. Please try again.' : 'Payment failed. Please try again.'),
+          'error'
+        );
       }
     } finally {
       setIsPaymentProcessing(false);
@@ -813,6 +884,8 @@ const Address: React.FC = () => {
                   <span className="text-gray-900">₹{payableTotal.toLocaleString()}</span>
                 </div>
               </div>
+
+              {renderPaymentMethodSection()}
             </motion.div>
           </div>
         </div>
@@ -997,6 +1070,8 @@ const Address: React.FC = () => {
                   </div>
                 </div>
 
+                {renderPaymentMethodSection()}
+
                 {selectedAddress && (
                   <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
                     <div className="flex items-start gap-3">
@@ -1020,12 +1095,12 @@ const Address: React.FC = () => {
                   {isPaymentProcessing ? (
                     <span className="flex items-center">
                       <span className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      Opening payment...
+                      {paymentMethod === 'cod' ? 'Placing order...' : 'Opening payment...'}
                     </span>
                   ) : (
                     <>
                       <CreditCard className="mr-2 h-5 w-5" />
-                      Pay ₹{payableTotal.toLocaleString()}
+                      {paymentMethod === 'cod' ? 'Place COD Order' : `Pay ₹${payableTotal.toLocaleString()}`}
                     </>
                   )}
                 </button>

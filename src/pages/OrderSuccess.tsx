@@ -24,6 +24,7 @@ interface Order {
   address?: string | Record<string, any>;
   payment_id?: string;
   razorpay_order_id?: string;
+  payment_method?: string;
   payment_status?: string;
   order_status?: string;
   shipping_address?: {
@@ -132,6 +133,10 @@ const OrderSuccess: React.FC = () => {
   }
 
   const deliveryAddress = getOrderAddress(order);
+  const isCodOrder = searchParams.get('payment') === 'cod' || order.payment_method === 'COD';
+  const paymentMethod = order.payment_method || (isCodOrder ? 'COD' : 'Razorpay');
+  const paymentStatus = order.payment_status || (isCodOrder ? 'Pending' : 'Paid');
+  const orderStatus = order.order_status || 'Confirmed';
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -147,17 +152,22 @@ const OrderSuccess: React.FC = () => {
                 Order Confirmed!
               </h1>
               <p className="mt-2 text-sm text-gray-500">
-                Your order has been placed successfully.
+                {isCodOrder
+                  ? 'Your Cash on Delivery order has been placed successfully.'
+                  : 'Your order has been placed successfully.'}
               </p>
               <p className="mt-4 text-sm font-medium text-gray-700">
                 Order ID: <span className="text-gray-900">{order.id}</span>
               </p>
               <div className="mt-3 flex flex-wrap justify-center gap-3 text-sm">
                 <span className="px-3 py-2 rounded-full bg-green-50 text-green-700">
-                  Payment: {order.payment_status || 'Completed'}
+                  Payment: {paymentStatus}
                 </span>
                 <span className="px-3 py-2 rounded-full bg-blue-50 text-blue-700">
-                  Status: {order.order_status || 'Processing'}
+                  Method: {paymentMethod}
+                </span>
+                <span className="px-3 py-2 rounded-full bg-blue-50 text-blue-700">
+                  Status: {orderStatus}
                 </span>
               </div>
             </div>

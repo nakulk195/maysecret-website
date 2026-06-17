@@ -186,4 +186,6 @@ select * from (
 where not exists (select 1 from public.coupons)
 on conflict (code) do nothing;
 
+notify pgrst, 'reload schema';
+
 commit;

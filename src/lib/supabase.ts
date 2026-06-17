@@ -206,6 +206,7 @@ export interface Database {
           user_id: string
           full_name: string
           phone: string
+          email?: string
           address_line_1: string
           address_line_2: string
           landmark: string
@@ -221,6 +222,7 @@ export interface Database {
           user_id: string
           full_name: string
           phone: string
+          email?: string
           address_line_1: string
           address_line_2?: string
           landmark?: string
@@ -236,6 +238,7 @@ export interface Database {
           user_id?: string
           full_name?: string
           phone?: string
+          email?: string
           address_line_1?: string
           address_line_2?: string
           landmark?: string

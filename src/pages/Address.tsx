@@ -202,6 +202,7 @@ const Address: React.FC = () => {
           savedAddress = await updateAddress(editingAddressId, {
             full_name: formData.fullName,
             phone: formData.mobileNumber,
+            email: formData.emailAddress || user?.email || '',
             address_line_1: formData.houseNo,
             address_line_2: [formData.apartment, formData.area].filter(Boolean).join(', '),
             landmark: formData.landmark || formData.area,
@@ -215,6 +216,7 @@ const Address: React.FC = () => {
           savedAddress = await addAddress({
             full_name: formData.fullName,
             phone: formData.mobileNumber,
+            email: formData.emailAddress || user?.email || '',
             address_line_1: formData.houseNo,
             address_line_2: [formData.apartment, formData.area].filter(Boolean).join(', '),
             landmark: formData.landmark || formData.area,

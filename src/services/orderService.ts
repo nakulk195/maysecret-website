@@ -1,5 +1,6 @@
 import { supabase, Order, OrderItem } from '../lib/supabase';
 import { CartItem } from '../contexts/CartContext';
+import { ShipmentService } from './shipmentService';
 
 export interface ShippingAddress {
   name: string;
@@ -49,6 +50,8 @@ export class OrderService {
         .insert(orderItems);
 
       if (itemsError) throw itemsError;
+
+      await ShipmentService.createShipmentForOrderSafely(order.id);
 
       return order;
     } catch (error) {

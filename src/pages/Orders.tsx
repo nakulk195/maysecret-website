@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle2, CreditCard, MapPin, Package, Phone, ShoppingBag, Truck } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, CreditCard, ExternalLink, MapPin, Package, Phone, RefreshCw, ShoppingBag, Truck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { supabase } from '../lib/supabase';
 import { getProductImage } from '../utils/productImages';
 import { getErrorMessage, withTimeout } from '../utils/safeAsync';
+import { ShipmentService } from '../services/shipmentService';
 
 const getOrderAddress = (order: any) => {
   if (order.shipping_address) return order.shipping_address;
@@ -26,6 +27,7 @@ const Orders: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (searchParams.get('success') === '1') {
@@ -33,54 +35,72 @@ const Orders: React.FC = () => {
     }
   }, [searchParams, showToast]);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (!user) {
-        setOrders([]);
-        setIsLoading(false);
-        return;
-      }
+  const fetchOrders = async () => {
+    if (!user) {
+      setOrders([]);
+      setIsLoading(false);
+      return;
+    }
 
-      setIsLoading(true);
-      try {
-        const { data, error } = await withTimeout(supabase
-          .from('orders')
-          .select(`
-            *,
-            order_items (
+    setIsLoading(true);
+    try {
+      const { data, error } = await withTimeout(supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items (
+            id,
+            product_id,
+            product_name,
+            product_image,
+            product_price,
+            quantity,
+            price,
+            products (
               id,
-              product_id,
-              product_name,
-              product_image,
-              product_price,
-              quantity,
-              price,
-              products (
-                id,
-                name,
-                image
-              )
+              name,
+              image
             )
-          `)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false }),
-          10000,
-          'Orders load timed out'
-        );
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false }),
+        10000,
+        'Orders load timed out'
+      );
 
-        if (error) throw error;
-        setOrders(data || []);
-      } catch (error) {
-        console.error('Error fetching orders:', getErrorMessage(error));
-        setOrders([]);
-        showToast('Could not load orders. Please try again.', 'error');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      if (error) throw error;
+      setOrders(data || []);
+    } catch (error) {
+      console.error('Error fetching orders:', getErrorMessage(error));
+      setOrders([]);
+      showToast('Could not load orders. Please try again.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrders();
   }, [user, showToast]);
+
+  const handleRefreshTracking = async (orderId: string) => {
+    setTrackingOrderId(orderId);
+    try {
+      const result = await ShipmentService.refreshTracking(orderId);
+      if (!result.success) {
+        showToast(result.error || 'Tracking is not available yet.', 'info');
+      } else {
+        showToast('Tracking updated');
+      }
+      await fetchOrders();
+    } catch (error) {
+      console.error('Error refreshing tracking:', getErrorMessage(error));
+      showToast('Could not refresh tracking right now.', 'error');
+    } finally {
+      setTrackingOrderId(null);
+    }
+  };
 
   const getOrderStatus = (order: any) => order.order_status || order.status || 'processing';
   const getPaymentStatus = (order: any) => order.payment_status || (order.payment_id ? 'Paid' : 'Pending');
@@ -262,6 +282,62 @@ const Orders: React.FC = () => {
                           <p className="text-xl font-bold text-gray-900">
                             ₹{Number(order.total_amount || 0).toLocaleString('en-IN')}
                           </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-200 bg-white p-6">
+                    <h4 className="mb-4 flex items-center text-sm font-semibold text-gray-800">
+                      <Truck className="mr-2 h-4 w-4 text-gray-900" />
+                      Shipment Tracking
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                      <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
+                        <p className="text-xs font-medium uppercase text-gray-500">Courier</p>
+                        <p className="mt-1 text-sm font-semibold text-gray-900">
+                          {order.courier_name || 'Not assigned yet'}
+                        </p>
+                      </div>
+                      <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
+                        <p className="text-xs font-medium uppercase text-gray-500">AWB</p>
+                        <p className="mt-1 break-all text-sm font-semibold text-gray-900">
+                          {order.awb_number || '-'}
+                        </p>
+                      </div>
+                      <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
+                        <p className="text-xs font-medium uppercase text-gray-500">Shipment Status</p>
+                        <p className="mt-1 text-sm font-semibold text-gray-900">
+                          {order.shipment_status || 'Pending'}
+                        </p>
+                      </div>
+                      <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
+                        <p className="text-xs font-medium uppercase text-gray-500">Tracking</p>
+                        <div className="mt-2 flex flex-wrap gap-3">
+                          {order.tracking_url ? (
+                            <a
+                              href={order.tracking_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center text-sm font-semibold text-blue-700 hover:text-blue-900"
+                            >
+                              Track Order
+                              <ExternalLink className="ml-1 h-4 w-4" />
+                            </a>
+                          ) : (
+                            <span className="text-sm text-gray-500">Unavailable</span>
+                          )}
+                          {order.awb_number && (
+                            <button
+                              type="button"
+                              onClick={() => handleRefreshTracking(order.id)}
+                              disabled={trackingOrderId === order.id}
+                              className="inline-flex items-center text-sm font-semibold text-gray-800 hover:text-black disabled:opacity-50"
+                            >
+                              <RefreshCw className={`mr-1 h-4 w-4 ${trackingOrderId === order.id ? 'animate-spin' : ''}`} />
+                              Refresh
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

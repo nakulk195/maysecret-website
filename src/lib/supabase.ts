@@ -101,6 +101,18 @@ export interface Database {
           address_id?: string
           payment_id?: string
           status?: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+          awb_number?: string
+          shipment_id?: string
+          courier_name?: string
+          tracking_number?: string
+          tracking_url?: string
+          shipment_status?: string
+          shipping_label_url?: string
+          invoice_url?: string
+          shipment_created_at?: string
+          ithink_shipment_response?: any
+          ithink_tracking_response?: any
+          ithink_shipment_error?: string
           created_at: string
         }
         Insert: {
@@ -117,6 +129,18 @@ export interface Database {
           address_id?: string
           payment_id?: string
           status?: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+          awb_number?: string
+          shipment_id?: string
+          courier_name?: string
+          tracking_number?: string
+          tracking_url?: string
+          shipment_status?: string
+          shipping_label_url?: string
+          invoice_url?: string
+          shipment_created_at?: string
+          ithink_shipment_response?: any
+          ithink_tracking_response?: any
+          ithink_shipment_error?: string
           created_at?: string
         }
         Update: {
@@ -133,6 +157,18 @@ export interface Database {
           address_id?: string
           payment_id?: string
           status?: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+          awb_number?: string
+          shipment_id?: string
+          courier_name?: string
+          tracking_number?: string
+          tracking_url?: string
+          shipment_status?: string
+          shipping_label_url?: string
+          invoice_url?: string
+          shipment_created_at?: string
+          ithink_shipment_response?: any
+          ithink_tracking_response?: any
+          ithink_shipment_error?: string
           created_at?: string
         }
       }

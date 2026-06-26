@@ -23,6 +23,7 @@ import Payment from './pages/Payment';
 import UserInfo from './pages/UserInfo';
 import OrderSuccess from './pages/OrderSuccess';
 import Orders from './pages/Orders';
+import AdminOrders from './pages/AdminOrders';
 import Wishlist from './pages/Wishlist';
 import Contact from './pages/Contact';
 import Search from './pages/Search';
@@ -85,6 +86,11 @@ function App() {
                   <Route path="/orders" element={
                     <ProtectedRoute>
                       <Orders />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/orders" element={
+                    <ProtectedRoute>
+                      <AdminOrders />
                     </ProtectedRoute>
                   } />
                   <Route path="/wishlist" element={<Wishlist />} />

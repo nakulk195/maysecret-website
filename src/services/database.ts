@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { Profile, Address, Wishlist, ContactMessage } from '../lib/supabase';
 import { resolveSupabaseProductIdFromValue } from '../utils/productIdResolver';
+import { ShipmentService } from './shipmentService';
 
 // Profile Service
 export const profileService = {
@@ -345,6 +346,8 @@ export const orderService = {
         .select();
 
       if (itemsError) throw itemsError;
+
+      await ShipmentService.createShipmentForOrderSafely(order.id);
 
       return { order, items };
     } catch (error) {

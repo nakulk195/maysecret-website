@@ -5,6 +5,7 @@ import { resolveSupabaseProductIdFromValue } from '../utils/productIdResolver';
 import { loadRazorpay } from '../utils/razorpay';
 import { getErrorMessage, withTimeout } from '../utils/safeAsync';
 import { safeRemoveItem } from '../utils/safeStorage';
+import { ShipmentService } from './shipmentService';
 
 export interface CheckoutAddress {
   id?: string;
@@ -152,6 +153,10 @@ const saveOrderToSupabase = async (
     console.error('[checkoutService] Supabase order_items insert error:', itemsError);
     throw itemsError;
   }
+
+  // Shipment creation runs through a secure backend function. If the courier API
+  // is unavailable, the order remains confirmed and the failure is logged.
+  await ShipmentService.createShipmentForOrderSafely(orderData.id);
 
   return orderData;
 };

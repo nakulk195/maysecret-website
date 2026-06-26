@@ -48,6 +48,15 @@ export interface Order {
   payment_method?: string;
   payment_status?: string;
   order_status?: string;
+  awb_number?: string;
+  shipment_id?: string;
+  courier_name?: string;
+  tracking_number?: string;
+  tracking_url?: string;
+  shipment_status?: string;
+  shipping_label_url?: string;
+  invoice_url?: string;
+  shipment_created_at?: string;
   created_at: string;
   updated_at: string;
 }

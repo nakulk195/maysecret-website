@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const AnnouncementBar: React.FC = () => {
   const messages: string[] = [
-    "Get 52% off on combo pack!",
+    "Get 48% off on combo pack!",
     "Get 40% off on sunscreen spray!",
     "Get 33% off on rice Brighting serum!"
   ];

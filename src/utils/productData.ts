@@ -234,7 +234,7 @@ export const products: Product[] = [
     id: 3,
     name: "May Secret Glow Combo Pack",
     isFeatured: true,
-    price: 1199,
+    price: 1299,
     created_at: "2024-11-20T00:00:00.000Z",
     originalPrice: 2498,
     image: comboImg,

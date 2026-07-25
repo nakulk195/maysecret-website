@@ -32,6 +32,7 @@ import { ProductService } from '../services/productService';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 import { BRAND_NAME } from '../config/brand';
 import { safeSetItem } from '../utils/safeStorage';
+import { handleMediaFallback } from '../config/storage';
 
 // Helper: Check if string is a valid UUID
 const isValidUUID = (id: string): boolean => {
@@ -332,6 +333,8 @@ const ProductDetails: React.FC = () => {
                 src={images[selectedImage]}
                 alt={currentProduct?.name || 'Product'}
                 className="w-full h-full object-contain transition-all duration-300 ease-in-out"
+                loading="eager"
+                onError={handleMediaFallback}
                 whileHover={{ scale: 1.05 }}
               />
               
@@ -380,6 +383,8 @@ const ProductDetails: React.FC = () => {
                       src={image}
                       alt={`${currentProduct?.name || 'Product'} ${index + 1}`}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={handleMediaFallback}
                     />
                   </motion.button>
                 ))}

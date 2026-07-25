@@ -6,6 +6,7 @@ import { Product } from '../lib/supabase';
 import { getProductImage } from '../utils/productImages';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
+import { handleMediaFallback } from '../config/storage';
 
 interface WishlistCardProps {
   product: Product;
@@ -66,6 +67,11 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
               imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             onLoad={() => setImageLoaded(true)}
+            onError={(event) => {
+              handleMediaFallback(event);
+              setImageLoaded(true);
+            }}
+            loading="lazy"
           />
           
           {/* Discount Badge */}

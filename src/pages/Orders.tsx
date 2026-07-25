@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase';
 import { getProductImage } from '../utils/productImages';
 import { getErrorMessage, withTimeout } from '../utils/safeAsync';
 import { ShipmentService } from '../services/shipmentService';
+import { handleMediaFallback } from '../config/storage';
 
 const getOrderAddress = (order: any) => {
   if (order.shipping_address) return order.shipping_address;
@@ -216,6 +217,8 @@ const Orders: React.FC = () => {
                               src={getProductImage(image)}
                               alt={name}
                               className="w-16 h-16 object-contain rounded-lg bg-white shadow-sm"
+                              loading="lazy"
+                              onError={handleMediaFallback}
                             />
                             <div className="flex-1 min-w-0">
                               <h5 className="text-base font-medium text-gray-800 mb-1">{name}</h5>

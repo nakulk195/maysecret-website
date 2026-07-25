@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Trash2, Plus, Minus, Star } from 'lucide-react';
 import { CartItem } from '../contexts/CartContext';
 import { getProductImage } from '../utils/productImages';
+import { handleMediaFallback } from '../config/storage';
 
 interface CartItemCardProps {
   item: CartItem;
@@ -77,10 +78,10 @@ const CartItemCard: React.FC<CartItemCardProps> = ({
                       className="h-full w-full object-contain rounded-lg"
                       onLoad={() => setImageLoaded(true)}
                       onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = '/placeholder-product.jpg';
+                        handleMediaFallback(e);
                         setImageLoaded(true);
                       }}
+                      loading="lazy"
                     />
                     {!imageLoaded && (
                       <div className="h-full w-full bg-gray-200 rounded-lg animate-pulse"></div>

@@ -12,10 +12,19 @@ import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
 import Newsletter from '../components/Newsletter';
 import GlassSkinRoutine from '../components/GlassSkinRoutine';
 import { BRAND_NAME } from '../config/brand';
-import heroImg1 from '../assets/images/Hero/heroimg1.PNG';
-import heroVideo2 from '../assets/images/Hero/heroimg2.MOV';
-import heroVideo3 from '../assets/images/Hero/heroimg3.MOV';
-import heroImg4 from '../assets/images/Hero/heroimg4.PNG';
+import { STORAGE_MEDIA } from '../config/storage';
+
+type HeroSlide = {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  remoteMedia: string;
+  fallbackMedia: string;
+  mediaType: 'image' | 'video';
+  gradient: string;
+  ctaHref: string;
+};
 
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -33,6 +42,18 @@ const Home: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const preloadLink = document.createElement('link');
+    preloadLink.rel = 'preload';
+    preloadLink.as = 'image';
+    preloadLink.href = STORAGE_MEDIA.hero.hero1.src;
+    document.head.appendChild(preloadLink);
+
+    return () => {
+      document.head.removeChild(preloadLink);
+    };
   }, []);
 
   const containerVariants = {
@@ -57,13 +78,14 @@ const Home: React.FC = () => {
     },
   };
 
-  const heroSlides = [
+  const heroSlides: HeroSlide[] = [
     {
       id: 'hero-1',
       title: 'From Courtroom Clarity to Skincare Confidence',
       subtitle: 'Meet the Founder of May Secret Skin & Beauty',
       description: 'Adv. PRASANNA',
-      media: heroImg1,
+      remoteMedia: STORAGE_MEDIA.hero.hero1.src,
+      fallbackMedia: STORAGE_MEDIA.hero.hero1.fallback,
       mediaType: 'image',
       gradient: 'from-sky-50 via-white to-rose-100',
       ctaHref: '/shop',
@@ -73,7 +95,8 @@ const Home: React.FC = () => {
       title: 'Unlock the Secret of Korean Glass Skin',
       subtitle: 'with May Secret',
       description: 'RICE BRIGHTENING SERUM',
-      media: heroVideo2,
+      remoteMedia: STORAGE_MEDIA.hero.hero2.src,
+      fallbackMedia: STORAGE_MEDIA.hero.hero2.fallback,
       mediaType: 'video',
       gradient: 'from-rose-50 via-white to-pink-100',
       ctaHref: '/shop',
@@ -83,7 +106,8 @@ const Home: React.FC = () => {
       title: 'Just Spray',
       subtitle: 'Shield Your Skin and Shine Brighter',
       description: 'With Every Single Spray',
-      media: heroVideo3,
+      remoteMedia: STORAGE_MEDIA.hero.hero3.src,
+      fallbackMedia: STORAGE_MEDIA.hero.hero3.fallback,
       mediaType: 'video',
       gradient: 'from-emerald-50 via-white to-rose-100',
       ctaHref: '/shop',
@@ -93,16 +117,37 @@ const Home: React.FC = () => {
       title: 'Elevate Your Daily Glow',
       subtitle: 'with our ultimate radiance duo',
       description: 'SUNSCREEN SPRAY & RICE BRIGHTENING SERUM',
-      media: heroImg4,
+      remoteMedia: STORAGE_MEDIA.hero.hero4.src,
+      fallbackMedia: STORAGE_MEDIA.hero.hero4.fallback,
       mediaType: 'image',
       gradient: 'from-purple-50 via-white to-pink-100',
       ctaHref: '/shop',
     }
   ];
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [failedHeroMedia, setFailedHeroMedia] = useState<Record<string, boolean>>({});
   const heroTouchStartX = useRef<number | null>(null);
   const heroTouchEndX = useRef<number | null>(null);
   const currentSlide = heroSlides[currentIndex] || heroSlides[0];
+  const currentSlideMedia = failedHeroMedia[currentSlide.id]
+    ? currentSlide.fallbackMedia
+    : currentSlide.remoteMedia;
+  const isCurrentSlideUsingFallback = Boolean(failedHeroMedia[currentSlide.id]);
+
+  const handleHeroMediaError = (slide: HeroSlide) => {
+    setFailedHeroMedia((failed) => {
+      if (failed[slide.id]) {
+        console.warn(`Local fallback hero media could not be loaded: ${slide.fallbackMedia}`);
+        return failed;
+      }
+
+      console.warn(`Supabase hero media could not be loaded, using local fallback: ${slide.remoteMedia}`);
+      return {
+        ...failed,
+        [slide.id]: true,
+      };
+    });
+  };
 
   const showPreviousSlide = () => {
     if (heroSlides.length === 0) return;
@@ -216,11 +261,13 @@ const Home: React.FC = () => {
               {currentSlide.mediaType === 'video' ? (
                 <motion.video
                   key={`video-${currentSlide.id}`}
-                  src={currentSlide.media}
+                  src={currentSlideMedia}
                   autoPlay
                   muted
                   loop
                   playsInline
+                  preload="metadata"
+                  onError={() => handleHeroMediaError(currentSlide)}
                   initial={{ opacity: 0, scale: 0.96, x: 18 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
                   transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -229,8 +276,10 @@ const Home: React.FC = () => {
               ) : (
                 <motion.img
                   key={`image-${currentSlide.id}`}
-                  src={currentSlide.media}
+                  src={currentSlideMedia}
                   alt={currentSlide.title}
+                  loading={currentIndex === 0 && !isCurrentSlideUsingFallback ? 'eager' : 'lazy'}
+                  onError={() => handleHeroMediaError(currentSlide)}
                   initial={{ opacity: 0, scale: 0.96, x: 18 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
                   transition={{ duration: 0.5, ease: 'easeOut' }}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { featuredTips } from '../data/skincareTipsData';
+import { handleMediaFallback } from '../config/storage';
 
 const SkincareTips: React.FC = () => {
   const containerVariants = {
@@ -69,13 +70,8 @@ const SkincareTips: React.FC = () => {
                   src={tip.image}
                   alt={tip.title}
                   className="w-full h-56 object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (!target.dataset.errorHandled) {
-                      target.dataset.errorHandled = 'true';
-                      target.src = '/placeholder.svg';
-                    }
-                  }}
+                  loading="lazy"
+                  onError={handleMediaFallback}
                 />
               </div>
               

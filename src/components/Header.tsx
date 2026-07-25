@@ -18,7 +18,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
-import maysecretLogo from '../assets/images/Logo/maysecret_logo.png';
+import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
 
 interface HeaderProps {
   isMenuOpen: boolean;
@@ -96,9 +96,11 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
           {/* Logo */}
           <Link to="/" className="flex items-center justify-center min-w-0">
             <img
-              src={maysecretLogo}
+              src={STORAGE_MEDIA.logo.src}
               alt="MAY SECRET"
               className="maysecret-logo"
+              loading="eager"
+              onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
             />
           </Link>
 
@@ -156,9 +158,11 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center gap-3">
                 <img
-                  src={maysecretLogo}
+                  src={STORAGE_MEDIA.logo.src}
                   alt="MAY SECRET"
                   className="maysecret-logo"
+                  loading="eager"
+                  onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
                 />
               </Link>
             </div>

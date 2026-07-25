@@ -7,6 +7,8 @@ import { OrderService } from '../services/orderService';
 import CouponBox from '../components/CouponBox';
 import { AppliedCoupon } from '../services/couponService';
 import { safeGetItem, safeSetItem } from '../utils/safeStorage';
+import { getProductImage } from '../utils/productImages';
+import { handleMediaFallback } from '../config/storage';
 
 // Types
 interface Address {
@@ -531,9 +533,11 @@ const Checkout: React.FC = () => {
                     <div className="flex items-center">
                       <div className="w-16 h-16 bg-gray-100 rounded-md mr-4 overflow-hidden">
                         <img
-                          src={item.cartProduct?.image || '/placeholder-product.jpg'}
+                          src={getProductImage(item.cartProduct?.image)}
                           alt={item.cartProduct?.name || 'Product'}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={handleMediaFallback}
                         />
                       </div>
                       <div>

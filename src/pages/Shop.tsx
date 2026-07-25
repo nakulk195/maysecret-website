@@ -9,6 +9,7 @@ import { getProductImage } from '../utils/productImages';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
+import { handleMediaFallback } from '../config/storage';
 
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'newest' | 'rating';
 
@@ -331,6 +332,7 @@ const Shop: React.FC = () => {
                       alt={product.name}
                       className="w-full h-full object-cover"
                       loading="lazy"
+                      onError={handleMediaFallback}
                     />
                   </div>
                   <div className="p-4 flex-1 flex flex-col">

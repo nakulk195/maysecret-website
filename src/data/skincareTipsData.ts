@@ -1,13 +1,15 @@
-import brightSkinGlowImg from '../assets/images/Skincare_Tips/bright-skin-glow.jpg';
-import glassSkinKoreanImg from '../assets/images/Skincare_Tips/glass-skin-korean.png';
-import lightweightSkincareImg from '../assets/images/Skincare_Tips/lightweight-skincare.png';
-import morningSkincareRoutineImg from '../assets/images/Skincare_Tips/morning-skincare-routine.png';
-import niacinamideBenefitsImg from '../assets/images/Skincare_Tips/niacinamide-benefits.png';
-import nightSkincareRoutineImg from '../assets/images/Skincare_Tips/night-skincare-routine.png';
-import riceExtractSkincareImg from '../assets/images/Skincare_Tips/rice-extract-skincare.png';
-import skinHydrationImg from '../assets/images/Skincare_Tips/skin-hydration.jpg';
-import sunDamageProtectionImg from '../assets/images/Skincare_Tips/sun-damage-protection.png';
-import sunscreenProtectionImg from '../assets/images/Skincare_Tips/sunscreen-protection.png';
+import { STORAGE_MEDIA } from '../config/storage';
+
+const brightSkinGlowImg = STORAGE_MEDIA.skincareTips.brightSkinGlow.src;
+const glassSkinKoreanImg = STORAGE_MEDIA.skincareTips.glassSkinKorean.src;
+const lightweightSkincareImg = STORAGE_MEDIA.skincareTips.lightweightSkincare.src;
+const morningSkincareRoutineImg = STORAGE_MEDIA.skincareTips.morningSkincareRoutine.src;
+const niacinamideBenefitsImg = STORAGE_MEDIA.skincareTips.niacinamideBenefits.src;
+const nightSkincareRoutineImg = STORAGE_MEDIA.skincareTips.nightSkincareRoutine.src;
+const riceExtractSkincareImg = STORAGE_MEDIA.skincareTips.riceExtractSkincare.src;
+const skinHydrationImg = STORAGE_MEDIA.skincareTips.skinHydration.src;
+const sunDamageProtectionImg = STORAGE_MEDIA.skincareTips.sunDamageProtection.src;
+const sunscreenProtectionImg = STORAGE_MEDIA.skincareTips.sunscreenProtection.src;
 
 export interface SkincareTip {
   id: number;

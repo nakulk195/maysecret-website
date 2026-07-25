@@ -2,10 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles, Droplets, Shield } from 'lucide-react';
-import serumImg from '../assets/images/Serum/brightening-serum.PNG';
-import sunscreenImg from '../assets/images/Spray/sunscreen-spray.jpeg';
-import glowImg from '../assets/images/Combo/combo.PNG';
 import { BRAND_NAME } from '../config/brand';
+import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
 
 const GlassSkinRoutine: React.FC = () => {
   const routineSteps = [
@@ -14,7 +12,7 @@ const GlassSkinRoutine: React.FC = () => {
       title: 'Step 1 – Brighten',
       product: 'Rice Brightening Serum',
       description: `Use ${BRAND_NAME} Rice Brightening Serum to reduce dullness and improve skin glow.`,
-      image: serumImg,
+      image: STORAGE_MEDIA.serum.brighteningSerum,
       icon: <Sparkles className="w-6 h-6 text-pink-600" />,
       buttonColor: 'bg-pink-600 hover:bg-pink-700',
       buttonText: 'View Product',
@@ -25,7 +23,7 @@ const GlassSkinRoutine: React.FC = () => {
       title: 'Step 2 – Hydrate & Glow',
       product: 'May Secret Glow Combo Pack',
       description: 'Niacinamide and rice extract help hydrate skin and improve brightness.',
-      image: glowImg,
+      image: STORAGE_MEDIA.combo.combo,
       icon: <Droplets className="w-6 h-6 text-blue-600" />,
       buttonColor: 'bg-gray-900 hover:bg-gray-800',
       buttonText: 'Learn More',
@@ -36,7 +34,7 @@ const GlassSkinRoutine: React.FC = () => {
       title: 'Step 3 – Protect',
       product: 'Sunscreen Spray SPF50',
       description: `Finish with ${BRAND_NAME} Sunscreen Spray SPF50 PA+++ for UVA/UVB protection.`,
-      image: sunscreenImg,
+      image: STORAGE_MEDIA.spray.sunscreenSpray,
       icon: <Shield className="w-6 h-6 text-green-600" />,
       buttonColor: 'bg-green-600 hover:bg-green-700',
       buttonText: 'View Product',
@@ -116,9 +114,11 @@ const GlassSkinRoutine: React.FC = () => {
               {/* Product Image */}
               <div className="mb-6">
                 <img
-                  src={step.image}
+                  src={step.image.src}
                   alt={step.product}
                   className="h-48 mx-auto object-contain rounded-lg"
+                  loading="lazy"
+                  onError={(event) => handleMediaFallback(event, step.image)}
                 />
               </div>
 

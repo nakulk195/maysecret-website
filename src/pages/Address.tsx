@@ -11,6 +11,8 @@ import CouponBox from '../components/CouponBox';
 import { AppliedCoupon } from '../services/couponService';
 import { getErrorMessage } from '../utils/safeAsync';
 import { safeGetItem, safeRemoveItem, safeSetItem } from '../utils/safeStorage';
+import { getProductImage } from '../utils/productImages';
+import { handleMediaFallback } from '../config/storage';
 
 // Indian states data
 const INDIAN_STATES = [
@@ -828,9 +830,11 @@ const Address: React.FC = () => {
                     {/* Product Image */}
                     <div className="flex-shrink-0">
                       <img
-                        src={item.cartProduct?.image || '/placeholder-product.jpg'}
+                        src={getProductImage(item.cartProduct?.image)}
                         alt={item.cartProduct?.name || 'Product'}
                         className="w-16 h-16 object-cover rounded-lg"
+                        loading="lazy"
+                        onError={handleMediaFallback}
                       />
                     </div>
                     
@@ -1013,9 +1017,11 @@ const Address: React.FC = () => {
                       {/* Product Image */}
                       <div className="flex-shrink-0">
                         <img
-                          src={item.cartProduct?.image || '/placeholder-product.jpg'}
+                          src={getProductImage(item.cartProduct?.image)}
                           alt={item.cartProduct?.name || 'Product'}
                           className="w-16 h-16 object-cover rounded-lg"
+                          loading="lazy"
+                          onError={handleMediaFallback}
                         />
                       </div>
                       

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { CartItem } from '../../contexts/CartContext';
 import { getProductImage } from '../../utils/productImages';
+import { handleMediaFallback } from '../../config/storage';
 
 interface OrderSummaryProps {
   items: CartItem[];
@@ -65,6 +66,8 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                       src={getProductImage(item.cartProduct.image)}
                       alt={item.cartProduct.name}
                       className="h-full w-full object-cover object-center"
+                      loading="lazy"
+                      onError={handleMediaFallback}
                     />
                   ) : (
                     <div className="h-full w-full flex items-center justify-center bg-gray-200 text-gray-400">

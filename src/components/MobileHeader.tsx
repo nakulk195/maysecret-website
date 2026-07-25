@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, ShoppingBag, Search, X, ChevronRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import maysecretLogo from '../assets/images/Logo/maysecret_logo.png';
+import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
 
 interface MobileHeaderProps {
   isMenuOpen: boolean;
@@ -48,9 +48,11 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({ isMenuOpen, onMenuToggle })
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <Link to="/" className="flex items-center">
               <img
-                src={maysecretLogo}
+                src={STORAGE_MEDIA.logo.src}
                 alt="MAY SECRET"
                 className="maysecret-logo"
+                loading="eager"
+                onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
               />
             </Link>
           </div>

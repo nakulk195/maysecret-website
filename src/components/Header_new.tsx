@@ -19,7 +19,7 @@ import {
 import { getLoggedInUser, removeUserSession } from '../utils/auth';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
-import maysecretLogo from '../assets/images/Logo/maysecret_logo.png';
+import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -85,16 +85,20 @@ const Header: React.FC = () => {
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-3">
               <motion.img 
-                src={maysecretLogo} 
+                src={STORAGE_MEDIA.logo.src} 
                 alt="MAY SECRET"
                 className="maysecret-logo hidden md:block"
+                loading="eager"
+                onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               />
               <motion.img 
-                src={maysecretLogo} 
+                src={STORAGE_MEDIA.logo.src} 
                 alt="MAY SECRET"
                 className="maysecret-logo md:hidden"
+                loading="eager"
+                onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               />
@@ -219,9 +223,11 @@ const Header: React.FC = () => {
                 {/* Mobile Logo Section */}
                 <div className="flex items-center space-x-3 px-2 py-3 border-b border-gray-100 mb-2">
                   <img 
-                    src={maysecretLogo} 
+                    src={STORAGE_MEDIA.logo.src} 
                     alt="MAY SECRET"
                     className="maysecret-logo"
+                    loading="lazy"
+                    onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
                   />
                   <h2 className="text-xl font-bold text-black tracking-wide">MAY SECRET</h2>
                 </div>

@@ -1,22 +1,23 @@
 import { ProductService } from '../services/productService';
 import { Product as SupabaseProduct } from '../lib/supabase';
+import { STORAGE_MEDIA } from '../config/storage';
 
-import brighteningSerumImg from "../assets/images/Serum/brightening-serum.PNG";
-import brighteningSerum2Img from "../assets/images/Serum/brightening-serum2.PNG";
-import brighteningSerum3Img from "../assets/images/Serum/brightening-serum3.JPG";
-import brighteningSerum4Img from "../assets/images/Serum/brightening-serum4.PNG";
-import sunscreenSprayImg from "../assets/images/Spray/sunscreen-spray.jpeg";
-import sunscreenSpray2Img from "../assets/images/Spray/sunscreen-spray2.JPG";
-import sunscreenSpray3Img from "../assets/images/Spray/sunscreen-spray3.JPG";
-import sunscreenSpray4Img from "../assets/images/Spray/sunscreen-spray4.JPG";
-import comboImg from "../assets/images/Combo/combo.PNG";
-import combo2Img from "../assets/images/Combo/combo2.JPG";
-import combo3Img from "../assets/images/Combo/combo3.JPG";
-import serumComboImg from "../assets/images/SerumCombo/1.PNG";
-import serumCombo2Img from "../assets/images/SerumCombo/2.JPG";
-import serumCombo3Img from "../assets/images/SerumCombo/3.JPG";
-import sprayComboImg from "../assets/images/SprayCombo/1.JPG";
-import sprayCombo2Img from "../assets/images/SprayCombo/2.JPG";
+const brighteningSerumImg = STORAGE_MEDIA.serum.brighteningSerum.src;
+const brighteningSerum2Img = STORAGE_MEDIA.serum.brighteningSerum2.src;
+const brighteningSerum3Img = STORAGE_MEDIA.serum.brighteningSerum3.src;
+const brighteningSerum4Img = STORAGE_MEDIA.serum.brighteningSerum4.src;
+const sunscreenSprayImg = STORAGE_MEDIA.spray.sunscreenSpray.src;
+const sunscreenSpray2Img = STORAGE_MEDIA.spray.sunscreenSpray2.src;
+const sunscreenSpray3Img = STORAGE_MEDIA.spray.sunscreenSpray3.src;
+const sunscreenSpray4Img = STORAGE_MEDIA.spray.sunscreenSpray4.src;
+const comboImg = STORAGE_MEDIA.combo.combo.src;
+const combo2Img = STORAGE_MEDIA.combo.combo2.src;
+const combo3Img = STORAGE_MEDIA.combo.combo3.src;
+const serumComboImg = STORAGE_MEDIA.serumCombo.serumCombo.src;
+const serumCombo2Img = STORAGE_MEDIA.serumCombo.serumCombo2.src;
+const serumCombo3Img = STORAGE_MEDIA.serumCombo.serumCombo3.src;
+const sprayComboImg = STORAGE_MEDIA.sprayCombo.sprayCombo.src;
+const sprayCombo2Img = STORAGE_MEDIA.sprayCombo.sprayCombo2.src;
 
 // Category type and available product categories
 export interface Category {

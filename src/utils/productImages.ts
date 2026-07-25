@@ -1,17 +1,13 @@
-import brighteningSerumImg from '../assets/images/Serum/brightening-serum.PNG';
-import comboImg from '../assets/images/Combo/combo.PNG';
-import serumComboImg from '../assets/images/SerumCombo/1.PNG';
-import sprayComboImg from '../assets/images/SprayCombo/1.JPG';
-import sunscreenSprayImg from '../assets/images/Spray/sunscreen-spray.jpeg';
+import { STORAGE_MEDIA } from '../config/storage';
 
 const productImages: Record<string, string> = {
-  'brightening-serum.png': brighteningSerumImg,
-  'combo.png': comboImg,
-  'serum-combo.png': serumComboImg,
-  'spray-combo.png': sprayComboImg,
-  'sunscreen-spray.png': sunscreenSprayImg,
-  'sunscreen-spray.jpeg': sunscreenSprayImg,
-  'sunscreen-spray.jpg': sunscreenSprayImg,
+  'brightening-serum.png': STORAGE_MEDIA.serum.brighteningSerum.src,
+  'combo.png': STORAGE_MEDIA.combo.combo.src,
+  'serum-combo.png': STORAGE_MEDIA.serumCombo.serumCombo.src,
+  'spray-combo.png': STORAGE_MEDIA.sprayCombo.sprayCombo.src,
+  'sunscreen-spray.png': STORAGE_MEDIA.spray.sunscreenSpray.src,
+  'sunscreen-spray.jpeg': STORAGE_MEDIA.spray.sunscreenSpray.src,
+  'sunscreen-spray.jpg': STORAGE_MEDIA.spray.sunscreenSpray.src,
 };
 
 export const getProductImage = (image?: string | null): string => {

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import giftKitPack from '../assets/images/Giftpack/giftkit_pack.png';
+import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
 
 const GiftKit: React.FC = () => {
   useEffect(() => {
@@ -39,9 +39,11 @@ const GiftKit: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-pink-100/60 via-white to-rose-100/80" />
               <div className="relative aspect-[4/3] flex items-center justify-center p-6">
                 <motion.img
-                  src={giftKitPack}
+                  src={STORAGE_MEDIA.giftPack.giftKitPack.src}
                   alt="Luxury Gift Kit"
                   className="max-h-full w-full object-contain rounded-3xl shadow-lg shadow-rose-200/50 transition-transform duration-500 group-hover:scale-[1.03]"
+                  loading="lazy"
+                  onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.giftPack.giftKitPack)}
                 />
               </div>
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import maysecretLogo from '../assets/images/Logo/maysecret_logo.png';
+import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
 
 const navLinks = [
   { to: '/shop', label: 'Shop' },
@@ -36,9 +36,11 @@ const HamburgerMenu = () => {
             {/* Logo Section */}
             <div className="flex items-center justify-center pb-6 border-b border-gray-200 mb-4">
               <img
-                src={maysecretLogo}
+                src={STORAGE_MEDIA.logo.src}
                 alt="MAY SECRET"
                 className="maysecret-logo"
+                loading="lazy"
+                onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
               />
             </div>
             

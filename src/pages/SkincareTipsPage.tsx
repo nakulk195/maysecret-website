@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Clock, User } from 'lucide-react';
 import { skincareTips } from '../data/skincareTipsData';
+import { handleMediaFallback } from '../config/storage';
 
 const SkincareTipsPage: React.FC = () => {
   useEffect(() => {
@@ -96,13 +97,8 @@ const SkincareTipsPage: React.FC = () => {
                   src={tip.image}
                   alt={tip.title}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (!target.dataset.errorHandled) {
-                      target.dataset.errorHandled = 'true';
-                      target.src = '/placeholder.svg';
-                    }
-                  }}
+                  loading="lazy"
+                  onError={handleMediaFallback}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
               </div>

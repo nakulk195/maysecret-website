@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, ShoppingBag, Search, X, ChevronRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import maysecretLogo from '../assets/images/maysecret_logo.png';
+import maysecretLogo from '../assets/images/Logo/maysecret_logo.png';
 
 interface MobileHeaderProps {
   isMenuOpen: boolean;

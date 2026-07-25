@@ -1,3 +1,14 @@
+import brightSkinGlowImg from '../assets/images/Skincare_Tips/bright-skin-glow.jpg';
+import glassSkinKoreanImg from '../assets/images/Skincare_Tips/glass-skin-korean.png';
+import lightweightSkincareImg from '../assets/images/Skincare_Tips/lightweight-skincare.png';
+import morningSkincareRoutineImg from '../assets/images/Skincare_Tips/morning-skincare-routine.png';
+import niacinamideBenefitsImg from '../assets/images/Skincare_Tips/niacinamide-benefits.png';
+import nightSkincareRoutineImg from '../assets/images/Skincare_Tips/night-skincare-routine.png';
+import riceExtractSkincareImg from '../assets/images/Skincare_Tips/rice-extract-skincare.png';
+import skinHydrationImg from '../assets/images/Skincare_Tips/skin-hydration.jpg';
+import sunDamageProtectionImg from '../assets/images/Skincare_Tips/sun-damage-protection.png';
+import sunscreenProtectionImg from '../assets/images/Skincare_Tips/sunscreen-protection.png';
+
 export interface SkincareTip {
   id: number;
   title: string;
@@ -15,7 +26,7 @@ export const skincareTips: SkincareTip[] = [
     title: "Why Sunscreen Is The Most Important Skincare Step",
     shortDescription: "Daily sunscreen protects your skin from harmful UVA and UVB rays that cause premature aging and pigmentation.",
     fullDescription: "Sun exposure is the number one cause of premature skin aging. UV rays can damage skin cells, cause wrinkles, dark spots, and uneven skin tone. Using a broad spectrum SPF 50 sunscreen every day protects your skin from these harmful effects. Apply sunscreen every morning and reapply if you are outdoors for long hours. Your May Secret Sunscreen Spray provides lightweight sun protection while keeping your skin comfortable and non-greasy.",
-    image: "/images/sunscreen-protection.png",
+    image: sunscreenProtectionImg,
     slug: "why-sunscreen-most-important-skincare-step",
     featured: true,
     category: "Sun Care"
@@ -25,7 +36,7 @@ export const skincareTips: SkincareTip[] = [
     title: "How To Achieve Korean Glass Skin",
     shortDescription: "Glass skin is smooth, hydrated, and naturally radiant skin that looks clear and luminous.",
     fullDescription: "Korean skincare focuses on hydration and gentle brightening ingredients. Key ingredients for glass skin include: • Niacinamide • Rice Extract • Hyaluronic Acid • Vitamin C. Using a brightening serum daily helps improve skin texture and radiance. The May Secret Rice Brightening Serum helps promote healthy glowing skin with powerful brightening ingredients.",
-    image: "/images/glass-skin-korean.png",
+    image: glassSkinKoreanImg,
     slug: "how-to-achieve-korean-glass-skin",
     featured: true,
     category: "Glow Tip"
@@ -35,7 +46,7 @@ export const skincareTips: SkincareTip[] = [
     title: "The Perfect Morning Skincare Routine",
     shortDescription: "A good morning routine protects your skin from pollution, sun damage, and dehydration.",
     fullDescription: "Step 1 — Cleanse your face to remove oil buildup. Step 2 — Apply serum to brighten and hydrate skin. Step 3 — Apply sunscreen to protect against UV rays. Consistency is the key to healthy glowing skin.",
-    image: "/images/morning-skincare-routine.png",
+    image: morningSkincareRoutineImg,
     slug: "perfect-morning-skincare-routine",
     featured: true,
     category: "Routine"
@@ -45,7 +56,7 @@ export const skincareTips: SkincareTip[] = [
     title: "Why Niacinamide Is A Skincare Superstar",
     shortDescription: "Niacinamide is one of the most effective ingredients for improving skin tone and texture.",
     fullDescription: "Niacinamide helps: • Reduce pigmentation • Improve skin barrier • Minimize pores • Brighten dull skin. Regular use of Niacinamide-based products like Rice Brightening Serum can significantly improve skin clarity.",
-    image: "/images/niacinamide-benefits.png",
+    image: niacinamideBenefitsImg,
     slug: "why-niacinamide-skincare-superstar",
     featured: false,
     category: "Ingredient"
@@ -55,7 +66,7 @@ export const skincareTips: SkincareTip[] = [
     title: "The Benefits Of Rice Extract For Skin",
     shortDescription: "Rice extract has been used in Korean skincare for centuries to brighten and smooth skin.",
     fullDescription: "Rice extract is rich in antioxidants and nutrients that help: • Brighten skin tone • Improve hydration • Reduce dullness • Smooth skin texture. It gives the famous Korean glow effect.",
-    image: "/images/rice-extract-skincare.png",
+    image: riceExtractSkincareImg,
     slug: "benefits-rice-extract-skin",
     featured: false,
     category: "Ingredient"
@@ -65,7 +76,7 @@ export const skincareTips: SkincareTip[] = [
     title: "How To Prevent Sun Damage Naturally",
     shortDescription: "Sun damage can lead to pigmentation, wrinkles, and dull skin.",
     fullDescription: "Protect your skin with these habits: • Use SPF 50 sunscreen daily • Wear hats or protective clothing • Avoid direct sunlight during peak hours • Reapply sunscreen every 2-3 hours. Sun protection is the foundation of healthy skin.",
-    image: "/images/sun-damage-protection.png",
+    image: sunDamageProtectionImg,
     slug: "prevent-sun-damage-naturally",
     featured: false,
     category: "Sun Care"
@@ -75,7 +86,7 @@ export const skincareTips: SkincareTip[] = [
     title: "The Secret To Bright And Even Skin Tone",
     shortDescription: "Bright skin is the result of consistent care and the right ingredients.",
     fullDescription: "Ingredients that improve skin brightness include: • Niacinamide • Vitamin C • Rice Extract • Alpha Arbutin. These ingredients help reduce pigmentation and enhance skin glow.",
-    image: "/images/bright-skin-glow.jpg",
+    image: brightSkinGlowImg,
     slug: "secret-bright-even-skin-tone",
     featured: false,
     category: "Glow Tip"
@@ -85,7 +96,7 @@ export const skincareTips: SkincareTip[] = [
     title: "Hydration Is The Key To Healthy Skin",
     shortDescription: "Hydrated skin looks smoother, brighter, and more youthful.",
     fullDescription: "To maintain hydration: • Drink enough water • Use hydrating skincare products • Avoid harsh cleansers • Apply serums that lock moisture into the skin. Healthy hydration improves skin elasticity and glow.",
-    image: "/images/skin-hydration.jpg",
+    image: skinHydrationImg,
     slug: "hydration-key-healthy-skin",
     featured: false,
     category: "Hydration"
@@ -95,7 +106,7 @@ export const skincareTips: SkincareTip[] = [
     title: "Why Lightweight Skincare Is Better For Daily Use",
     shortDescription: "Heavy creams can clog pores and make skin feel greasy.",
     fullDescription: "Lightweight skincare products absorb quickly and allow the skin to breathe. Products like May Secret Sunscreen Spray provide sun protection without leaving a sticky or oily residue.",
-    image: "/images/lightweight-skincare.png",
+    image: lightweightSkincareImg,
     slug: "why-lightweight-skincare-better-daily-use",
     featured: false,
     category: "Product Tip"
@@ -105,7 +116,7 @@ export const skincareTips: SkincareTip[] = [
     title: "A Simple Night Skincare Routine",
     shortDescription: "Nighttime is when your skin repairs and regenerates itself.",
     fullDescription: "Step 1 — Cleanse your skin thoroughly. Step 2 — Apply a brightening serum. Step 3 — Use a moisturizer if needed. Night skincare helps repair damage caused during the day.",
-    image: "/images/night-skincare-routine.png",
+    image: nightSkincareRoutineImg,
     slug: "simple-night-skincare-routine",
     featured: false,
     category: "Routine"

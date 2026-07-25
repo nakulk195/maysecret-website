@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import maysecretLogo from '../assets/images/maysecret_logo.png';
+import maysecretLogo from '../assets/images/Logo/maysecret_logo.png';
 
 const navLinks = [
   { to: '/shop', label: 'Shop' },

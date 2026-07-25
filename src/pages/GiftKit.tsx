@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import giftKitPack from '../assets/images/giftkit_pack.png';
+import giftKitPack from '../assets/images/Giftpack/giftkit_pack.png';
 
 const GiftKit: React.FC = () => {
   useEffect(() => {

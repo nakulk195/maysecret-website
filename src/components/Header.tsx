@@ -18,7 +18,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
-import maysecretLogo from '../assets/images/maysecret_logo.png';
+import maysecretLogo from '../assets/images/Logo/maysecret_logo.png';
 
 interface HeaderProps {
   isMenuOpen: boolean;

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, CreditCard, Wallet } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaWhatsapp, FaYoutube } from 'react-icons/fa';
-import maysecretLogo from '../assets/images/maysecret_logo.png';
+import maysecretLogo from '../assets/images/Logo/maysecret_logo.png';
 import { BRAND_NAME } from '../config/brand';
 
 const InstagramIcon = FaInstagram as unknown as React.ComponentType<{ className?: string }>;

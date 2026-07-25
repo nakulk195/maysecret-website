@@ -1,17 +1,22 @@
 import { ProductService } from '../services/productService';
 import { Product as SupabaseProduct } from '../lib/supabase';
 
-import brighteningSerumImg from "../assets/images/brightening-serum.PNG";
-import brighteningSerum2Img from "../assets/images/brightening-serum2.PNG";
-import brighteningSerum3Img from "../assets/images/brightening-serum3.JPG";
-import brighteningSerum4Img from "../assets/images/brightening-serum4.PNG";
-import sunscreenSprayImg from "../assets/images/sunscreen-spray.jpeg";
-import sunscreenSpray2Img from "../assets/images/sunscreen-spray2.JPG";
-import sunscreenSpray3Img from "../assets/images/sunscreen-spray3.JPG";
-import sunscreenSpray4Img from "../assets/images/sunscreen-spray4.JPG";
-import comboImg from "../assets/images/combo.PNG";
-import combo2Img from "../assets/images/combo2.JPG";
-import combo3Img from "../assets/images/combo3.JPG";
+import brighteningSerumImg from "../assets/images/Serum/brightening-serum.PNG";
+import brighteningSerum2Img from "../assets/images/Serum/brightening-serum2.PNG";
+import brighteningSerum3Img from "../assets/images/Serum/brightening-serum3.JPG";
+import brighteningSerum4Img from "../assets/images/Serum/brightening-serum4.PNG";
+import sunscreenSprayImg from "../assets/images/Spray/sunscreen-spray.jpeg";
+import sunscreenSpray2Img from "../assets/images/Spray/sunscreen-spray2.JPG";
+import sunscreenSpray3Img from "../assets/images/Spray/sunscreen-spray3.JPG";
+import sunscreenSpray4Img from "../assets/images/Spray/sunscreen-spray4.JPG";
+import comboImg from "../assets/images/Combo/combo.PNG";
+import combo2Img from "../assets/images/Combo/combo2.JPG";
+import combo3Img from "../assets/images/Combo/combo3.JPG";
+import serumComboImg from "../assets/images/SerumCombo/1.PNG";
+import serumCombo2Img from "../assets/images/SerumCombo/2.JPG";
+import serumCombo3Img from "../assets/images/SerumCombo/3.JPG";
+import sprayComboImg from "../assets/images/SprayCombo/1.JPG";
+import sprayCombo2Img from "../assets/images/SprayCombo/2.JPG";
 
 // Category type and available product categories
 export interface Category {
@@ -66,7 +71,7 @@ export const products: Product[] = [
     id: 1,
     name: "MAY SECRET Sunscreen Spray",
     isFeatured: true,
-    price: 499,
+    price: 349,
     created_at: "2024-11-01T00:00:00.000Z",
     originalPrice: 999,
     image: sunscreenSprayImg,
@@ -142,7 +147,7 @@ export const products: Product[] = [
     id: 2,
     name: "Rice Brightening Serum",
     isFeatured: true,
-    price: 999,
+    price: 549,
     created_at: "2024-11-15T00:00:00.000Z",
     originalPrice: 1499,
     image: brighteningSerumImg,
@@ -234,7 +239,7 @@ export const products: Product[] = [
     id: 3,
     name: "May Secret Glow Combo Pack",
     isFeatured: true,
-    price: 1299,
+    price: 879,
     created_at: "2024-11-20T00:00:00.000Z",
     originalPrice: 2498,
     image: comboImg,
@@ -267,6 +272,83 @@ export const products: Product[] = [
     includes: [
       "Sunscreen Spray (100 ml)",
       "Rice Brightening Serum (30 ml)"
+    ]
+  },
+  {
+    id: 4,
+    name: "Brightening Serum Combo Pack",
+    isFeatured: true,
+    price: 999,
+    created_at: "2024-11-25T00:00:00.000Z",
+    originalPrice: 2998,
+    image: serumComboImg,
+    images: [
+      serumComboImg,
+      serumCombo2Img,
+      serumCombo3Img
+    ],
+    description: "Value combo pack with two Rice Brightening Serums for a longer glass-skin routine. Ideal for consistent brightening care or sharing your glow ritual.",
+    benefits: [
+      "2 Rice Brightening Serums",
+      "Brightens skin tone",
+      "Reduces pigmentation",
+      "Hydrates and repairs skin",
+      "Better value for daily serum users"
+    ],
+    category: "combo",
+    stock: 1,
+    rating: 4.8,
+    reviews: 62,
+    size: "2 x 30 ml",
+    ingredients: [
+      "See Rice Brightening Serum product page for full ingredients"
+    ],
+    howToUse: [
+      "Apply a few drops to clean skin and gently massage until absorbed.",
+      "Use daily for best brightening results.",
+      "External Use Only."
+    ],
+    includes: [
+      "Rice Brightening Serum (30 ml)",
+      "Rice Brightening Serum (30 ml)"
+    ]
+  },
+  {
+    id: 5,
+    name: "Sunscreen Spray Combo Pack",
+    isFeatured: true,
+    price: 649,
+    created_at: "2024-11-30T00:00:00.000Z",
+    originalPrice: 1998,
+    image: sprayComboImg,
+    images: [
+      sprayComboImg,
+      sprayCombo2Img
+    ],
+    description: "Value combo pack with two May Secret Sunscreen Sprays for easy daily SPF protection at home, in your bag, or on the go.",
+    benefits: [
+      "2 Sunscreen Sprays",
+      "SPF 50 PA+++",
+      "Broad Spectrum UVA/UVB Protection",
+      "Quick application",
+      "Better value for daily sun protection"
+    ],
+    category: "combo",
+    stock: 1,
+    rating: 4.7,
+    reviews: 58,
+    size: "2 x 100 ml",
+    ingredients: [
+      "See Sunscreen Spray product page for full ingredients"
+    ],
+    howToUse: [
+      "Spray a generous amount onto your hand and gently apply on face.",
+      "For body, spray directly from a distance of 1-2 inches and spread evenly.",
+      "Reapply sunscreen every 2 hours when outdoors."
+    ],
+    includes: [
+      "Sunscreen Spray (100 ml)",
+      "Sunscreen Spray (100 ml)"
     ]
   }
 ];

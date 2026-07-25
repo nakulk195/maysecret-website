@@ -19,7 +19,7 @@ import {
 import { getLoggedInUser, removeUserSession } from '../utils/auth';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
-import maysecretLogo from '../assets/images/maysecret_logo.png';
+import maysecretLogo from '../assets/images/Logo/maysecret_logo.png';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

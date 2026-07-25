@@ -12,10 +12,10 @@ import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
 import Newsletter from '../components/Newsletter';
 import GlassSkinRoutine from '../components/GlassSkinRoutine';
 import { BRAND_NAME } from '../config/brand';
-import heroImg1 from '../assets/images/heroimg1.PNG';
-import heroVideo2 from '../assets/images/heroimg2.MOV';
-import heroVideo3 from '../assets/images/heroimg3.MOV';
-import heroImg4 from '../assets/images/heroimg4.PNG';
+import heroImg1 from '../assets/images/Hero/heroimg1.PNG';
+import heroVideo2 from '../assets/images/Hero/heroimg2.MOV';
+import heroVideo3 from '../assets/images/Hero/heroimg3.MOV';
+import heroImg4 from '../assets/images/Hero/heroimg4.PNG';
 
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -319,7 +319,7 @@ const Home: React.FC = () => {
             animate="visible"
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 px-0 py-4 sm:p-5"
           >
-            {products && products.length > 0 && products.slice(0, 6).map((product: Product, index: number) => (
+            {products && products.length > 0 && products.filter((product) => product.isFeatured).slice(0, 5).map((product: Product, index: number) => (
               <motion.div
               key={product.id}
                 variants={itemVariants}

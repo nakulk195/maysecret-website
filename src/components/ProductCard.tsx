@@ -94,6 +94,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
   const comboSavings = product.originalPrice && product.originalPrice > product.price
     ? product.originalPrice - product.price
     : 0;
+  const comboPromoLabel = product.id === 3 ? '✨ BEST VALUE' : product.id === 4 ? '🔥 BEST SELLER' : '⭐ CUSTOMER FAVORITE';
   const comboSubtitle = product.id === 3 ? 'Complete Skincare Combo' : '2 Premium Products Included';
   const comboIcons = product.id === 3 ? ['🧴', '☀️'] : product.id === 4 ? ['🧴', '🧴'] : ['☀️', '☀️'];
 
@@ -128,7 +129,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
           />
           
           {/* Discount Badge */}
-          {discountPercentage > 0 && (
+          {discountPercentage > 0 && !isComboHighlight && (
             <div className="absolute top-2 left-2 bg-rose-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full z-10">
               {discountPercentage}% OFF
             </div>
@@ -136,21 +137,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
 
           {isComboHighlight && (
             <>
-              <motion.div
-                whileHover={{ y: -1, scale: 1.01 }}
-                transition={{ duration: 0.2 }}
-                className="absolute left-2 top-2 z-10 rounded-full border border-amber-200/70 bg-white/90 px-2 py-1 text-[9px] font-semibold tracking-[0.14em] text-amber-700 shadow-sm backdrop-blur sm:px-2.5 sm:text-[11px]"
-              >
-                ✨ BEST VALUE
-              </motion.div>
-
-              <motion.div
-                whileHover={{ y: -1, scale: 1.01 }}
-                transition={{ duration: 0.2 }}
-                className="absolute right-2 top-2 z-10 rounded-full border border-amber-200/70 bg-amber-50/95 px-2 py-1 text-[9px] font-semibold text-amber-800 shadow-sm backdrop-blur sm:px-2.5 sm:text-[11px]"
-              >
-                SAVE ₹{comboSavings.toLocaleString()}
-              </motion.div>
+              <div className="absolute left-2 right-2 top-2 z-10 flex flex-wrap items-start gap-1.5 sm:gap-2">
+                <motion.div
+                  whileHover={{ y: -1, scale: 1.01 }}
+                  transition={{ duration: 0.2 }}
+                  className="inline-flex min-h-[28px] items-center rounded-full border border-amber-200/70 bg-white/90 px-2 py-1 text-[9px] font-semibold tracking-[0.14em] text-amber-700 shadow-sm backdrop-blur sm:px-2.5 sm:text-[10px]"
+                >
+                  {comboPromoLabel}
+                </motion.div>
+              </div>
 
               <motion.div
                 animate={{ x: ['-20%', '120%'] }}
@@ -252,6 +247,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
                 </span>
               )}
             </div>
+            {product.originalPrice && product.originalPrice > product.price && (
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="mt-2 inline-flex min-h-[28px] items-center rounded-full bg-[#E53935] px-2.5 py-1 text-[10px] font-semibold text-white shadow-[0_6px_18px_rgba(229,57,53,0.22)] sm:text-xs"
+              >
+                SAVE ₹{(product.originalPrice - product.price).toLocaleString()}
+              </motion.div>
+            )}
             <p className="mt-1 hidden text-xs font-medium text-gray-500 min-[390px]:block">
               Inclusive all taxes
             </p>

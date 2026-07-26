@@ -18,19 +18,20 @@ type CampaignCountdownProps = {
 const CampaignCountdown: React.FC<CampaignCountdownProps> = ({ countdown, variant = 'desktop' }) => {
   const compact = variant === 'mobile';
 
+  const isEndingSoon = !countdown.isExpired && countdown.hours === 0 && countdown.minutes < 60;
+
   return (
     <div
-      className={`grid grid-cols-4 overflow-hidden border border-white/16 bg-white/10 shadow-2xl backdrop-blur-md ${
+      className={`grid grid-cols-3 overflow-hidden border border-white/16 bg-white/10 shadow-2xl backdrop-blur-md ${
         compact ? 'rounded-2xl' : 'max-w-xl rounded-2xl'
-      }`}
+      } ${isEndingSoon ? 'animate-pulse' : ''}`}
     >
       {countdown.isExpired ? (
-        <div className="col-span-4 px-4 py-4 text-center text-sm font-bold text-white">
-          Offer Ended
+        <div className="col-span-3 px-4 py-4 text-center text-sm font-bold text-white">
+          Offer Expired
         </div>
       ) : (
         [
-          ['Days', countdown.days],
           ['Hours', countdown.hours],
           ['Minutes', countdown.minutes],
           ['Seconds', countdown.seconds],
@@ -43,7 +44,7 @@ const CampaignCountdown: React.FC<CampaignCountdownProps> = ({ countdown, varian
           </div>
         ))
       )}
-      <div className="col-span-4 flex items-center justify-center gap-2 border-t border-white/12 px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-100">
+      <div className="col-span-3 flex items-center justify-center gap-2 border-t border-white/12 px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-100">
         <Clock className="h-3.5 w-3.5" />
         {campaign.countdownTitle}
       </div>

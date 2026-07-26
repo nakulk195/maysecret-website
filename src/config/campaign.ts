@@ -3,6 +3,8 @@ import alternateHeroImage from '../assets/images/2.png';
 import backgroundImage from '../assets/images/3.png';
 import featuredPromoImage from '../assets/images/4.png';
 
+const twentyFourHourCampaignEnd = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
 export type FloatingCampaignCard = {
   id: string;
   label: string;
@@ -138,7 +140,7 @@ export const campaign: CampaignConfig = {
   comboSavingsLabel: 'Combo Savings',
   announcementText:
     'Monsoon Glow Sale - Up to 65% OFF - Combo Packs from Rs. 879 - Free Shipping - Limited Time Offer',
-  countdownEndDate: '2026-08-31T23:59:59+05:30',
+  countdownEndDate: twentyFourHourCampaignEnd,
   countdownTitle: 'Offer Ends In',
   countdownEnabled: true,
   heroBadge: {

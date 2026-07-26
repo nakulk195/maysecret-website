@@ -12,7 +12,7 @@ export const founderNoteContent = {
   ],
   signature: "Adv. Prasanna",
   role: "Founder & Brand Director",
-  imageUrl: "https://umyqlnurvuylnvtbrsiy.supabase.co/storage/v1/object/public/MaySecret/Owner/Owner.jpg",
+  imageUrl: "https://umyqlnurvuylnvtbrsiy.supabase.co/storage/v1/object/public/MaySecret/Owner/Owner.png",
   values: [
     {
       icon: "✨",

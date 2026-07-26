@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { getProductImage } from '../utils/productImages';
 import { supabase } from '../lib/supabase';
 import { CheckCircle, Package, Truck, Heart } from 'lucide-react';
-import { handleMediaFallback } from '../config/storage';
 
 interface OrderItem {
   id: string;
@@ -186,7 +185,6 @@ const OrderSuccess: React.FC = () => {
                           alt={item.product_name || 'Product'}
                           className="w-full h-full object-cover object-center"
                           loading="lazy"
-                          onError={handleMediaFallback}
                         />
                       </div>
                     </div>

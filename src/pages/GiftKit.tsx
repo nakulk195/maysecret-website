@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
+import { STORAGE_MEDIA } from '../config/storage';
 
 const GiftKit: React.FC = () => {
   useEffect(() => {
@@ -43,7 +43,6 @@ const GiftKit: React.FC = () => {
                   alt="Luxury Gift Kit"
                   className="max-h-full w-full object-contain rounded-3xl shadow-lg shadow-rose-200/50 transition-transform duration-500 group-hover:scale-[1.03]"
                   loading="lazy"
-                  onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.giftPack.giftKitPack)}
                 />
               </div>
 

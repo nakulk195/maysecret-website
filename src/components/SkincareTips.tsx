@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { featuredTips } from '../data/skincareTipsData';
-import { handleMediaFallback } from '../config/storage';
 
 const SkincareTips: React.FC = () => {
   const containerVariants = {
@@ -71,7 +70,6 @@ const SkincareTips: React.FC = () => {
                   alt={tip.title}
                   className="w-full h-56 object-cover"
                   loading="lazy"
-                  onError={handleMediaFallback}
                 />
               </div>
               

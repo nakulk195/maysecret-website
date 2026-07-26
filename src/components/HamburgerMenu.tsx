@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
+import { STORAGE_MEDIA } from '../config/storage';
 
 const navLinks = [
   { to: '/shop', label: 'Shop' },
@@ -40,7 +40,6 @@ const HamburgerMenu = () => {
                 alt="MAY SECRET"
                 className="maysecret-logo"
                 loading="lazy"
-                onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
               />
             </div>
             

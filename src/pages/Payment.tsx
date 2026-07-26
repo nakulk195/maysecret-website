@@ -10,7 +10,6 @@ import { startRazorpayCheckout } from '../services/checkoutService';
 import CouponBox from '../components/CouponBox';
 import { AppliedCoupon } from '../services/couponService';
 import { safeGetItem, safeRemoveItem } from '../utils/safeStorage';
-import { handleMediaFallback } from '../config/storage';
 
 const Payment: React.FC = () => {
   const { user } = useAuth();
@@ -408,7 +407,6 @@ const Payment: React.FC = () => {
                         alt={item.cartProduct?.name || 'Product'}
                         className="w-16 h-16 object-cover rounded-lg"
                         loading="lazy"
-                        onError={handleMediaFallback}
                       />
                     </div>
                     

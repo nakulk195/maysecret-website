@@ -13,11 +13,16 @@ const sunscreenSpray4Img = STORAGE_MEDIA.spray.sunscreenSpray4.src;
 const comboImg = STORAGE_MEDIA.combo.combo.src;
 const combo2Img = STORAGE_MEDIA.combo.combo2.src;
 const combo3Img = STORAGE_MEDIA.combo.combo3.src;
+const combo4Img = STORAGE_MEDIA.combo.combo4.src;
 const serumComboImg = STORAGE_MEDIA.serumCombo.serumCombo.src;
 const serumCombo2Img = STORAGE_MEDIA.serumCombo.serumCombo2.src;
 const serumCombo3Img = STORAGE_MEDIA.serumCombo.serumCombo3.src;
+const serumCombo4Img = STORAGE_MEDIA.serumCombo.serumCombo4.src;
 const sprayComboImg = STORAGE_MEDIA.sprayCombo.sprayCombo.src;
 const sprayCombo2Img = STORAGE_MEDIA.sprayCombo.sprayCombo2.src;
+const sprayCombo3Img = STORAGE_MEDIA.sprayCombo.sprayCombo3.src;
+const heroVideo2Img = STORAGE_MEDIA.hero.hero2.src;
+const heroVideo3Img = STORAGE_MEDIA.hero.hero3.src;
 
 // Category type and available product categories
 export interface Category {
@@ -80,7 +85,8 @@ export const products: Product[] = [
       sunscreenSprayImg,
       sunscreenSpray2Img,
       sunscreenSpray3Img,
-      sunscreenSpray4Img
+      sunscreenSpray4Img,
+      heroVideo3Img
     ],
     description: "Introducing our new sunscreen spray, fortified with advanced sun protection technology. Formulated with Suncat DE, Uvinul A Plus, and other powerful sunscreen agents, it provides broad-spectrum protection against both UVA and UVB rays. With its lightweight and non-greasy formula, it is perfect for daily use, keeping your skin safe and healthy under the sun.",
     benefits: [
@@ -156,7 +162,8 @@ export const products: Product[] = [
       brighteningSerumImg,
       brighteningSerum2Img,
       brighteningSerum3Img,
-      brighteningSerum4Img
+      brighteningSerum4Img,
+      heroVideo2Img
     ],
     description: "A powerful brightening serum enriched with Rice Extract, Niacinamide and Sepiwhite designed to improve skin tone, reduce pigmentation and give a radiant glass glow skin effect.",
     benefits: [
@@ -247,7 +254,8 @@ export const products: Product[] = [
     images: [
       comboImg,
       combo2Img,
-      combo3Img
+      combo3Img,
+      combo4Img
     ],
     description: "Complete daily skin protection and brightening routine in one pack! Get our premium Sunscreen Spray (100 ml) and Rice Brightening Serum (30 ml) at an incredible value.",
     benefits: [
@@ -286,7 +294,8 @@ export const products: Product[] = [
     images: [
       serumComboImg,
       serumCombo2Img,
-      serumCombo3Img
+      serumCombo3Img,
+      serumCombo4Img
     ],
     description: "Value combo pack with two Rice Brightening Serums for a longer glass-skin routine. Ideal for consistent brightening care or sharing your glow ritual.",
     benefits: [
@@ -324,7 +333,8 @@ export const products: Product[] = [
     image: sprayComboImg,
     images: [
       sprayComboImg,
-      sprayCombo2Img
+      sprayCombo2Img,
+      sprayCombo3Img
     ],
     description: "Value combo pack with two May Secret Sunscreen Sprays for easy daily SPF protection at home, in your bag, or on the go.",
     benefits: [

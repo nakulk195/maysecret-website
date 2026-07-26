@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, ShoppingBag, Search, X, ChevronRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
+import { STORAGE_MEDIA } from '../config/storage';
 
 interface MobileHeaderProps {
   isMenuOpen: boolean;
@@ -52,7 +52,6 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({ isMenuOpen, onMenuToggle })
                 alt="MAY SECRET"
                 className="maysecret-logo"
                 loading="eager"
-                onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
               />
             </Link>
           </div>

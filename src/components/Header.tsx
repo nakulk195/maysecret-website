@@ -18,7 +18,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
-import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
+import { STORAGE_MEDIA } from '../config/storage';
 
 interface HeaderProps {
   isMenuOpen: boolean;
@@ -100,7 +100,6 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
               alt="MAY SECRET"
               className="maysecret-logo"
               loading="eager"
-              onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
             />
           </Link>
 
@@ -162,7 +161,6 @@ const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
                   alt="MAY SECRET"
                   className="maysecret-logo"
                   loading="eager"
-                  onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
                 />
               </Link>
             </div>

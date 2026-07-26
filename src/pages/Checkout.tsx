@@ -8,7 +8,6 @@ import CouponBox from '../components/CouponBox';
 import { AppliedCoupon } from '../services/couponService';
 import { safeGetItem, safeSetItem } from '../utils/safeStorage';
 import { getProductImage } from '../utils/productImages';
-import { handleMediaFallback } from '../config/storage';
 
 // Types
 interface Address {
@@ -537,7 +536,6 @@ const Checkout: React.FC = () => {
                           alt={item.cartProduct?.name || 'Product'}
                           className="w-full h-full object-cover"
                           loading="lazy"
-                          onError={handleMediaFallback}
                         />
                       </div>
                       <div>

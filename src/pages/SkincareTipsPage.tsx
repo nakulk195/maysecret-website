@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Clock, User } from 'lucide-react';
 import { skincareTips } from '../data/skincareTipsData';
-import { handleMediaFallback } from '../config/storage';
 
 const SkincareTipsPage: React.FC = () => {
   useEffect(() => {
@@ -98,7 +97,6 @@ const SkincareTipsPage: React.FC = () => {
                   alt={tip.title}
                   className="w-full h-full object-cover"
                   loading="lazy"
-                  onError={handleMediaFallback}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
               </div>

@@ -8,7 +8,6 @@ import { addToRecentlyViewed } from '../utils/storage';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useToast } from '../contexts/ToastContext';
-import { handleMediaFallback } from '../config/storage';
 
 
 interface ProductCardProps {
@@ -116,10 +115,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
               isHovered ? 'scale-105' : 'scale-100'
             } ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             onLoad={() => setImageLoaded(true)}
-            onError={(event) => {
-              handleMediaFallback(event);
-              setImageLoaded(true);
-            }}
+            onError={() => setImageLoaded(true)}
             loading="lazy"
             style={{ objectFit: 'contain', objectPosition: 'center' }}
           />

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles, Droplets, Shield } from 'lucide-react';
 import { BRAND_NAME } from '../config/brand';
-import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
+import { STORAGE_MEDIA } from '../config/storage';
 
 const GlassSkinRoutine: React.FC = () => {
   const routineSteps = [
@@ -118,7 +118,6 @@ const GlassSkinRoutine: React.FC = () => {
                   alt={step.product}
                   className="h-48 mx-auto object-contain rounded-lg"
                   loading="lazy"
-                  onError={(event) => handleMediaFallback(event, step.image)}
                 />
               </div>
 

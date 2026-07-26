@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Mail, CreditCard, Wallet } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import { BRAND_NAME } from '../config/brand';
-import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
+import { STORAGE_MEDIA } from '../config/storage';
 
 const InstagramIcon = FaInstagram as unknown as React.ComponentType<{ className?: string }>;
 const WhatsappIcon = FaWhatsapp as unknown as React.ComponentType<{ className?: string }>;
@@ -22,7 +22,6 @@ const Footer: React.FC = () => {
               alt={BRAND_NAME}
               className="maysecret-logo mb-4 mx-auto md:mx-0"
               loading="lazy"
-              onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
             />
             <p className="text-black text-sm leading-relaxed">
               {BRAND_NAME} combines Korean beauty science with powerful ingredients like Niacinamide, Rice Extract and UV protection technology to create glowing healthy skin.

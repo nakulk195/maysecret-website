@@ -19,7 +19,7 @@ import {
 import { getLoggedInUser, removeUserSession } from '../utils/auth';
 import { useCart } from '../contexts/CartContext';
 import SearchBar from './SearchBar';
-import { STORAGE_MEDIA, handleMediaFallback } from '../config/storage';
+import { STORAGE_MEDIA } from '../config/storage';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -89,7 +89,6 @@ const Header: React.FC = () => {
                 alt="MAY SECRET"
                 className="maysecret-logo hidden md:block"
                 loading="eager"
-                onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               />
@@ -98,7 +97,6 @@ const Header: React.FC = () => {
                 alt="MAY SECRET"
                 className="maysecret-logo md:hidden"
                 loading="eager"
-                onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               />
@@ -227,7 +225,6 @@ const Header: React.FC = () => {
                     alt="MAY SECRET"
                     className="maysecret-logo"
                     loading="lazy"
-                    onError={(event) => handleMediaFallback(event, STORAGE_MEDIA.logo)}
                   />
                   <h2 className="text-xl font-bold text-black tracking-wide">MAY SECRET</h2>
                 </div>

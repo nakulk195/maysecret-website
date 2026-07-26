@@ -32,12 +32,16 @@ import { ProductService } from '../services/productService';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 import { BRAND_NAME } from '../config/brand';
 import { safeSetItem } from '../utils/safeStorage';
-import { handleMediaFallback } from '../config/storage';
 
 // Helper: Check if string is a valid UUID
 const isValidUUID = (id: string): boolean => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(id);
+};
+
+const isVideoMedia = (src?: string): boolean => {
+  if (!src) return false;
+  return /\.(mov|mp4|webm|m4v)$/i.test(src);
 };
 
 const ProductDetails: React.FC = () => {
@@ -196,6 +200,9 @@ const ProductDetails: React.FC = () => {
     navigate('/login');
   };
 
+  const selectedMedia = images[selectedImage];
+  const isSelectedMediaVideo = isVideoMedia(selectedMedia);
+
   const handleWishlistToggle = async () => {
     if (!currentProduct) return;
     if (authLoading) return;
@@ -329,14 +336,27 @@ const ProductDetails: React.FC = () => {
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
-              <motion.img
-                src={images[selectedImage]}
-                alt={currentProduct?.name || 'Product'}
-                className="w-full h-full object-contain transition-all duration-300 ease-in-out"
-                loading="eager"
-                onError={handleMediaFallback}
-                whileHover={{ scale: 1.05 }}
-              />
+              {isSelectedMediaVideo ? (
+                <motion.video
+                  key={`video-${selectedImage}`}
+                  src={selectedMedia}
+                  className="w-full h-full object-contain transition-all duration-300 ease-in-out"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  whileHover={{ scale: 1.05 }}
+                />
+              ) : (
+                <motion.img
+                  src={selectedMedia}
+                  alt={currentProduct?.name || 'Product'}
+                  className="w-full h-full object-contain transition-all duration-300 ease-in-out"
+                  loading="eager"
+                  whileHover={{ scale: 1.05 }}
+                />
+              )}
               
               {/* Navigation Arrows */}
               {images.length > 1 && (
@@ -366,28 +386,36 @@ const ProductDetails: React.FC = () => {
             {/* Thumbnail Images */}
             {images.length > 1 && (
               <div className="thumbnail-strip flex gap-3 overflow-x-auto py-2 px-1 md:justify-center">
-                {images.map((image, index) => (
-                  <motion.button
-                    key={index}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setSelectedImage(index)}
-                    aria-label={`View image ${index + 1}`}
-                    className={`w-16 h-16 min-w-[4rem] rounded-2xl overflow-hidden border-2 transition-all duration-300 ${
-                      selectedImage === index
-                        ? 'active-thumbnail'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${currentProduct?.name || 'Product'} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                      onError={handleMediaFallback}
-                    />
-                  </motion.button>
-                ))}
+                {images.map((image, index) => {
+                  const isVideo = isVideoMedia(image);
+                  return (
+                    <motion.button
+                      key={index}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setSelectedImage(index)}
+                      aria-label={`View ${isVideo ? 'video' : 'image'} ${index + 1}`}
+                      className={`w-16 h-16 min-w-[4rem] rounded-2xl overflow-hidden border-2 transition-all duration-300 ${
+                        selectedImage === index
+                          ? 'active-thumbnail'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      {isVideo ? (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-700 text-white text-[10px] font-semibold uppercase tracking-wider">
+                          Video
+                        </div>
+                      ) : (
+                        <img
+                          src={image}
+                          alt={`${currentProduct?.name || 'Product'} ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                            />
+                      )}
+                    </motion.button>
+                  );
+                })}
               </div>
             )}
           </motion.div>

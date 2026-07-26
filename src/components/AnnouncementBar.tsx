@@ -1,45 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { campaign } from '../config/campaign';
 
 const AnnouncementBar: React.FC = () => {
-  const messages: string[] = [
-    "Get 48% off on combo pack!",
-    "Get 40% off on sunscreen spray!",
-    "Get 33% off on rice Brighting serum!"
-  ];
+  if (!campaign.isCampaignActive || !campaign.showAnnouncementBar) {
+    return null;
+  }
 
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
-    }, 5000); // 5 seconds per message
-
-    return () => clearInterval(interval);
-  }, [messages.length]);
+  const repeatedAnnouncement = Array.from({ length: 4 }, () => campaign.announcementText);
 
   return (
-    <div className="w-full bg-black flex items-center justify-center h-10 md:h-12 overflow-hidden relative">
-      <div className="w-full h-full flex items-center justify-center">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentMessageIndex}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="w-full h-full flex items-center justify-center"
+    <div
+      className="campaign-announcement-bar sticky top-0 z-50 h-10 w-full overflow-hidden border-b border-white/15 bg-gray-950/95 text-white shadow-sm backdrop-blur-md md:h-11"
+      style={{ backgroundImage: campaign.gradientColors.announcement }}
+    >
+      <div className="campaign-announcement-shimmer" aria-hidden="true" />
+      <div className="campaign-announcement-track flex h-full items-center whitespace-nowrap">
+        {repeatedAnnouncement.map((message, index) => (
+          <span
+            key={`${message}-${index}`}
+            className="mx-8 text-xs font-semibold uppercase tracking-[0.18em] text-white/95 md:text-sm"
           >
-            <p
-              className="text-white text-center font-semibold text-sm md:text-base px-4 md:px-6 py-2 w-full flex items-center justify-center"
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {messages[currentMessageIndex]}
-            </p>
-          </motion.div>
-        </AnimatePresence>
+            {message}
+          </span>
+        ))}
       </div>
     </div>
   );

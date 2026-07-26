@@ -90,13 +90,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
+  const isComboHighlight = product.category === 'combo' && [3, 4, 5].includes(product.id);
+  const comboSavings = product.originalPrice && product.originalPrice > product.price
+    ? product.originalPrice - product.price
+    : 0;
+  const comboSubtitle = product.id === 3 ? 'Complete Skincare Combo' : '2 Premium Products Included';
+  const comboIcons = product.id === 3 ? ['🧴', '☀️'] : product.id === 4 ? ['🧴', '🧴'] : ['☀️', '☀️'];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
+      whileHover={{ y: -5, scale: 1.01 }}
       transition={{ duration: 0.3 }}
-      className={`relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 group flex flex-col h-full ${className}`}
+      className={`relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border group flex flex-col h-full ${isComboHighlight ? 'border-amber-300/70 bg-[linear-gradient(135deg,rgba(255,250,240,0.95),rgba(255,255,255,0.98))] shadow-[0_12px_40px_rgba(251,191,36,0.12)]' : 'border-gray-100'} ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -125,6 +132,32 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
             <div className="absolute top-2 left-2 bg-rose-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
               {discountPercentage}% OFF
             </div>
+          )}
+
+          {isComboHighlight && (
+            <>
+              <motion.div
+                whileHover={{ y: -1, scale: 1.01 }}
+                transition={{ duration: 0.2 }}
+                className="absolute left-2 top-2 z-10 rounded-full border border-amber-200/70 bg-white/80 px-2.5 py-1 text-[11px] font-semibold tracking-[0.2em] text-amber-700 shadow-sm backdrop-blur"
+              >
+                ✨ BEST VALUE
+              </motion.div>
+
+              <motion.div
+                whileHover={{ y: -1, scale: 1.01 }}
+                transition={{ duration: 0.2 }}
+                className="absolute right-2 top-2 z-10 rounded-full border border-amber-200/70 bg-amber-50/90 px-2.5 py-1 text-[11px] font-semibold text-amber-800 shadow-sm backdrop-blur"
+              >
+                SAVE ₹{comboSavings.toLocaleString()}
+              </motion.div>
+
+              <motion.div
+                animate={{ x: ['-20%', '120%'] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+              />
+            </>
           )}
           
           {/* Action Buttons - Always visible on mobile, on hover on desktop */}
@@ -183,6 +216,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
               }}>
             {product.name}
           </h3>
+
+          {isComboHighlight && (
+            <div className="mb-3 flex items-center justify-between rounded-full border border-amber-200/70 bg-amber-50/70 px-2.5 py-1.5 text-[11px] font-medium text-amber-800">
+              <span className="flex items-center gap-1.5">
+                <span>{comboIcons[0]}</span>
+                <span>{comboIcons[1]}</span>
+              </span>
+              <span className="tracking-[0.16em] text-[10px] uppercase">{comboSubtitle}</span>
+            </div>
+          )}
           
           {/* Rating and Reviews */}
           <div className="flex items-center gap-2 mb-3">

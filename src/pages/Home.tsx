@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Check, Clock, Sparkles, Star } from 'lucide-react';
 // Load products from local productData
 import { products as localProducts } from '../utils/productData';
 import type { Product } from '../utils/productData';
@@ -8,26 +8,50 @@ import ProductCard from '../components/ProductCard';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 import RotatingTagline from '../components/RotatingTagline';
 import SkincareTips from '../components/SkincareTips';
-import WhyChooseMaySecret from '../components/WhyChooseMaySecret';
 import Newsletter from '../components/Newsletter';
 import GlassSkinRoutine from '../components/GlassSkinRoutine';
+import FoundersNote from '../components/FoundersNote';
 import { BRAND_NAME } from '../config/brand';
-import { STORAGE_MEDIA } from '../config/storage';
+import { campaign } from '../config/campaign';
 
-type HeroSlide = {
-  id: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  remoteMedia: string;
-  mediaType: 'image' | 'video';
-  gradient: string;
-  ctaHref: string;
+type CountdownState = {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  isExpired: boolean;
+};
+
+const getCountdownState = (endDate: string): CountdownState => {
+  const endTime = new Date(endDate).getTime();
+  const distance = endTime - Date.now();
+
+  if (!Number.isFinite(endTime) || distance <= 0) {
+    return {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      isExpired: true,
+    };
+  }
+
+  return {
+    days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((distance / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((distance / (1000 * 60)) % 60),
+    seconds: Math.floor((distance / 1000) % 60),
+    isExpired: false,
+  };
 };
 
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [heroOffset, setHeroOffset] = useState({ x: 0, y: 0 });
+  const [countdown, setCountdown] = useState<CountdownState>(() =>
+    getCountdownState(campaign.countdownEndDate)
+  );
 
   // Load products from local productData
   useEffect(() => {
@@ -47,12 +71,23 @@ const Home: React.FC = () => {
     const preloadLink = document.createElement('link');
     preloadLink.rel = 'preload';
     preloadLink.as = 'image';
-    preloadLink.href = STORAGE_MEDIA.hero.hero1.src;
+    preloadLink.href = campaign.heroMedia;
     document.head.appendChild(preloadLink);
 
     return () => {
       document.head.removeChild(preloadLink);
     };
+  }, []);
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      setCountdown(getCountdownState(campaign.countdownEndDate));
+    };
+
+    updateCountdown();
+    const id = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(id);
   }, []);
 
   const containerVariants = {
@@ -77,222 +112,270 @@ const Home: React.FC = () => {
     },
   };
 
-  const heroSlides: HeroSlide[] = [
-    {
-      id: 'hero-1',
-      title: 'From Courtroom Clarity to Skincare Confidence',
-      subtitle: 'Meet the Founder of May Secret Skin & Beauty',
-      description: 'Adv. PRASANNA',
-      remoteMedia: STORAGE_MEDIA.hero.hero1.src,
-      mediaType: 'image',
-      gradient: 'from-sky-50 via-white to-rose-100',
-      ctaHref: '/shop',
-    },
-    {
-      id: 'hero-2',
-      title: 'Unlock the Secret of Korean Glass Skin',
-      subtitle: 'with May Secret',
-      description: 'RICE BRIGHTENING SERUM',
-      remoteMedia: STORAGE_MEDIA.hero.hero2.src,
-      mediaType: 'video',
-      gradient: 'from-rose-50 via-white to-pink-100',
-      ctaHref: '/shop',
-    },
-    {
-      id: 'hero-3',
-      title: 'Just Spray',
-      subtitle: 'Shield Your Skin and Shine Brighter',
-      description: 'With Every Single Spray',
-      remoteMedia: STORAGE_MEDIA.hero.hero3.src,
-      mediaType: 'video',
-      gradient: 'from-emerald-50 via-white to-rose-100',
-      ctaHref: '/shop',
-    },
-    {
-      id: 'hero-4',
-      title: 'Elevate Your Daily Glow',
-      subtitle: 'with our ultimate radiance duo',
-      description: 'SUNSCREEN SPRAY & RICE BRIGHTENING SERUM',
-      remoteMedia: STORAGE_MEDIA.hero.hero4.src,
-      mediaType: 'image',
-      gradient: 'from-purple-50 via-white to-pink-100',
-      ctaHref: '/shop',
-    }
-  ];
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const heroTouchStartX = useRef<number | null>(null);
-  const heroTouchEndX = useRef<number | null>(null);
-  const currentSlide = heroSlides[currentIndex] || heroSlides[0];
-  const currentSlideMedia = currentSlide.remoteMedia;
-
-  const showPreviousSlide = () => {
-    if (heroSlides.length === 0) return;
-    setCurrentIndex((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-  };
-
-  const showNextSlide = () => {
-    if (heroSlides.length === 0) return;
-    setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
-  };
-
-  const handleHeroTouchStart = (event: React.TouchEvent<HTMLElement>) => {
-    heroTouchStartX.current = event.touches[0]?.clientX ?? null;
-  };
-
-  const handleHeroTouchMove = (event: React.TouchEvent<HTMLElement>) => {
-    heroTouchEndX.current = event.touches[0]?.clientX ?? null;
-  };
-
-  const handleHeroTouchEnd = () => {
-    if (heroTouchStartX.current === null || heroTouchEndX.current === null) {
-      heroTouchStartX.current = null;
-      heroTouchEndX.current = null;
+  const handleHeroPointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    if (window.matchMedia('(max-width: 1023px)').matches) {
       return;
     }
 
-    const distance = heroTouchStartX.current - heroTouchEndX.current;
-
-    if (Math.abs(distance) > 45) {
-      if (distance > 0) {
-        showNextSlide();
-      } else {
-        showPreviousSlide();
-      }
-    }
-
-    heroTouchStartX.current = null;
-    heroTouchEndX.current = null;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 18;
+    const y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 12;
+    setHeroOffset({ x, y });
   };
 
-  useEffect(() => {
-    if (heroSlides.length === 0) return;
-
-    const id = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
-    }, 10000); // 10 seconds per slide
-    return () => clearInterval(id);
-  }, [heroSlides.length]);
+  const handleHeroPointerLeave = () => {
+    setHeroOffset({ x: 0, y: 0 });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-cream-100 font-['Inter',sans-serif]">
       {/* Floating Social Buttons */}
       <FloatingSocialButtons />
 
-      {/* Product Hero Slider */}
-      {currentSlide && (
+      {/* Campaign Hero */}
+      {campaign.isCampaignActive && (
         <section
-          className={`relative w-full overflow-hidden bg-gradient-to-br ${currentSlide.gradient}`}
-          onTouchStart={handleHeroTouchStart}
-          onTouchMove={handleHeroTouchMove}
-          onTouchEnd={handleHeroTouchEnd}
+          className="campaign-hero relative w-full overflow-hidden text-white"
+          onPointerMove={handleHeroPointerMove}
+          onPointerLeave={handleHeroPointerLeave}
+          style={{
+            backgroundImage: campaign.gradientColors.hero,
+            ['--campaign-primary' as string]: campaign.accentColors.primary,
+            ['--campaign-secondary' as string]: campaign.accentColors.secondary,
+            ['--campaign-accent' as string]: campaign.accentColors.accent,
+          }}
         >
-          <div className="relative mx-auto grid h-[260px] max-w-7xl grid-cols-[1.08fr_0.92fr] items-center gap-3 px-5 sm:h-[340px] sm:px-8 md:h-[430px] lg:h-[500px] lg:grid-cols-2 lg:px-12">
-            <div className="z-10 max-w-xl">
+          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+            <img
+              src={campaign.backgroundMedia}
+              alt=""
+              className="campaign-hero-background h-full w-full object-cover"
+              loading="eager"
+            />
+            {campaign.backgroundEffects.rain && <div className="campaign-rain-layer" />}
+            {campaign.backgroundEffects.glow && (
+              <>
+                <motion.div
+                  animate={{ x: [0, 22, 0], y: [0, -18, 0], opacity: [0.3, 0.52, 0.3] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute left-[-10%] top-12 h-72 w-72 rounded-full bg-emerald-400/30 blur-3xl"
+                />
+                <motion.div
+                  animate={{ x: [0, -18, 0], y: [0, 18, 0], opacity: [0.24, 0.44, 0.24] }}
+                  transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute bottom-[-12%] right-[-6%] h-80 w-80 rounded-full bg-sky-400/25 blur-3xl"
+                />
+              </>
+            )}
+          </div>
+
+          <div className="relative mx-auto grid min-h-[650px] max-w-7xl grid-cols-1 items-center gap-8 px-4 py-10 sm:px-6 md:min-h-[700px] lg:min-h-[680px] lg:grid-cols-[0.96fr_1.04fr] lg:px-12">
+            <div className="z-10 max-w-2xl">
               <motion.p
-                key={`eyebrow-${currentSlide.id}`}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45 }}
-                className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-rose-500 sm:text-sm"
+                className="mb-4 inline-flex items-center rounded-full border border-emerald-200/30 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-emerald-100 shadow-sm backdrop-blur-md sm:text-sm"
               >
-                MAY SECRET
+                {campaign.campaignLabel}
               </motion.p>
+
               <motion.h1
-                key={`title-${currentSlide.id}`}
-                initial={{ opacity: 0, y: 14 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mb-2 text-2xl font-bold leading-tight text-gray-950 sm:text-4xl lg:text-5xl"
+                transition={{ duration: 0.55 }}
+                className="mb-3 text-4xl font-extrabold leading-[1.02] text-white sm:text-5xl lg:text-6xl"
               >
-                {currentSlide.title}
+                {campaign.heading}
               </motion.h1>
+
               <motion.p
-                key={`subtitle-${currentSlide.id}`}
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.05 }}
-                className="mb-2 max-w-md text-sm leading-relaxed text-gray-600 sm:text-base lg:text-lg"
+                className="mb-4 text-xl font-semibold text-emerald-100 sm:text-2xl"
               >
-                {currentSlide.subtitle}
+                {campaign.subHeading}
               </motion.p>
+
               <motion.p
-                key={`description-${currentSlide.id}`}
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-gray-800 sm:text-sm"
+                className="mb-6 max-w-xl text-sm leading-relaxed text-white/78 sm:text-base lg:text-lg"
               >
-                {currentSlide.description}
+                {campaign.description}
               </motion.p>
-              <button
-                type="button"
-                onClick={() => window.location.href = currentSlide.ctaHref}
-                className="rounded-full bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:bg-rose-600 sm:px-7 sm:py-3"
-              >
-                Shop Now
-              </button>
-            </div>
 
-            <div className="relative flex h-full min-w-0 items-center justify-center">
-              {currentSlide.mediaType === 'video' ? (
-                <motion.video
-                  key={`video-${currentSlide.id}`}
-                  src={currentSlideMedia}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                  initial={{ opacity: 0, scale: 0.96, x: 18 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
-                  className="max-h-[220px] w-full object-contain drop-shadow-2xl transition-all duration-500 ease-in-out sm:max-h-[300px] md:max-h-[390px] lg:max-h-[455px]"
-                />
-              ) : (
-                <motion.img
-                  key={`image-${currentSlide.id}`}
-                  src={currentSlideMedia}
-                  alt={currentSlide.title}
-                  loading={currentIndex === 0 ? 'eager' : 'lazy'}
-                  initial={{ opacity: 0, scale: 0.96, x: 18 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
-                  className="max-h-[220px] w-full object-contain drop-shadow-2xl transition-all duration-500 ease-in-out sm:max-h-[300px] md:max-h-[390px] lg:max-h-[455px]"
-                />
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.16 }}
+                className="mb-6 flex flex-col gap-3 sm:flex-row"
+              >
+                <button
+                  type="button"
+                  onClick={() => window.location.href = campaign.primaryCTA.href}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-gray-950 shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-100 sm:px-7"
+                >
+                  {campaign.primaryCTA.label}
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.location.href = campaign.secondaryCTA.href}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200/60 hover:bg-white/16 sm:px-7"
+                >
+                  {campaign.secondaryCTA.label}
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mb-5 flex flex-wrap gap-2"
+              >
+                {campaign.offerChips.map((chip) => (
+                  <span
+                    key={chip}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/86 shadow-sm backdrop-blur-md"
+                  >
+                    <Check className="h-3.5 w-3.5 text-emerald-200" />
+                    {chip}
+                  </span>
+                ))}
+              </motion.div>
+
+              {campaign.showCountdown && campaign.countdownEnabled && (
+                <motion.div
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.24 }}
+                  className="grid max-w-xl grid-cols-4 overflow-hidden rounded-2xl border border-white/16 bg-white/10 shadow-2xl backdrop-blur-md"
+                >
+                  {countdown.isExpired ? (
+                    <div className="col-span-4 px-4 py-4 text-center text-sm font-bold text-white">
+                      Offer Ended
+                    </div>
+                  ) : (
+                    [
+                      ['Days', countdown.days],
+                      ['Hours', countdown.hours],
+                      ['Minutes', countdown.minutes],
+                      ['Seconds', countdown.seconds],
+                    ].map(([label, value]) => (
+                      <div key={label} className="border-r border-white/12 px-2 py-3 text-center last:border-r-0">
+                        <p className="text-lg font-extrabold text-white sm:text-2xl">
+                          {String(value).padStart(2, '0')}
+                        </p>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-100/76">{label}</p>
+                      </div>
+                    ))
+                  )}
+                  <div className="col-span-4 flex items-center justify-center gap-2 border-t border-white/12 px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-100">
+                    <Clock className="h-3.5 w-3.5" />
+                    {campaign.countdownTitle}
+                  </div>
+                </motion.div>
               )}
             </div>
 
-            <button
-              type="button"
-              onClick={showPreviousSlide}
-              className="absolute left-3 top-1/2 z-20 hidden -translate-y-1/2 rounded-full bg-white/85 p-3 text-gray-900 shadow-md transition-all duration-300 hover:bg-white md:flex"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
+            <div className="relative z-10 flex min-h-[340px] min-w-0 items-center justify-center md:min-h-[440px] lg:min-h-[560px]">
+              {campaign.showOfferBadge && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, rotate: 3 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 5 }}
+                  transition={{ duration: 0.55, delay: 0.24 }}
+                  className="campaign-discount-badge absolute left-1 top-3 z-20 sm:left-4 lg:left-0"
+                >
+                  <span>{campaign.heroBadge.eyebrow}</span>
+                  <strong>{campaign.offerPercentage}%</strong>
+                  <span>{campaign.heroBadge.suffix}</span>
+                </motion.div>
+              )}
 
-            <button
-              type="button"
-              onClick={showNextSlide}
-              className="absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 rounded-full bg-white/85 p-3 text-gray-900 shadow-md transition-all duration-300 hover:bg-white md:flex"
-              aria-label="Next slide"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
+              {campaign.showFloatingComboCard && (
+                <motion.div
+                  initial={{ opacity: 0, y: 18, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.55, delay: 0.32 }}
+                  className="campaign-combo-card absolute bottom-2 right-0 z-20 w-60 overflow-hidden rounded-3xl border border-emerald-100/25 bg-slate-950/58 shadow-2xl backdrop-blur-xl sm:right-6"
+                >
+                  <img
+                    src={campaign.featuredPromoMedia}
+                    alt={campaign.featuredComboName}
+                    className="h-24 w-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="p-4">
+                    <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-100">{campaign.featuredComboName}</p>
+                    <div className="mt-2 flex items-end gap-2">
+                      <span className="text-2xl font-black text-white">{campaign.featuredComboPrice}</span>
+                      <span className="pb-1 text-sm font-semibold text-white/45 line-through">{campaign.featuredComboOriginalPrice}</span>
+                    </div>
+                    <p className="mt-1 text-sm font-bold text-emerald-200">{campaign.featuredComboSavings}</p>
+                    <button
+                      type="button"
+                      onClick={() => window.location.href = campaign.secondaryCTA.href}
+                      className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-white transition-colors hover:text-emerald-100"
+                    >
+                      {campaign.featuredComboCtaText}
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
 
-            <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2">
-              {heroSlides.map((slide, index) => (
-                <button
-                  key={slide.id}
-                  type="button"
-                  onClick={() => setCurrentIndex(index)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    index === currentIndex ? 'w-7 bg-gray-950' : 'w-2 bg-gray-950/30'
-                  }`}
-                  aria-label={`Go to ${slide.title}`}
-                />
-              ))}
+              <motion.div
+                className="campaign-hero-media-wrap relative w-full"
+                animate={{
+                  x: heroOffset.x,
+                  y: heroOffset.y,
+                  scale: heroOffset.x || heroOffset.y ? 1.012 : 1,
+                }}
+                transition={{ type: 'spring', stiffness: 80, damping: 22 }}
+              >
+                <div className="campaign-product-glow" aria-hidden="true" />
+                {campaign.heroMediaType === 'video' ? (
+                  <motion.video
+                    src={campaign.heroMedia}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    initial={{ opacity: 0, scale: 0.97, y: 16 }}
+                    animate={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
+                    transition={{ opacity: { duration: 0.55 }, scale: { duration: 0.55 }, y: { duration: 6, repeat: Infinity, ease: 'easeInOut' } }}
+                    className="campaign-hero-media relative w-full object-contain"
+                  />
+                ) : (
+                  <motion.img
+                    src={campaign.heroMedia}
+                    alt={campaign.heroMediaAlt}
+                    loading="eager"
+                    initial={{ opacity: 0, scale: 0.97, y: 16 }}
+                    animate={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
+                    transition={{ opacity: { duration: 0.55 }, scale: { duration: 0.55 }, y: { duration: 6, repeat: Infinity, ease: 'easeInOut' } }}
+                    className="campaign-hero-media relative w-full object-contain"
+                  />
+                )}
+              </motion.div>
             </div>
+
+            {campaign.showTrustStrip && (
+              <div className="absolute bottom-0 left-0 right-0 z-10 hidden border-t border-white/12 bg-slate-950/34 px-4 py-3 backdrop-blur-md md:block">
+                <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-8 gap-y-2">
+                  {campaign.trustPoints.map((point) => (
+                    <span key={point} className="inline-flex items-center gap-2 text-sm font-bold text-white/82">
+                      <Check className="h-4 w-4 text-emerald-200" />
+                      {point}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -449,6 +532,8 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      <FoundersNote />
+
       {/* May Secret Brand section (moved below Featured Products) */}
       <section className="relative overflow-hidden bg-gradient-to-br from-pink-50 via-white to-cream-100 py-6 md:py-8 px-4 scroll-smooth">
         {/* Background Animation Elements */}
@@ -578,7 +663,6 @@ const Home: React.FC = () => {
 
       <GlassSkinRoutine />
 
-      <WhyChooseMaySecret />
 
       <SkincareTips />
 

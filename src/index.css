@@ -327,6 +327,194 @@ h1, h2, h3, h4, h5, h6 {
   transform: scale(1.03);
 }
 
+.campaign-announcement-track {
+  animation: campaign-marquee 26s linear infinite;
+  will-change: transform;
+}
+
+.campaign-announcement-bar:hover .campaign-announcement-track {
+  animation-play-state: paused;
+}
+
+.campaign-announcement-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.18) 42%, transparent 62%);
+  background-size: 220% 100%;
+  animation: campaign-shimmer 4.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.campaign-rain-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image:
+    linear-gradient(115deg, rgba(14, 165, 233, 0.18) 0 1px, transparent 1px 18px),
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.45), transparent 18%),
+    radial-gradient(circle at 72% 58%, rgba(244, 114, 182, 0.18), transparent 24%);
+  background-size: 120px 120px, 420px 420px, 520px 520px;
+  animation: campaign-rain 16s linear infinite;
+  pointer-events: none;
+}
+
+.campaign-discount-badge {
+  display: inline-flex;
+  min-width: 132px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(251, 191, 36, 0.46);
+  border-radius: 24px;
+  background: rgba(2, 6, 23, 0.62);
+  box-shadow: 0 18px 45px rgba(16, 185, 129, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  padding: 12px 18px;
+  text-transform: uppercase;
+  backdrop-filter: blur(16px);
+  animation: campaign-badge-pulse 4s ease-in-out infinite;
+}
+
+.campaign-discount-badge span {
+  color: #d1fae5;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.campaign-discount-badge strong {
+  color: #ffffff;
+  font-size: 2.45rem;
+  font-weight: 900;
+  line-height: 0.95;
+}
+
+@keyframes campaign-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes campaign-shimmer {
+  0% {
+    background-position: 220% 0;
+  }
+
+  100% {
+    background-position: -220% 0;
+  }
+}
+
+@keyframes campaign-rain {
+  from {
+    background-position: 0 0, 0 0, 0 0;
+  }
+
+  to {
+    background-position: -120px 240px, 40px 20px, -30px 50px;
+  }
+}
+
+@keyframes campaign-badge-pulse {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 18px 45px rgba(16, 185, 129, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
+
+  50% {
+    transform: translateY(-2px) scale(1.025);
+    box-shadow: 0 22px 56px rgba(14, 165, 233, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  }
+}
+
+.campaign-hero-background {
+  opacity: 0.18;
+  filter: blur(3px) saturate(1.08);
+  transform: scale(1.04);
+}
+
+.campaign-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.78) 0%, rgba(2, 6, 23, 0.42) 48%, rgba(2, 6, 23, 0.18) 100%),
+    radial-gradient(circle at 72% 48%, rgba(16, 185, 129, 0.22), transparent 34%);
+  pointer-events: none;
+}
+
+.campaign-hero-media-wrap {
+  max-width: min(100%, 680px);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.campaign-product-glow {
+  position: absolute;
+  inset: 10% 6% 8%;
+  border-radius: 40px;
+  background:
+    radial-gradient(circle at 62% 38%, rgba(16, 185, 129, 0.36), transparent 38%),
+    radial-gradient(circle at 72% 56%, rgba(14, 165, 233, 0.2), transparent 42%);
+  filter: blur(18px);
+  opacity: 0.9;
+}
+
+.campaign-hero-media {
+  max-height: 540px;
+  border-radius: 28px;
+  filter: drop-shadow(0 28px 58px rgba(0, 0, 0, 0.46));
+}
+
+.campaign-combo-card {
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.36), 0 0 42px rgba(16, 185, 129, 0.14);
+}
+
+@media (max-width: 1023px) {
+  .campaign-hero::after {
+    background:
+      linear-gradient(180deg, rgba(2, 6, 23, 0.78) 0%, rgba(2, 6, 23, 0.48) 56%, rgba(2, 6, 23, 0.2) 100%),
+      radial-gradient(circle at 62% 68%, rgba(16, 185, 129, 0.22), transparent 38%);
+  }
+
+  .campaign-hero-media {
+    max-height: 420px;
+  }
+}
+
+@media (max-width: 640px) {
+  .campaign-discount-badge {
+    min-width: 104px;
+    padding: 10px 14px;
+  }
+
+  .campaign-discount-badge strong {
+    font-size: 1.9rem;
+  }
+
+  .campaign-hero-media {
+    max-height: 310px;
+    border-radius: 20px;
+  }
+
+  .campaign-combo-card {
+    width: 13.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campaign-announcement-track,
+  .campaign-announcement-shimmer,
+  .campaign-rain-layer,
+  .campaign-discount-badge {
+    animation: none;
+  }
+}
+
 .thumbnail-strip {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

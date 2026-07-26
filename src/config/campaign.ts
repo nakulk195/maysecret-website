@@ -42,6 +42,17 @@ export type CampaignConfig = {
   alternateHeroMedia: string;
   backgroundMedia: string;
   featuredPromoMedia: string;
+  heroDesktopImage: string;
+  heroTabletImage: string;
+  heroMobileImage: string;
+  backgroundImage: string;
+  heroImageFit: 'contain' | 'cover';
+  heroImagePosition: string;
+  heroHeightDesktop: string;
+  heroHeightMobile: string;
+  heroCardStyle: 'glass-emerald';
+  mobileHeroLayout: 'shopping-card';
+  desktopHeroLayout: 'split-campaign';
   heroMediaType: CampaignMediaType;
   heroMediaAlt: string;
   offerPercentage: number;
@@ -74,6 +85,11 @@ export type CampaignConfig = {
   showFloatingComboCard: boolean;
   showShippingCard: boolean;
   showTrustStrip: boolean;
+  showSecondaryCTA: boolean;
+  showRating: boolean;
+  showSavings: boolean;
+  showOriginalPrice: boolean;
+  showPriceCard: boolean;
   backgroundEffects: {
     rain: boolean;
     mist: boolean;
@@ -104,6 +120,17 @@ export const campaign: CampaignConfig = {
   alternateHeroMedia: alternateHeroImage,
   backgroundMedia: backgroundImage,
   featuredPromoMedia: featuredPromoImage,
+  heroDesktopImage: heroImage,
+  heroTabletImage: alternateHeroImage,
+  heroMobileImage: featuredPromoImage,
+  backgroundImage,
+  heroImageFit: 'contain',
+  heroImagePosition: 'center',
+  heroHeightDesktop: '680px',
+  heroHeightMobile: 'auto',
+  heroCardStyle: 'glass-emerald',
+  mobileHeroLayout: 'shopping-card',
+  desktopHeroLayout: 'split-campaign',
   heroMediaType: 'image',
   heroMediaAlt: 'May Secret Monsoon Glow Sale combo pack with rice brightening serum and sunscreen spray',
   offerPercentage: 65,
@@ -150,6 +177,11 @@ export const campaign: CampaignConfig = {
   showFloatingComboCard: true,
   showShippingCard: false,
   showTrustStrip: true,
+  showSecondaryCTA: true,
+  showRating: true,
+  showSavings: true,
+  showOriginalPrice: true,
+  showPriceCard: true,
   backgroundEffects: {
     rain: true,
     mist: true,

@@ -485,6 +485,55 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 22px 56px rgba(0, 0, 0, 0.36), 0 0 42px rgba(16, 185, 129, 0.14);
 }
 
+.campaign-hero-mobile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.22), transparent 38%),
+    radial-gradient(circle at 100% 70%, rgba(14, 165, 233, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.14) 0%, rgba(2, 6, 23, 0.44) 100%);
+  pointer-events: none;
+}
+
+.campaign-mobile-bg {
+  opacity: 0.08;
+  filter: blur(2px) saturate(1.05);
+  transform: scale(1.04);
+}
+
+.campaign-mobile-product-card {
+  position: relative;
+  display: flex;
+  min-height: 275px;
+  max-height: 38dvh;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(209, 250, 229, 0.22);
+  border-radius: 28px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)),
+    radial-gradient(circle at 50% 45%, rgba(16, 185, 129, 0.18), transparent 48%);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.38),
+    0 0 42px rgba(16, 185, 129, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  padding: 16px;
+  backdrop-filter: blur(18px);
+}
+
+.campaign-mobile-product-glow {
+  position: absolute;
+  inset: 12% 10%;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(16, 185, 129, 0.34), transparent 42%),
+    radial-gradient(circle at 70% 60%, rgba(14, 165, 233, 0.16), transparent 44%);
+  filter: blur(18px);
+  opacity: 0.9;
+}
+
 @media (max-width: 1023px) {
   .campaign-hero::after {
     background:
@@ -519,6 +568,24 @@ h1, h2, h3, h4, h5, h6 {
     margin-right: 1rem;
     font-size: 0.66rem;
     letter-spacing: 0.11em;
+  }
+
+  .campaign-hero-mobile {
+    min-height: auto;
+  }
+
+  .campaign-hero-mobile button,
+  .campaign-hero-mobile a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .campaign-hero-mobile .overflow-x-auto {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .campaign-hero-mobile .overflow-x-auto::-webkit-scrollbar {
+    display: none;
   }
 
   .campaign-discount-badge {
@@ -583,6 +650,14 @@ h1, h2, h3, h4, h5, h6 {
   .product-card:hover,
   .product-card:focus-within {
     transform: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .campaign-mobile-product-card {
+    min-height: 245px;
+    border-radius: 24px;
+    padding: 12px;
   }
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Check, Clock, Sparkles, Star } from 'lucide-react';
+import { Sparkles, Star } from 'lucide-react';
 // Load products from local productData
 import { products as localProducts } from '../utils/productData';
 import type { Product } from '../utils/productData';
@@ -8,9 +8,9 @@ import ProductCard from '../components/ProductCard';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
 import RotatingTagline from '../components/RotatingTagline';
 import SkincareTips from '../components/SkincareTips';
-import Newsletter from '../components/Newsletter';
 import GlassSkinRoutine from '../components/GlassSkinRoutine';
 import FoundersNote from '../components/FoundersNote';
+import CampaignHero from '../components/hero/CampaignHero';
 import { BRAND_NAME } from '../config/brand';
 import { campaign } from '../config/campaign';
 
@@ -48,7 +48,6 @@ const getCountdownState = (endDate: string): CountdownState => {
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [heroOffset, setHeroOffset] = useState({ x: 0, y: 0 });
   const [countdown, setCountdown] = useState<CountdownState>(() =>
     getCountdownState(campaign.countdownEndDate)
   );
@@ -65,18 +64,6 @@ const Home: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    const preloadLink = document.createElement('link');
-    preloadLink.rel = 'preload';
-    preloadLink.as = 'image';
-    preloadLink.href = campaign.heroMedia;
-    document.head.appendChild(preloadLink);
-
-    return () => {
-      document.head.removeChild(preloadLink);
-    };
   }, []);
 
   useEffect(() => {
@@ -112,273 +99,12 @@ const Home: React.FC = () => {
     },
   };
 
-  const handleHeroPointerMove = (event: React.PointerEvent<HTMLElement>) => {
-    if (window.matchMedia('(max-width: 1023px)').matches) {
-      return;
-    }
-
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 18;
-    const y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 12;
-    setHeroOffset({ x, y });
-  };
-
-  const handleHeroPointerLeave = () => {
-    setHeroOffset({ x: 0, y: 0 });
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-cream-100 font-['Inter',sans-serif]">
       {/* Floating Social Buttons */}
       <FloatingSocialButtons />
 
-      {/* Campaign Hero */}
-      {campaign.isCampaignActive && (
-        <section
-          className="campaign-hero relative w-full overflow-hidden text-white"
-          onPointerMove={handleHeroPointerMove}
-          onPointerLeave={handleHeroPointerLeave}
-          style={{
-            backgroundImage: campaign.gradientColors.hero,
-            ['--campaign-primary' as string]: campaign.accentColors.primary,
-            ['--campaign-secondary' as string]: campaign.accentColors.secondary,
-            ['--campaign-accent' as string]: campaign.accentColors.accent,
-          }}
-        >
-          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-            <img
-              src={campaign.backgroundMedia}
-              alt=""
-              className="campaign-hero-background h-full w-full object-cover"
-              loading="eager"
-            />
-            {campaign.backgroundEffects.rain && <div className="campaign-rain-layer" />}
-            {campaign.backgroundEffects.glow && (
-              <>
-                <motion.div
-                  animate={{ x: [0, 22, 0], y: [0, -18, 0], opacity: [0.3, 0.52, 0.3] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute left-[-10%] top-12 h-72 w-72 rounded-full bg-emerald-400/30 blur-3xl"
-                />
-                <motion.div
-                  animate={{ x: [0, -18, 0], y: [0, 18, 0], opacity: [0.24, 0.44, 0.24] }}
-                  transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute bottom-[-12%] right-[-6%] h-80 w-80 rounded-full bg-sky-400/25 blur-3xl"
-                />
-              </>
-            )}
-          </div>
-
-          <div className="relative mx-auto grid min-h-[82dvh] max-w-7xl grid-cols-1 items-center gap-5 px-4 py-6 sm:px-6 md:min-h-[700px] md:gap-8 md:py-10 lg:min-h-[680px] lg:grid-cols-[0.96fr_1.04fr] lg:px-12">
-            <div className="z-10 max-w-2xl">
-              <motion.p
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45 }}
-                className="mb-3 inline-flex items-center rounded-full border border-emerald-200/30 bg-white/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-100 shadow-sm backdrop-blur-md sm:px-4 sm:py-2 sm:text-sm"
-              >
-                {campaign.campaignLabel}
-              </motion.p>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55 }}
-                className="mb-2 text-[2.45rem] font-extrabold leading-[1.02] text-white min-[390px]:text-[2.65rem] sm:text-5xl lg:text-6xl"
-              >
-                {campaign.heading}
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.05 }}
-                className="mb-3 text-lg font-semibold text-emerald-100 sm:text-2xl"
-              >
-                {campaign.subHeading}
-              </motion.p>
-
-              <motion.p
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="mb-5 max-w-xl text-sm leading-relaxed text-white/78 sm:text-base lg:text-lg"
-              >
-                {campaign.description}
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.16 }}
-                className="mb-5 flex flex-col gap-3 sm:flex-row"
-              >
-                <button
-                  type="button"
-                  onClick={() => window.location.href = campaign.primaryCTA.href}
-                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-gray-950 shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-100 sm:w-auto sm:px-7"
-                >
-                  {campaign.primaryCTA.label}
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => window.location.href = campaign.secondaryCTA.href}
-                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200/60 hover:bg-white/16 sm:w-auto sm:px-7"
-                >
-                  {campaign.secondaryCTA.label}
-                </button>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="mb-4 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible"
-              >
-                {campaign.offerChips.map((chip) => (
-                  <span
-                    key={chip}
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/86 shadow-sm backdrop-blur-md"
-                  >
-                    <Check className="h-3.5 w-3.5 text-emerald-200" />
-                    {chip}
-                  </span>
-                ))}
-              </motion.div>
-
-              {campaign.showCountdown && campaign.countdownEnabled && (
-                <motion.div
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.24 }}
-                  className="grid max-w-xl grid-cols-4 overflow-hidden rounded-2xl border border-white/16 bg-white/10 shadow-2xl backdrop-blur-md"
-                >
-                  {countdown.isExpired ? (
-                    <div className="col-span-4 px-4 py-4 text-center text-sm font-bold text-white">
-                      Offer Ended
-                    </div>
-                  ) : (
-                    [
-                      ['Days', countdown.days],
-                      ['Hours', countdown.hours],
-                      ['Minutes', countdown.minutes],
-                      ['Seconds', countdown.seconds],
-                    ].map(([label, value]) => (
-                      <div key={label} className="border-r border-white/12 px-1.5 py-2 text-center last:border-r-0 sm:px-2 sm:py-3">
-                        <p className="text-base font-extrabold text-white sm:text-2xl">
-                          {String(value).padStart(2, '0')}
-                        </p>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-100/76">{label}</p>
-                      </div>
-                    ))
-                  )}
-                  <div className="col-span-4 flex items-center justify-center gap-2 border-t border-white/12 px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-100">
-                    <Clock className="h-3.5 w-3.5" />
-                    {campaign.countdownTitle}
-                  </div>
-                </motion.div>
-              )}
-            </div>
-
-            <div className="relative z-10 flex min-h-[260px] min-w-0 items-center justify-center md:min-h-[440px] lg:min-h-[560px]">
-              {campaign.showOfferBadge && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9, rotate: 3 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 5 }}
-                  transition={{ duration: 0.55, delay: 0.24 }}
-                  className="campaign-discount-badge absolute left-1 top-1 z-20 sm:left-4 sm:top-3 lg:left-0"
-                >
-                  <span>{campaign.heroBadge.eyebrow}</span>
-                  <strong>{campaign.offerPercentage}%</strong>
-                  <span>{campaign.heroBadge.suffix}</span>
-                </motion.div>
-              )}
-
-              {campaign.showFloatingComboCard && (
-                <motion.div
-                  initial={{ opacity: 0, y: 18, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.55, delay: 0.32 }}
-                  className="campaign-combo-card absolute bottom-0 right-0 z-20 w-60 overflow-hidden rounded-3xl border border-emerald-100/25 bg-slate-950/58 shadow-2xl backdrop-blur-xl sm:bottom-2 sm:right-6"
-                >
-                  <img
-                    src={campaign.featuredPromoMedia}
-                    alt={campaign.featuredComboName}
-                    className="h-24 w-full object-cover"
-                    loading="lazy"
-                  />
-                  <div className="p-4">
-                    <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-100">{campaign.featuredComboName}</p>
-                    <div className="mt-2 flex items-end gap-2">
-                      <span className="text-2xl font-black text-white">{campaign.featuredComboPrice}</span>
-                      <span className="pb-1 text-sm font-semibold text-white/45 line-through">{campaign.featuredComboOriginalPrice}</span>
-                    </div>
-                    <p className="mt-1 text-sm font-bold text-emerald-200">{campaign.featuredComboSavings}</p>
-                    <button
-                      type="button"
-                      onClick={() => window.location.href = campaign.secondaryCTA.href}
-                      className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-white transition-colors hover:text-emerald-100"
-                    >
-                      {campaign.featuredComboCtaText}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-
-              <motion.div
-                className="campaign-hero-media-wrap relative w-full"
-                animate={{
-                  x: heroOffset.x,
-                  y: heroOffset.y,
-                  scale: heroOffset.x || heroOffset.y ? 1.012 : 1,
-                }}
-                transition={{ type: 'spring', stiffness: 80, damping: 22 }}
-              >
-                <div className="campaign-product-glow" aria-hidden="true" />
-                {campaign.heroMediaType === 'video' ? (
-                  <motion.video
-                    src={campaign.heroMedia}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                    initial={{ opacity: 0, scale: 0.97, y: 16 }}
-                    animate={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
-                    transition={{ opacity: { duration: 0.55 }, scale: { duration: 0.55 }, y: { duration: 6, repeat: Infinity, ease: 'easeInOut' } }}
-                    className="campaign-hero-media relative w-full object-contain"
-                  />
-                ) : (
-                  <motion.img
-                    src={campaign.heroMedia}
-                    alt={campaign.heroMediaAlt}
-                    loading="eager"
-                    initial={{ opacity: 0, scale: 0.97, y: 16 }}
-                    animate={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
-                    transition={{ opacity: { duration: 0.55 }, scale: { duration: 0.55 }, y: { duration: 6, repeat: Infinity, ease: 'easeInOut' } }}
-                    className="campaign-hero-media relative w-full object-contain"
-                  />
-                )}
-              </motion.div>
-            </div>
-
-            {campaign.showTrustStrip && (
-              <div className="absolute bottom-0 left-0 right-0 z-10 hidden border-t border-white/12 bg-slate-950/34 px-4 py-3 backdrop-blur-md md:block">
-                <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-8 gap-y-2">
-                  {campaign.trustPoints.map((point) => (
-                    <span key={point} className="inline-flex items-center gap-2 text-sm font-bold text-white/82">
-                      <Check className="h-4 w-4 text-emerald-200" />
-                      {point}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+      <CampaignHero countdown={countdown} />
 
       {/* New Rotating Tagline Below Hero Images */}
       <RotatingTagline />
@@ -666,49 +392,6 @@ const Home: React.FC = () => {
 
       <SkincareTips />
 
-      {/* CTA Section */}
-      <section className="py-12 md:py-20 px-4 bg-gradient-to-br from-pink-100 to-cream-200">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="text-2xl md:text-5xl font-bold mb-4 md:mb-6 text-gray-800"
-            >
-              <span className="inline-block">Ready to Transform Your Skin?</span>
-              <span className="inline-block ml-3 text-3xl md:text-4xl font-medium text-pink-600" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>피부 변화를 준비하세요</span>
-            </motion.h2>
-            <p className="text-base md:text-xl mb-7 md:mb-10 text-gray-700 leading-relaxed max-w-2xl mx-auto">
-              Join thousands of satisfied customers who have discovered their natural beauty with {BRAND_NAME}.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button 
-                onClick={() => window.location.href = '/shop'}
-                className="min-h-[44px] w-full bg-white text-pink-600 hover:bg-pink-50 px-8 py-3 md:px-10 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-pink-200 sm:w-auto"
-              >
-                Start Your Journey
-              </button>
-              <button 
-                onClick={() => {
-                  window.open('https://wa.me/919075849555', '_blank');
-                }}
-                className="min-h-[44px] w-full bg-[#25D366] hover:bg-[#20ba5a] text-white px-8 py-3 md:px-10 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl sm:w-auto"
-              >
-                Chat with Expert
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <Newsletter />
     </div>
   );
 };

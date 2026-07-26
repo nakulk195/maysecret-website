@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, CreditCard, Wallet } from 'lucide-react';
+import { Mail, CreditCard, Wallet, Phone } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import { BRAND_NAME } from '../config/brand';
 import { STORAGE_MEDIA } from '../config/storage';
@@ -112,6 +112,12 @@ const Footer: React.FC = () => {
                 <Mail className="w-4 h-4" />
                 <span>maysecretskinandbeauty@gmail.com</span>
               </div>
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4" />
+                <a href="tel:+919075849555" className="hover:text-pink-500 transition duration-200">
+                  +91 90758 49555
+                </a>
+              </div>
               <p className="mt-2">
                 Pune, Maharashtra, India
               </p>
@@ -160,6 +166,20 @@ const Footer: React.FC = () => {
 
         {/* Payment Icons Section */}
         <div className="border-t border-gray-300 mt-8 pt-4 text-center">
+          <div className="mb-5 grid grid-cols-2 gap-3 px-4 text-sm font-semibold sm:hidden">
+            <a href="https://wa.me/919075849555" target="_blank" rel="noopener noreferrer" className="flex min-h-[44px] items-center justify-center rounded-xl border border-gray-200 bg-white text-black">
+              WhatsApp
+            </a>
+            <a href="https://www.instagram.com/maysecretskinandbeauty?igsh=MThqeHI2bTJ5ZmFkNw==" target="_blank" rel="noopener noreferrer" className="flex min-h-[44px] items-center justify-center rounded-xl border border-gray-200 bg-white text-black">
+              Instagram
+            </a>
+            <a href="tel:+919075849555" className="flex min-h-[44px] items-center justify-center rounded-xl border border-gray-200 bg-white text-black">
+              Call
+            </a>
+            <a href="mailto:maysecretskinandbeauty@gmail.com" className="flex min-h-[44px] items-center justify-center rounded-xl border border-gray-200 bg-white text-black">
+              Email
+            </a>
+          </div>
           <p className="text-black text-sm mb-3">
             Secure Payments
           </p>

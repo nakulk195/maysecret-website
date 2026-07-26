@@ -169,13 +169,13 @@ const Home: React.FC = () => {
             )}
           </div>
 
-          <div className="relative mx-auto grid min-h-[650px] max-w-7xl grid-cols-1 items-center gap-8 px-4 py-10 sm:px-6 md:min-h-[700px] lg:min-h-[680px] lg:grid-cols-[0.96fr_1.04fr] lg:px-12">
+          <div className="relative mx-auto grid min-h-[82dvh] max-w-7xl grid-cols-1 items-center gap-5 px-4 py-6 sm:px-6 md:min-h-[700px] md:gap-8 md:py-10 lg:min-h-[680px] lg:grid-cols-[0.96fr_1.04fr] lg:px-12">
             <div className="z-10 max-w-2xl">
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45 }}
-                className="mb-4 inline-flex items-center rounded-full border border-emerald-200/30 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-emerald-100 shadow-sm backdrop-blur-md sm:text-sm"
+                className="mb-3 inline-flex items-center rounded-full border border-emerald-200/30 bg-white/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-100 shadow-sm backdrop-blur-md sm:px-4 sm:py-2 sm:text-sm"
               >
                 {campaign.campaignLabel}
               </motion.p>
@@ -184,7 +184,7 @@ const Home: React.FC = () => {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55 }}
-                className="mb-3 text-4xl font-extrabold leading-[1.02] text-white sm:text-5xl lg:text-6xl"
+                className="mb-2 text-[2.45rem] font-extrabold leading-[1.02] text-white min-[390px]:text-[2.65rem] sm:text-5xl lg:text-6xl"
               >
                 {campaign.heading}
               </motion.h1>
@@ -193,7 +193,7 @@ const Home: React.FC = () => {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.05 }}
-                className="mb-4 text-xl font-semibold text-emerald-100 sm:text-2xl"
+                className="mb-3 text-lg font-semibold text-emerald-100 sm:text-2xl"
               >
                 {campaign.subHeading}
               </motion.p>
@@ -202,7 +202,7 @@ const Home: React.FC = () => {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="mb-6 max-w-xl text-sm leading-relaxed text-white/78 sm:text-base lg:text-lg"
+                className="mb-5 max-w-xl text-sm leading-relaxed text-white/78 sm:text-base lg:text-lg"
               >
                 {campaign.description}
               </motion.p>
@@ -211,12 +211,12 @@ const Home: React.FC = () => {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.16 }}
-                className="mb-6 flex flex-col gap-3 sm:flex-row"
+                className="mb-5 flex flex-col gap-3 sm:flex-row"
               >
                 <button
                   type="button"
                   onClick={() => window.location.href = campaign.primaryCTA.href}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-gray-950 shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-100 sm:px-7"
+                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-gray-950 shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-100 sm:w-auto sm:px-7"
                 >
                   {campaign.primaryCTA.label}
                   <ArrowRight className="h-4 w-4" />
@@ -224,7 +224,7 @@ const Home: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => window.location.href = campaign.secondaryCTA.href}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200/60 hover:bg-white/16 sm:px-7"
+                  className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200/60 hover:bg-white/16 sm:w-auto sm:px-7"
                 >
                   {campaign.secondaryCTA.label}
                 </button>
@@ -234,12 +234,12 @@ const Home: React.FC = () => {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="mb-5 flex flex-wrap gap-2"
+                className="mb-4 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible"
               >
                 {campaign.offerChips.map((chip) => (
                   <span
                     key={chip}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/86 shadow-sm backdrop-blur-md"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/86 shadow-sm backdrop-blur-md"
                   >
                     <Check className="h-3.5 w-3.5 text-emerald-200" />
                     {chip}
@@ -265,8 +265,8 @@ const Home: React.FC = () => {
                       ['Minutes', countdown.minutes],
                       ['Seconds', countdown.seconds],
                     ].map(([label, value]) => (
-                      <div key={label} className="border-r border-white/12 px-2 py-3 text-center last:border-r-0">
-                        <p className="text-lg font-extrabold text-white sm:text-2xl">
+                      <div key={label} className="border-r border-white/12 px-1.5 py-2 text-center last:border-r-0 sm:px-2 sm:py-3">
+                        <p className="text-base font-extrabold text-white sm:text-2xl">
                           {String(value).padStart(2, '0')}
                         </p>
                         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-100/76">{label}</p>
@@ -281,13 +281,13 @@ const Home: React.FC = () => {
               )}
             </div>
 
-            <div className="relative z-10 flex min-h-[340px] min-w-0 items-center justify-center md:min-h-[440px] lg:min-h-[560px]">
+            <div className="relative z-10 flex min-h-[260px] min-w-0 items-center justify-center md:min-h-[440px] lg:min-h-[560px]">
               {campaign.showOfferBadge && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9, rotate: 3 }}
                   animate={{ opacity: 1, scale: 1, rotate: 5 }}
                   transition={{ duration: 0.55, delay: 0.24 }}
-                  className="campaign-discount-badge absolute left-1 top-3 z-20 sm:left-4 lg:left-0"
+                  className="campaign-discount-badge absolute left-1 top-1 z-20 sm:left-4 sm:top-3 lg:left-0"
                 >
                   <span>{campaign.heroBadge.eyebrow}</span>
                   <strong>{campaign.offerPercentage}%</strong>
@@ -300,7 +300,7 @@ const Home: React.FC = () => {
                   initial={{ opacity: 0, y: 18, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ duration: 0.55, delay: 0.32 }}
-                  className="campaign-combo-card absolute bottom-2 right-0 z-20 w-60 overflow-hidden rounded-3xl border border-emerald-100/25 bg-slate-950/58 shadow-2xl backdrop-blur-xl sm:right-6"
+                  className="campaign-combo-card absolute bottom-0 right-0 z-20 w-60 overflow-hidden rounded-3xl border border-emerald-100/25 bg-slate-950/58 shadow-2xl backdrop-blur-xl sm:bottom-2 sm:right-6"
                 >
                   <img
                     src={campaign.featuredPromoMedia}
@@ -393,14 +393,14 @@ const Home: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="text-center mb-7 md:mb-12"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-block mb-4"
+              className="hidden sm:inline-block mb-4"
             >
               <Sparkles className="w-12 h-12 text-pink-500 mx-auto mb-4" />
             </motion.div>
@@ -409,7 +409,7 @@ const Home: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, ease: "easeOut" }}
-              className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-6"
+              className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-3 md:mb-6"
             >
               <span className="inline-block">Featured Products</span>
               <span className="inline-block text-xl md:text-2xl lg:text-3xl font-medium text-pink-600" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>미래 제품</span>
@@ -423,7 +423,7 @@ const Home: React.FC = () => {
             variants={containerVariants}
             initial={false}
             animate="visible"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 px-0 py-4 sm:p-5"
+            className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 px-0 py-3 sm:p-5"
           >
             {products && products.length > 0 && products.filter((product) => product.isFeatured).slice(0, 5).map((product: Product, index: number) => (
               <motion.div
@@ -667,7 +667,7 @@ const Home: React.FC = () => {
       <SkincareTips />
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-pink-100 to-cream-200">
+      <section className="py-12 md:py-20 px-4 bg-gradient-to-br from-pink-100 to-cream-200">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -680,18 +680,18 @@ const Home: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, ease: "easeOut" }}
-              className="text-4xl md:text-5xl font-bold mb-6 text-gray-800"
+              className="text-2xl md:text-5xl font-bold mb-4 md:mb-6 text-gray-800"
             >
               <span className="inline-block">Ready to Transform Your Skin?</span>
               <span className="inline-block ml-3 text-3xl md:text-4xl font-medium text-pink-600" style={{ fontFamily: "'Noto Sans KR', sans-serif" }}>피부 변화를 준비하세요</span>
             </motion.h2>
-            <p className="text-xl mb-10 text-gray-700 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-base md:text-xl mb-7 md:mb-10 text-gray-700 leading-relaxed max-w-2xl mx-auto">
               Join thousands of satisfied customers who have discovered their natural beauty with {BRAND_NAME}.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button 
                 onClick={() => window.location.href = '/shop'}
-                className="bg-white text-pink-600 hover:bg-pink-50 px-10 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-pink-200"
+                className="min-h-[44px] w-full bg-white text-pink-600 hover:bg-pink-50 px-8 py-3 md:px-10 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-pink-200 sm:w-auto"
               >
                 Start Your Journey
               </button>
@@ -699,7 +699,7 @@ const Home: React.FC = () => {
                 onClick={() => {
                   window.open('https://wa.me/919075849555', '_blank');
                 }}
-                className="bg-[#25D366] hover:bg-[#20ba5a] text-white px-10 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                className="min-h-[44px] w-full bg-[#25D366] hover:bg-[#20ba5a] text-white px-8 py-3 md:px-10 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl sm:w-auto"
               >
                 Chat with Expert
               </button>

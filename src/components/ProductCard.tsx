@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, Eye } from 'lucide-react';
 import { Product } from '../utils/productData';
@@ -103,12 +103,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5, scale: 1.01 }}
       transition={{ duration: 0.3 }}
-      className={`relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border group flex flex-col h-full ${isComboHighlight ? 'border-amber-300/70 bg-[linear-gradient(135deg,rgba(255,250,240,0.95),rgba(255,255,255,0.98))] shadow-[0_12px_40px_rgba(251,191,36,0.12)]' : 'border-gray-100'} ${className}`}
+      className={`product-card relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border group flex flex-col h-full ${isComboHighlight ? 'border-amber-300/70 bg-[linear-gradient(135deg,rgba(255,250,240,0.95),rgba(255,255,255,0.98))] shadow-[0_12px_40px_rgba(251,191,36,0.12)]' : 'border-gray-100'} ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <Link to={`/product/${product.id}`} onClick={handleProductClick} className="block">
-        <div className="relative overflow-hidden h-40 md:h-52 w-full bg-gray-50 flex items-center justify-center">
+        <div className="relative overflow-hidden h-32 min-[390px]:h-36 sm:h-40 md:h-52 w-full bg-gray-50 flex items-center justify-center">
           {/* Loading placeholder */}
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-gray-50 to-white animate-pulse" />
@@ -129,7 +129,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
           
           {/* Discount Badge */}
           {discountPercentage > 0 && (
-            <div className="absolute top-2 left-2 bg-rose-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+            <div className="absolute top-2 left-2 bg-rose-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full z-10">
               {discountPercentage}% OFF
             </div>
           )}
@@ -139,7 +139,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
               <motion.div
                 whileHover={{ y: -1, scale: 1.01 }}
                 transition={{ duration: 0.2 }}
-                className="absolute left-2 top-2 z-10 rounded-full border border-amber-200/70 bg-white/80 px-2.5 py-1 text-[11px] font-semibold tracking-[0.2em] text-amber-700 shadow-sm backdrop-blur"
+                className="absolute left-2 top-2 z-10 rounded-full border border-amber-200/70 bg-white/90 px-2 py-1 text-[9px] font-semibold tracking-[0.14em] text-amber-700 shadow-sm backdrop-blur sm:px-2.5 sm:text-[11px]"
               >
                 ✨ BEST VALUE
               </motion.div>
@@ -147,7 +147,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
               <motion.div
                 whileHover={{ y: -1, scale: 1.01 }}
                 transition={{ duration: 0.2 }}
-                className="absolute right-2 top-2 z-10 rounded-full border border-amber-200/70 bg-amber-50/90 px-2.5 py-1 text-[11px] font-semibold text-amber-800 shadow-sm backdrop-blur"
+                className="absolute right-2 top-2 z-10 rounded-full border border-amber-200/70 bg-amber-50/95 px-2 py-1 text-[9px] font-semibold text-amber-800 shadow-sm backdrop-blur sm:px-2.5 sm:text-[11px]"
               >
                 SAVE ₹{comboSavings.toLocaleString()}
               </motion.div>
@@ -168,7 +168,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={handleWishlistToggle}
-              className={`p-3 md:p-2 rounded-full shadow-lg transition-colors min-h-[44px] ${
+              className={`p-2.5 md:p-2 rounded-full shadow-lg transition-colors min-h-[44px] min-w-[44px] ${
                 isWishlisted 
                   ? 'bg-warm-700 text-white' 
                   : 'bg-white text-warm-700 hover:bg-warm-50'
@@ -182,7 +182,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={handleAddToCart}
-              className="p-3 md:p-2 bg-white text-warm-700 rounded-full shadow-lg hover:bg-warm-50 transition-colors min-h-[44px]"
+              className="p-2.5 md:p-2 bg-white text-warm-700 rounded-full shadow-lg hover:bg-warm-50 transition-colors min-h-[44px] min-w-[44px]"
               aria-label="Add to cart"
             >
               <ShoppingCart className="h-5 w-5 md:h-4 md:w-4" />
@@ -203,10 +203,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
       </Link>
 
       {/* Product Info */}
-      <div className="p-4 sm:p-5 flex flex-col">
-        <div>
+      <div className="p-3 sm:p-5 flex flex-1 flex-col">
+        <div className="flex-1">
           {/* Product Name with ellipsis */}
-          <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2 line-clamp-2 overflow-hidden" 
+          <h3 className="min-h-[2.5rem] text-[13px] sm:text-base font-semibold text-gray-900 mb-2 line-clamp-2 overflow-hidden" 
               style={{ 
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
@@ -218,49 +218,49 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
           </h3>
 
           {isComboHighlight && (
-            <div className="mb-3 flex items-center justify-between rounded-full border border-amber-200/70 bg-amber-50/70 px-2.5 py-1.5 text-[11px] font-medium text-amber-800">
-              <span className="flex items-center gap-1.5">
+            <div className="mb-2 flex min-h-[34px] items-center justify-between rounded-lg border border-amber-200/70 bg-amber-50/70 px-2 py-1.5 text-[9px] font-medium text-amber-800 sm:mb-3 sm:rounded-full sm:px-2.5 sm:text-[11px]">
+              <span className="hidden items-center gap-1.5 min-[390px]:flex">
                 <span>{comboIcons[0]}</span>
                 <span>{comboIcons[1]}</span>
               </span>
-              <span className="tracking-[0.16em] text-[10px] uppercase">{comboSubtitle}</span>
+              <span className="tracking-[0.08em] text-[9px] uppercase sm:tracking-[0.16em] sm:text-[10px]">{comboSubtitle}</span>
             </div>
           )}
           
           {/* Rating and Reviews */}
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-1.5 mb-2 sm:gap-2 sm:mb-3">
             <div className="flex items-center bg-amber-50 rounded-full px-2 py-1">
               <Star className="h-4 w-4 text-yellow-400 fill-current" />
               <span className="text-xs text-gray-700 ml-1 font-medium">
                 {product.rating}
               </span>
             </div>
-            <span className="text-xs text-gray-500 whitespace-nowrap">
+            <span className="hidden text-xs text-gray-500 whitespace-nowrap min-[390px]:inline">
               ({product.reviews} reviews)
             </span>
           </div>
           
           {/* Price */}
           <div className="mb-3">
-            <div className="flex items-baseline gap-3 flex-wrap">
-              <span className="text-lg font-bold text-gray-900">
+            <div className="flex items-baseline gap-1.5 flex-wrap sm:gap-3">
+              <span className="text-base font-bold text-gray-900 sm:text-lg">
                 ₹{product.price.toLocaleString()}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (
-                <span className="text-sm text-gray-500 line-through">
+                <span className="text-xs text-gray-500 line-through sm:text-sm">
                   ₹{product.originalPrice.toLocaleString()}
                 </span>
               )}
             </div>
-            <p className="mt-1 text-xs font-medium text-gray-500">
+            <p className="mt-1 hidden text-xs font-medium text-gray-500 min-[390px]:block">
               Inclusive all taxes
             </p>
           </div>
         </div>
         
         {/* Stock Status and Add to Cart */}
-        <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
-          <span className={`text-xs px-2 py-1 rounded-full ${
+        <div className="mt-auto pt-3 border-t border-gray-100">
+          <span className={`mb-2 inline-flex text-[10px] px-2 py-1 rounded-full sm:text-xs ${
             product.stock > 0 
               ? 'bg-green-100 text-green-700' 
               : 'bg-red-100 text-red-700'
@@ -268,18 +268,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
             {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
           </span>
           
-          {/* Add to Cart Button */}
-          <button
-            onClick={handleAddToCart}
-            disabled={!product.stock}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-              product.stock > 0 
-                ? 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-lg' 
-                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            }`}
+          <Link
+            to={`/product/${product.id}`}
+            onClick={handleProductClick}
+            className="flex min-h-[44px] w-full items-center justify-center rounded-lg bg-gray-900 px-2 py-2 text-center text-xs font-semibold text-white transition-all duration-200 hover:bg-gray-800 hover:shadow-lg sm:text-sm"
           >
-            {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
-          </button>
+            View Details
+          </Link>
         </div>
       </div>
     </motion.div>

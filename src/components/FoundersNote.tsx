@@ -48,35 +48,29 @@ const FoundersNote: React.FC = () => {
         <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto flex max-w-7xl flex-col gap-10 lg:gap-14">
-        <motion.div
-          initial={{ opacity: 0, y: 28 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="max-w-3xl"
-        >
-          <p className="mb-4 text-[0.72rem] uppercase tracking-[0.45em] text-stone-400">
-            {founderNoteContent.label}
-          </p>
-          <h2 className="text-3xl font-semibold leading-[1.05] text-stone-100 sm:text-4xl lg:text-6xl">
-            {headingLines.map((line, index) => (
-              <span key={line} className="block">
-                {line}
-                {index === 0 && <span className="mt-2 block h-px w-24 bg-gradient-to-r from-amber-200/60 to-transparent" />}
-              </span>
-            ))}
-          </h2>
-        </motion.div>
-
+      <div className="relative mx-auto flex max-w-7xl flex-col gap-8 lg:gap-14">
         <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
           <motion.div
             initial={{ opacity: 0, x: -24 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.75, ease: 'easeOut' }}
-            className="space-y-6"
+            className="order-2 space-y-5 lg:order-1 lg:space-y-6"
           >
+            <div className="max-w-3xl">
+              <p className="mb-3 text-[0.68rem] uppercase tracking-[0.32em] text-stone-400 sm:mb-4 sm:text-[0.72rem] sm:tracking-[0.45em]">
+                {founderNoteContent.label}
+              </p>
+              <h2 className="text-2xl font-semibold leading-[1.08] text-stone-100 min-[390px]:text-3xl sm:text-4xl lg:text-6xl">
+                {headingLines.map((line, index) => (
+                  <span key={line} className="block">
+                    {line}
+                    {index === 0 && <span className="mt-2 block h-px w-20 bg-gradient-to-r from-amber-200/60 to-transparent sm:w-24" />}
+                  </span>
+                ))}
+              </h2>
+            </div>
+
             <div className="space-y-4 text-[1rem] leading-8 text-stone-300 sm:text-[1.05rem]">
               {founderNoteContent.body.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
@@ -106,7 +100,7 @@ const FoundersNote: React.FC = () => {
             transition={{ duration: 0.8, ease: 'easeOut' }}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            className="relative mx-auto flex w-full max-w-[470px] items-center justify-center"
+            className="relative order-1 mx-auto flex w-full max-w-[470px] items-center justify-center lg:order-2"
           >
             <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-amber-300/20 via-transparent to-stone-200/20 blur-3xl" />
             <motion.div
@@ -122,7 +116,7 @@ const FoundersNote: React.FC = () => {
                 decoding="async"
                 referrerPolicy="no-referrer"
                 onError={handleImageError}
-                className="h-[360px] w-full rounded-[2rem] object-cover object-center sm:h-[440px] lg:h-[520px]"
+                className="h-[320px] w-full rounded-[2rem] object-cover object-center min-[390px]:h-[360px] sm:h-[440px] lg:h-[520px]"
               />
             </motion.div>
           </motion.div>
@@ -133,7 +127,7 @@ const FoundersNote: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
+          className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4"
         >
           {founderNoteContent.values.map((value, index) => (
             <motion.article
@@ -143,13 +137,13 @@ const FoundersNote: React.FC = () => {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.5, delay: 0.06 * index }}
               whileHover={{ y: -5, scale: 1.01 }}
-              className="rounded-[1.6rem] border border-white/10 bg-white/10 p-5 shadow-[0_12px_50px_rgba(0,0,0,0.2)] backdrop-blur-xl"
+              className="rounded-2xl border border-white/10 bg-white/10 p-3 shadow-[0_12px_50px_rgba(0,0,0,0.2)] backdrop-blur-xl sm:rounded-[1.6rem] sm:p-5"
             >
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-xl">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-lg sm:mb-4 sm:h-11 sm:w-11 sm:text-xl">
                 {value.icon}
               </div>
-              <h3 className="text-[1rem] font-semibold text-stone-100">{value.title}</h3>
-              <p className="mt-2 text-sm leading-7 text-stone-400">{value.description}</p>
+              <h3 className="text-sm font-semibold text-stone-100 sm:text-[1rem]">{value.title}</h3>
+              <p className="mt-2 text-xs leading-5 text-stone-400 sm:text-sm sm:leading-7">{value.description}</p>
             </motion.article>
           ))}
         </motion.div>

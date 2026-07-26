@@ -306,32 +306,32 @@ const ProductDetails: React.FC = () => {
     : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-orange-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-orange-50 py-4 sm:py-8">
       <FloatingSocialButtons />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Back Button */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => navigate(-1)}
-          className="mb-8 flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+          className="mb-4 flex min-h-[44px] items-center text-gray-600 transition-colors hover:text-gray-800 sm:mb-8"
         >
           <ChevronLeft size={20} className="mr-2" />
           Back
         </motion.button>
 
         {/* Hero Product Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+        <div className="grid grid-cols-1 gap-6 mb-8 sm:gap-12 sm:mb-16 lg:grid-cols-2">
           {/* Left Side - Product Image */}
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="space-y-4"
+            className="space-y-3 sm:space-y-4"
           >
             {/* Main Image */}
             <div
-              className="relative aspect-square bg-white rounded-3xl shadow-2xl overflow-hidden group product-main-image"
+              className="relative aspect-square bg-white rounded-2xl shadow-xl overflow-hidden group product-main-image sm:rounded-3xl sm:shadow-2xl"
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
@@ -425,7 +425,7 @@ const ProductDetails: React.FC = () => {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
             {/* Product Name */}
             <div>
@@ -433,7 +433,7 @@ const ProductDetails: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-3xl md:text-4xl font-light text-gray-900 mb-3"
+                className="text-2xl md:text-4xl font-light text-gray-900 mb-2 sm:mb-3"
               >
                 {currentProduct?.name || 'Product'}
               </motion.h1>
@@ -443,7 +443,7 @@ const ProductDetails: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-gray-600 text-lg mb-4"
+                className="text-gray-600 text-base sm:text-lg mb-4"
               >
                 {currentProduct?.category === 'sunscreen' && "SPF 50 PA+++ | Broad Spectrum UVA/UVB Protection"}
                 {currentProduct?.category === 'serum' && "Glow Boost Complex | Rice Extract Formula"}
@@ -455,19 +455,19 @@ const ProductDetails: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="flex flex-wrap gap-2 mb-6"
+                className="flex gap-2 mb-5 overflow-x-auto pb-1 sm:mb-6 sm:flex-wrap sm:overflow-visible"
               >
                 {currentProduct?.category === 'sunscreen' && (
                   <>
-                    <div className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium border border-orange-200">
+                    <div className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 px-3 py-2 rounded-full text-xs font-medium border border-orange-200 sm:px-4 sm:text-sm">
                       <Sun size={14} />
                       SPF 50 PA+++
                     </div>
-                    <div className="flex items-center gap-1.5 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium border border-blue-200">
+                    <div className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 px-3 py-2 rounded-full text-xs font-medium border border-blue-200 sm:px-4 sm:text-sm">
                       <ShieldCheck size={14} />
                       Broad Spectrum
                     </div>
-                    <div className="flex items-center gap-1.5 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium border border-purple-200">
+                    <div className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 px-3 py-2 rounded-full text-xs font-medium border border-purple-200 sm:px-4 sm:text-sm">
                       <Droplets size={14} />
                       Lightweight
                     </div>
@@ -475,27 +475,27 @@ const ProductDetails: React.FC = () => {
                 )}
                 {currentProduct?.category === 'serum' && (
                   <>
-                    <div className="flex items-center gap-1.5 bg-gradient-to-r from-pink-100 to-rose-100 text-pink-800 px-4 py-2 rounded-full text-sm font-medium border border-pink-200">
+                    <div className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-pink-100 to-rose-100 text-pink-800 px-3 py-2 rounded-full text-xs font-medium border border-pink-200 sm:px-4 sm:text-sm">
                       <Sparkles size={14} />
                       Brightens Skin
                     </div>
-                    <div className="flex items-center gap-1.5 bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium border border-purple-200">
+                    <div className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-800 px-3 py-2 rounded-full text-xs font-medium border border-purple-200 sm:px-4 sm:text-sm">
                       <Zap size={14} />
                       Reduces Pigmentation
                     </div>
-                    <div className="flex items-center gap-1.5 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium border border-green-200">
+                    <div className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-3 py-2 rounded-full text-xs font-medium border border-green-200 sm:px-4 sm:text-sm">
                       <Leaf size={14} />
                       Rice Extract
                     </div>
                   </>
                 )}
                 {currentProduct?.category !== 'sunscreen' && (
-                  <div className="flex items-center gap-1.5 bg-gradient-to-r from-rose-100 to-pink-100 text-rose-800 px-4 py-2 rounded-full text-sm font-medium border border-rose-200">
+                  <div className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-rose-100 to-pink-100 text-rose-800 px-3 py-2 rounded-full text-xs font-medium border border-rose-200 sm:px-4 sm:text-sm">
                     <Sparkles size={14} />
                     K-Beauty Inspired
                   </div>
                 )}
-                <div className="flex items-center gap-1.5 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium border border-green-200">
+                <div className="flex shrink-0 items-center gap-1.5 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-3 py-2 rounded-full text-xs font-medium border border-green-200 sm:px-4 sm:text-sm">
                   <Leaf size={14} />
                   Skin Friendly
                 </div>
@@ -606,7 +606,7 @@ const ProductDetails: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
-                className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto] sm:gap-4 mb-8"
+                className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto] sm:gap-4 mb-6 sm:mb-8"
               >
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -648,7 +648,7 @@ const ProductDetails: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.0 }}
-                className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-gray-200"
+                className="grid grid-cols-1 min-[390px]:grid-cols-3 gap-3 sm:gap-4 pt-5 sm:pt-6 border-t border-gray-200"
               >
                 <div className="flex items-center space-x-3">
                   <Truck size={18} className="text-green-600" />
@@ -672,10 +672,10 @@ const ProductDetails: React.FC = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="bg-white rounded-3xl shadow-xl p-8"
+          className="bg-white rounded-2xl shadow-xl p-3 sm:rounded-3xl sm:p-8"
         >
           <div className="border-b border-gray-100 mb-8">
-            <nav className="flex space-x-1 sm:space-x-8 overflow-x-auto">
+            <nav className="flex space-x-1 overflow-x-auto sm:space-x-8">
               {[
                 { id: 'description', label: 'Description', icon: Sparkles },
                 { id: 'benefits', label: 'Benefits', icon: Award },
@@ -686,7 +686,7 @@ const ProductDetails: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-6 border-b-2 font-medium text-sm transition-all flex items-center gap-2 whitespace-nowrap ${
+                  className={`min-h-[44px] py-3 px-4 sm:py-4 sm:px-6 border-b-2 font-medium text-xs sm:text-sm transition-all flex items-center gap-2 whitespace-nowrap ${
                     activeTab === tab.id
                       ? 'border-rose-400 text-rose-600 bg-rose-50 rounded-t-xl'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -709,9 +709,9 @@ const ProductDetails: React.FC = () => {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  <div className="bg-gradient-to-r from-pink-50 to-orange-50 rounded-2xl p-8">
-                    <h3 className="text-2xl font-light text-gray-900 mb-4">Product Overview</h3>
-                    <p className="text-gray-700 leading-relaxed text-lg">
+                  <div className="bg-gradient-to-r from-pink-50 to-orange-50 rounded-2xl p-4 sm:p-8">
+                    <h3 className="text-xl sm:text-2xl font-light text-gray-900 mb-4">Product Overview</h3>
+                    <p className="text-gray-700 leading-relaxed text-base sm:text-lg">
                       {currentProduct?.description || 'Product description not available'}
                     </p>
                   </div>

@@ -22,8 +22,8 @@ const Newsletter: React.FC = () => {
   };
 
   return (
-    <section className="py-16 bg-black text-white text-center">
-      <div className="max-w-4xl mx-auto px-6">
+    <section className="py-12 md:py-16 bg-black text-white text-center">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -37,7 +37,7 @@ const Newsletter: React.FC = () => {
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold mb-4">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Join Our Skincare Community
           </h2>
           
@@ -46,20 +46,20 @@ const Newsletter: React.FC = () => {
           </p>
 
           {!isSubscribed ? (
-            <form onSubmit={handleSubmit} className="flex justify-center max-w-md mx-auto">
+            <form onSubmit={handleSubmit} className="flex max-w-md flex-col justify-center gap-3 mx-auto sm:flex-row sm:gap-0">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="px-4 py-3 w-full rounded-l-lg text-black focus:outline-none focus:ring-2 focus:ring-pink-600"
+                className="min-h-[44px] px-4 py-3 w-full rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-pink-600 sm:rounded-l-lg sm:rounded-r-none"
                 required
               />
               <motion.button
                 type="submit"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-pink-600 px-6 py-3 rounded-r-lg hover:bg-pink-700 transition duration-300 font-semibold flex items-center gap-2"
+                className="min-h-[44px] bg-pink-600 px-6 py-3 rounded-lg hover:bg-pink-700 transition duration-300 font-semibold flex items-center justify-center gap-2 sm:rounded-l-none sm:rounded-r-lg"
               >
                 <Send className="w-4 h-4" />
                 Subscribe

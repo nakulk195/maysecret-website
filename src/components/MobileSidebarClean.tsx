@@ -41,7 +41,7 @@ export const MobileSidebarClean: React.FC<MobileSidebarProps> = ({ isOpen, setIs
             {/* Header */}
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">Menu</h2>
-              <button onClick={() => setIsOpen(false)}>
+              <button onClick={() => setIsOpen(false)} className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full hover:bg-gray-100" aria-label="Close menu">
                 <X className="w-6 h-6" />
               </button>
             </div>
@@ -55,11 +55,13 @@ export const MobileSidebarClean: React.FC<MobileSidebarProps> = ({ isOpen, setIs
             </div>
 
             {/* Links */}
-            <nav className="flex flex-col gap-4 px-4">
+            <nav className="flex flex-col gap-2 px-4">
               {[
-                { name: "Home", path: "/", icon: Home },
                 { name: "Shop", path: "/shop", icon: ShoppingBag },
+                { name: "Combo Packs", path: "/product/3", icon: Gift, highlight: true },
+                { name: "Offers", path: "/shop", icon: Gift, highlight: true },
                 { name: "Cart", path: "/cart", icon: ShoppingCart },
+                { name: "Home", path: "/", icon: Home },
                 { name: "Wishlist", path: "/wishlist", icon: Heart },
                 ...(user ? [{ name: "Orders", path: "/orders", icon: Package }] : []),
                 { name: "Gift Kit", path: "/giftkit", icon: Gift },
@@ -83,9 +85,9 @@ export const MobileSidebarClean: React.FC<MobileSidebarProps> = ({ isOpen, setIs
                         // Redirect to login page after logout
                         window.location.href = '/login';
                       }}
-                      className="block w-full text-lg font-medium text-gray-700 hover:text-pink-600 transition-all text-left"
+                      className="block min-h-[44px] w-full rounded-xl px-3 text-left text-base font-medium text-gray-700 transition-all hover:bg-pink-50 hover:text-pink-600"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex min-h-[44px] items-center gap-3">
                         <Icon className="w-5 h-5" />
                         <span>{item.name}</span>
                       </div>
@@ -97,9 +99,13 @@ export const MobileSidebarClean: React.FC<MobileSidebarProps> = ({ isOpen, setIs
                       key={item.name + index}
                       to={item.path}
                       onClick={() => setIsOpen(false)}
-                      className="block text-lg font-medium text-gray-700 hover:text-pink-600 transition-all"
+                      className={`block min-h-[44px] rounded-xl px-3 text-base font-medium transition-all ${
+                        item.highlight
+                          ? "bg-pink-50 text-pink-700 shadow-sm"
+                          : "text-gray-700 hover:bg-pink-50 hover:text-pink-600"
+                      }`}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex min-h-[44px] items-center gap-3">
                         <Icon className="w-5 h-5" />
                         <span>{item.name}</span>
                       </div>

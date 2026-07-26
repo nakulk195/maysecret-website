@@ -174,7 +174,7 @@ const Shop: React.FC = () => {
             {/* Mobile Filter Button */}
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 sm:hidden"
+              className="flex min-h-[44px] items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 sm:hidden"
             >
               <Filter size={16} />
               {isFilterOpen ? 'Hide Filters' : 'Show Filters'}
@@ -203,11 +203,11 @@ const Shop: React.FC = () => {
 
             {/* Sort and View Toggle */}
             <div className="flex items-center gap-3 w-full sm:w-auto">
-              <div className="relative">
+              <div className="relative flex-1 sm:flex-none">
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="appearance-none bg-white border border-gray-300 rounded-full pl-3 pr-8 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  className="min-h-[44px] w-full appearance-none bg-white border border-gray-300 rounded-full pl-3 pr-8 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 >
                   <option value="featured">Featured</option>
                   <option value="newest">Newest</option>
@@ -223,7 +223,7 @@ const Shop: React.FC = () => {
               <div className="flex items-center bg-white rounded-lg p-0.5 border border-gray-200">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-md transition-colors ${
+                  className={`flex min-h-[40px] min-w-[40px] items-center justify-center rounded-md transition-colors ${
                     viewMode === 'grid'
                       ? 'bg-rose-600 text-white'
                       : 'text-gray-600 hover:text-gray-800'
@@ -234,7 +234,7 @@ const Shop: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-1.5 rounded-md transition-colors ${
+                  className={`flex min-h-[40px] min-w-[40px] items-center justify-center rounded-md transition-colors ${
                     viewMode === 'list'
                       ? 'bg-rose-600 text-white'
                       : 'text-gray-600 hover:text-gray-800'
@@ -301,7 +301,7 @@ const Shop: React.FC = () => {
 
         {/* Products Grid/List */}
         {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
             {filteredProducts.map((product) => (
               <motion.div
                 key={product.id}

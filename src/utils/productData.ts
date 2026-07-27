@@ -6,10 +6,12 @@ const brighteningSerumImg = STORAGE_MEDIA.serum.brighteningSerum.src;
 const brighteningSerum2Img = STORAGE_MEDIA.serum.brighteningSerum2.src;
 const brighteningSerum3Img = STORAGE_MEDIA.serum.brighteningSerum3.src;
 const brighteningSerum4Img = STORAGE_MEDIA.serum.brighteningSerum4.src;
+const brighteningSerumVideoImg = STORAGE_MEDIA.serum.brighteningSerum5.src;
 const sunscreenSprayImg = STORAGE_MEDIA.spray.sunscreenSpray.src;
 const sunscreenSpray2Img = STORAGE_MEDIA.spray.sunscreenSpray2.src;
 const sunscreenSpray3Img = STORAGE_MEDIA.spray.sunscreenSpray3.src;
 const sunscreenSpray4Img = STORAGE_MEDIA.spray.sunscreenSpray4.src;
+const sunscreenSprayVideoImg = STORAGE_MEDIA.spray.sunscreenSpray5.src;
 const comboImg = STORAGE_MEDIA.combo.combo.src;
 const combo2Img = STORAGE_MEDIA.combo.combo2.src;
 const combo3Img = STORAGE_MEDIA.combo.combo3.src;
@@ -86,7 +88,7 @@ export const products: Product[] = [
       sunscreenSpray2Img,
       sunscreenSpray3Img,
       sunscreenSpray4Img,
-      heroVideo3Img
+      sunscreenSprayVideoImg
     ],
     description: "Introducing our new sunscreen spray, fortified with advanced sun protection technology. Formulated with Suncat DE, Uvinul A Plus, and other powerful sunscreen agents, it provides broad-spectrum protection against both UVA and UVB rays. With its lightweight and non-greasy formula, it is perfect for daily use, keeping your skin safe and healthy under the sun.",
     benefits: [
@@ -163,7 +165,7 @@ export const products: Product[] = [
       brighteningSerum2Img,
       brighteningSerum3Img,
       brighteningSerum4Img,
-      heroVideo2Img
+      brighteningSerumVideoImg
     ],
     description: "A powerful brightening serum enriched with Rice Extract, Niacinamide and Sepiwhite designed to improve skin tone, reduce pigmentation and give a radiant glass glow skin effect.",
     benefits: [

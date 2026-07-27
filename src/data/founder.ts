@@ -1,3 +1,5 @@
+import { STORAGE_MEDIA } from '../config/storage';
+
 export const founderNoteContent = {
   label: "FOUNDER'S NOTE",
   heading: "More Than Skincare.\nA Promise From Our Heart.",
@@ -12,7 +14,7 @@ export const founderNoteContent = {
   ],
   signature: "Adv. Prasanna",
   role: "Founder & Brand Director",
-  imageUrl: "https://umyqlnurvuylnvtbrsiy.supabase.co/storage/v1/object/public/MaySecret/Owner/Owner.png",
+  imageUrl: STORAGE_MEDIA.hero.owner.src,
   values: [
     {
       icon: "✨",

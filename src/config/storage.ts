@@ -18,6 +18,7 @@ export const STORAGE_MEDIA = {
     hero2: remoteAsset('Hero/heroimg2.MOV'),
     hero3: remoteAsset('Hero/heroimg3.MOV'),
     hero4: remoteAsset('Hero/heroimg4.PNG'),
+    owner: remoteAsset('Hero/Owner.PNG'),
   },
   combo: {
     combo: remoteAsset('Combo/combo.PNG'),
@@ -30,12 +31,14 @@ export const STORAGE_MEDIA = {
     brighteningSerum2: remoteAsset('Serum/brightening-serum2.PNG'),
     brighteningSerum3: remoteAsset('Serum/brightening-serum3.JPG'),
     brighteningSerum4: remoteAsset('Serum/brightening-serum4.PNG'),
+    brighteningSerum5: remoteAsset('Serum/brightening-serum5.MOV'),
   },
   spray: {
     sunscreenSpray: remoteAsset('Spray/sunscreen-spray.jpeg'),
     sunscreenSpray2: remoteAsset('Spray/sunscreen-spray2.JPG'),
     sunscreenSpray3: remoteAsset('Spray/sunscreen-spray3.JPG'),
     sunscreenSpray4: remoteAsset('Spray/sunscreen-spray4.JPG'),
+    sunscreenSpray5: remoteAsset('Spray/sunscreen-spray5.MOV'),
   },
   skincareTips: {
     brightSkinGlow: remoteAsset('Skincare_Tips/bright-skin-glow.jpg'),

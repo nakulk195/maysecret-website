@@ -10,6 +10,7 @@ import RotatingTagline from '../components/RotatingTagline';
 import SkincareTips from '../components/SkincareTips';
 import GlassSkinRoutine from '../components/GlassSkinRoutine';
 import FoundersNote from '../components/FoundersNote';
+import CustomerTestimonials from '../components/CustomerTestimonials';
 import CampaignHero from '../components/hero/CampaignHero';
 import { BRAND_NAME } from '../config/brand';
 import { campaign } from '../config/campaign';
@@ -259,6 +260,8 @@ const Home: React.FC = () => {
       </section>
 
       <FoundersNote />
+
+      <CustomerTestimonials />
 
       {/* May Secret Brand section (moved below Featured Products) */}
       <section className="relative overflow-hidden bg-gradient-to-br from-pink-50 via-white to-cream-100 py-6 md:py-8 px-4 scroll-smooth">

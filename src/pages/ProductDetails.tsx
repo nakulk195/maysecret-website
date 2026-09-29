@@ -23,6 +23,7 @@ import {
 import { getProductById } from '../utils/productData';
 import { addToRecentlyViewed } from '../utils/storage';
 import { getProductImage, getProductImages } from '../utils/productImages';
+import { calculateDiscountPercentage } from '../utils/pricing';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -300,10 +301,8 @@ const ProductDetails: React.FC = () => {
     setSelectedImage((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  // @ts-ignore
-  const discountPercentage = currentProduct?.originalPrice || currentProduct?.original_price 
-    ? Math.round((((currentProduct?.originalPrice || currentProduct?.original_price) - (currentProduct?.price || 0)) / (currentProduct?.originalPrice || currentProduct?.original_price)) * 100)
-    : 0;
+  const originalPrice = currentProduct?.originalPrice ?? currentProduct?.original_price;
+  const discountPercentage = calculateDiscountPercentage(originalPrice, currentProduct?.price);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-orange-50 py-4 sm:py-8">
@@ -537,10 +536,10 @@ const ProductDetails: React.FC = () => {
                   <span className="text-4xl font-light text-gray-900">
                     ₹{(currentProduct?.price || 0).toLocaleString()}
                   </span>
-                  {(currentProduct?.originalPrice || currentProduct?.original_price) && (
+                  {discountPercentage !== null && (
                     <>
                       <span className="text-xl text-gray-400 line-through">
-                        ₹{(currentProduct?.originalPrice || currentProduct?.original_price || 0).toLocaleString()}
+                        ₹{originalPrice.toLocaleString()}
                       </span>
                       <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                         {discountPercentage}% OFF

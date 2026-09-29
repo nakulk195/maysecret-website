@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, Trash2 } from 'lucide-react';
 import { Product } from '../lib/supabase';
 import { getProductImage } from '../utils/productImages';
+import { calculateDiscountPercentage } from '../utils/pricing';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 
@@ -41,7 +42,7 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
     // Navigate to product details
   };
 
-  const discountPercentage = 0; // No discount calculation since original_price doesn't exist
+  const discountPercentage = calculateDiscountPercentage(product.original_price, product.price);
 
   return (
     <motion.div
@@ -71,9 +72,9 @@ const WishlistCard: React.FC<WishlistCardProps> = ({ product, onRemove }) => {
           />
           
           {/* Discount Badge */}
-          {discountPercentage > 0 && (
-            <div className="absolute top-3 left-3 bg-warm-700 text-white text-xs font-semibold px-2 py-1 rounded-full">
-              -{discountPercentage}%
+          {discountPercentage !== null && (
+            <div className="absolute top-3 left-3 bg-rose-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+              {discountPercentage}% OFF
             </div>
           )}
           

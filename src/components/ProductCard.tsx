@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, Eye } from 'lucide-react';
 import { Product } from '../utils/productData';
 import { getProductImage } from '../utils/productImages';
+import { calculateDiscountPercentage, calculateSavingsAmount } from '../utils/pricing';
 import { addToRecentlyViewed } from '../utils/storage';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
@@ -86,15 +87,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
     addToRecentlyViewed(product as any);
   };
 
-  const discountPercentage = product.originalPrice && product.originalPrice > product.price
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
+  const discountPercentage = calculateDiscountPercentage(product.originalPrice, product.price);
+  const savingsAmount = calculateSavingsAmount(product.originalPrice, product.price);
 
   const isComboHighlight = product.category === 'combo' && [3, 4, 5].includes(product.id);
-  const comboSavings = product.originalPrice && product.originalPrice > product.price
-    ? product.originalPrice - product.price
-    : 0;
-  const comboPromoLabel = product.id === 3 ? '✨ BEST VALUE' : product.id === 4 ? '🔥 BEST SELLER' : '⭐ CUSTOMER FAVORITE';
   const comboSubtitle = product.id === 3 ? 'Complete Skincare Combo' : '2 Premium Products Included';
   const comboIcons = product.id === 3 ? ['🧴', '☀️'] : product.id === 4 ? ['🧴', '🧴'] : ['☀️', '☀️'];
 
@@ -129,7 +125,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
           />
           
           {/* Discount Badge */}
-          {discountPercentage > 0 && !isComboHighlight && (
+          {discountPercentage !== null && (
             <div className="absolute top-2 left-2 bg-rose-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full z-10">
               {discountPercentage}% OFF
             </div>
@@ -137,16 +133,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
 
           {isComboHighlight && (
             <>
-              <div className="absolute left-2 right-2 top-2 z-10 flex flex-wrap items-start gap-1.5 sm:gap-2">
-                <motion.div
-                  whileHover={{ y: -1, scale: 1.01 }}
-                  transition={{ duration: 0.2 }}
-                  className="inline-flex min-h-[28px] items-center rounded-full border border-amber-200/70 bg-white/90 px-2 py-1 text-[9px] font-semibold tracking-[0.14em] text-amber-700 shadow-sm backdrop-blur sm:px-2.5 sm:text-[10px]"
-                >
-                  {comboPromoLabel}
-                </motion.div>
-              </div>
-
               <motion.div
                 animate={{ x: ['-20%', '120%'] }}
                 transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
@@ -241,18 +227,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
               <span className="text-base font-bold text-gray-900 sm:text-lg">
                 ₹{product.price.toLocaleString()}
               </span>
-              {product.originalPrice && product.originalPrice > product.price && (
+              {discountPercentage !== null && (
                 <span className="text-xs text-gray-500 line-through sm:text-sm">
-                  ₹{product.originalPrice.toLocaleString()}
+                  ₹{product.originalPrice?.toLocaleString()}
                 </span>
               )}
             </div>
-            {product.originalPrice && product.originalPrice > product.price && (
+            {savingsAmount !== null && (
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 className="mt-2 inline-flex min-h-[28px] items-center rounded-full bg-[#E53935] px-2.5 py-1 text-[10px] font-semibold text-white shadow-[0_6px_18px_rgba(229,57,53,0.22)] sm:text-xs"
               >
-                SAVE ₹{(product.originalPrice - product.price).toLocaleString()}
+                SAVE ₹{savingsAmount.toLocaleString()}
               </motion.div>
             )}
             <p className="mt-1 hidden text-xs font-medium text-gray-500 min-[390px]:block">

@@ -135,11 +135,11 @@ export const campaign: CampaignConfig = {
   desktopHeroLayout: 'split-campaign',
   heroMediaType: 'image',
   heroMediaAlt: 'May Secret Monsoon Glow Sale combo pack with rice brightening serum and sunscreen spray',
-  offerPercentage: 65,
+  offerPercentage: 54,
   comboSavings: 'Rs. 1619',
   comboSavingsLabel: 'Combo Savings',
   announcementText:
-    'Monsoon Glow Sale - Up to 65% OFF - Combo Packs from Rs. 1149 - Free Shipping - Limited Time Offer',
+    'Monsoon Glow Sale - Up to 54% OFF - Combo Packs from Rs. 1149 - Free Shipping - Limited Time Offer',
   countdownEndDate: twentyFourHourCampaignEnd,
   countdownTitle: 'Offer Ends In',
   countdownEnabled: true,

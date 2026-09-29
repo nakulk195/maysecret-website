@@ -6,6 +6,7 @@ import ProductCard from '../components/ProductCard';
 import { Product } from '../utils/productData';
 import { products as localProducts } from '../utils/productData';
 import { getProductImage } from '../utils/productImages';
+import { calculateDiscountPercentage, calculateSavingsAmount } from '../utils/pricing';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import FloatingSocialButtons from '../components/FloatingSocialButtons';
@@ -316,7 +317,11 @@ const Shop: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredProducts.map((product) => (
+            {filteredProducts.map((product) => {
+              const discountPercentage = calculateDiscountPercentage(product.originalPrice, product.price);
+              const savingsAmount = calculateSavingsAmount(product.originalPrice, product.price);
+
+              return (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, x: -20 }}
@@ -325,13 +330,18 @@ const Shop: React.FC = () => {
                 className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden"
               >
                 <div className="flex flex-col sm:flex-row">
-                  <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
+                  <div className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
                     <img
                       src={getProductImage(product.image)}
                       alt={product.name}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
+                    {discountPercentage !== null && (
+                      <span className="absolute left-2 top-2 rounded-full bg-rose-600 px-2 py-1 text-xs font-bold text-white">
+                        {discountPercentage}% OFF
+                      </span>
+                    )}
                   </div>
                   <div className="p-4 flex-1 flex flex-col">
                     <div className="flex justify-between items-start">
@@ -356,6 +366,18 @@ const Shop: React.FC = () => {
                         <span className="text-lg font-bold text-warm-700">
                           ₹{product.price.toLocaleString()}
                         </span>
+                        {discountPercentage !== null && (
+                          <>
+                            <span className="ml-2 text-sm text-gray-500 line-through">
+                              ₹{product.originalPrice?.toLocaleString()}
+                            </span>
+                            {savingsAmount !== null && (
+                              <span className="ml-2 text-xs font-semibold text-rose-600">
+                                SAVE ₹{savingsAmount.toLocaleString()}
+                              </span>
+                            )}
+                          </>
+                        )}
                       </div>
                       
                       <button
@@ -373,7 +395,8 @@ const Shop: React.FC = () => {
                   </div>
                 </div>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         )}
 

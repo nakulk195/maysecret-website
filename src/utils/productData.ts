@@ -393,6 +393,7 @@ export const getProductsFromSupabase = async (): Promise<Product[]> => {
       id: parseInt(sp.id),
       name: sp.name,
       price: sp.price,
+      originalPrice: sp.original_price,
       image: sp.image,
       images: [sp.image], // For now, single image
       description: sp.description,
@@ -418,6 +419,7 @@ export const getProductsByCategoryFromSupabase = async (category: string): Promi
       id: parseInt(sp.id),
       name: sp.name,
       price: sp.price,
+      originalPrice: sp.original_price,
       image: sp.image,
       images: [sp.image],
       description: sp.description,
@@ -443,6 +445,7 @@ export const searchProductsFromSupabase = async (query: string): Promise<Product
       id: parseInt(sp.id),
       name: sp.name,
       price: sp.price,
+      originalPrice: sp.original_price,
       image: sp.image,
       images: [sp.image],
       description: sp.description,

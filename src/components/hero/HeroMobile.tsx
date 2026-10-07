@@ -24,14 +24,13 @@ const HeroMobile: React.FC<HeroMobileProps> = ({ countdown }) => {
         ['--campaign-daily-glow' as string]: dailyTheme.glow,
       }}
     >
-      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-        <img
-          src={campaign.heroMobileBackgroundImage}
-          alt=""
-          className="campaign-mobile-bg h-full w-full object-cover"
-          loading="lazy"
-        />
-      </div>
+      <img
+        src={campaign.heroMobileBackgroundImage}
+        alt=""
+        aria-hidden="true"
+        className="campaign-mobile-bg absolute left-0 top-0 h-auto w-full object-contain"
+        loading="eager"
+      />
 
       <div className="relative z-10 mx-auto flex max-w-md flex-col gap-4">
         <motion.div

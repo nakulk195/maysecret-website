@@ -13,7 +13,7 @@ import FoundersNote from '../components/FoundersNote';
 import CustomerTestimonials from '../components/CustomerTestimonials';
 import CampaignHero from '../components/hero/CampaignHero';
 import { BRAND_NAME } from '../config/brand';
-import { campaign } from '../config/campaign';
+import { getCampaignCountdownTarget } from '../config/campaign';
 
 type CountdownState = {
   days: number;
@@ -23,8 +23,9 @@ type CountdownState = {
   isExpired: boolean;
 };
 
-const getCountdownState = (endDate: string): CountdownState => {
-  const endTime = new Date(endDate).getTime();
+const getCountdownState = (): CountdownState => {
+  const countdownTarget = getCampaignCountdownTarget();
+  const endTime = countdownTarget ? new Date(countdownTarget).getTime() : NaN;
   const distance = endTime - Date.now();
 
   if (!Number.isFinite(endTime) || distance <= 0) {
@@ -49,9 +50,7 @@ const getCountdownState = (endDate: string): CountdownState => {
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [countdown, setCountdown] = useState<CountdownState>(() =>
-    getCountdownState(campaign.countdownEndDate)
-  );
+  const [countdown, setCountdown] = useState<CountdownState>(() => getCountdownState());
 
   // Load products from local productData
   useEffect(() => {
@@ -69,7 +68,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const updateCountdown = () => {
-      setCountdown(getCountdownState(campaign.countdownEndDate));
+      setCountdown(getCountdownState());
     };
 
     updateCountdown();

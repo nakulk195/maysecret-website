@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { campaign } from '../../config/campaign';
+import { campaign, isCampaignVisible } from '../../config/campaign';
 import HeroDesktop from './HeroDesktop';
 import HeroMobile from './HeroMobile';
 import { CountdownState } from './CampaignCountdown';
@@ -62,7 +62,7 @@ const CampaignHero: React.FC<CampaignHeroProps> = ({ countdown }) => {
     };
   }, [selectedHeroImage]);
 
-  if (!campaign.isCampaignActive) {
+  if (!isCampaignVisible()) {
     return null;
   }
 

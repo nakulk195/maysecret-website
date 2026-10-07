@@ -680,3 +680,130 @@ h1, h2, h3, h4, h5, h6 {
 .thumbnail-strip::-webkit-scrollbar {
   display: none;
 }
+
+/* Navratri campaign: restrained festive accents over the existing premium skincare photography. */
+.campaign-hero-background {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  object-position: center;
+}
+
+.campaign-hero::after {
+  background: transparent;
+}
+
+.campaign-navratri-mandala {
+  position: absolute;
+  right: -8rem;
+  top: 50%;
+  width: min(44vw, 38rem);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--campaign-daily-accent) 38%, transparent);
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(
+      from 0deg,
+      color-mix(in srgb, var(--campaign-daily-accent) 32%, transparent) 0deg 1deg,
+      transparent 1deg 15deg
+    ),
+    radial-gradient(circle, transparent 0 22%, color-mix(in srgb, var(--campaign-daily-accent) 25%, transparent) 22.3% 22.8%, transparent 23% 48%, color-mix(in srgb, var(--campaign-daily-accent) 18%, transparent) 48.3% 48.8%, transparent 49%);
+  box-shadow: 0 0 90px var(--campaign-daily-glow), inset 0 0 60px rgba(214, 169, 77, 0.08);
+  opacity: 0.65;
+  transform: translateY(-50%);
+}
+
+.campaign-festive-particles {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 14% 23%, rgba(255, 232, 178, 0.82) 0 1px, transparent 2px),
+    radial-gradient(circle at 74% 18%, rgba(255, 222, 154, 0.74) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 88% 57%, rgba(255, 244, 214, 0.64) 0 1px, transparent 2px),
+    radial-gradient(circle at 38% 84%, rgba(214, 169, 77, 0.52) 0 1px, transparent 2px);
+  background-size: 160px 130px, 210px 180px, 180px 160px, 240px 210px;
+  mix-blend-mode: screen;
+  opacity: 0.62;
+  pointer-events: none;
+}
+
+.campaign-discount-badge {
+  border-color: color-mix(in srgb, var(--campaign-daily-accent) 68%, transparent);
+  background: linear-gradient(145deg, rgba(88, 17, 44, 0.88), rgba(18, 7, 11, 0.88));
+  box-shadow: 0 18px 45px var(--campaign-daily-glow), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.campaign-discount-badge span {
+  color: #f9dfab;
+}
+
+.campaign-discount-badge strong {
+  color: var(--campaign-daily-accent);
+}
+
+.campaign-product-glow {
+  background:
+    radial-gradient(circle at 62% 38%, var(--campaign-daily-glow), transparent 38%),
+    radial-gradient(circle at 72% 56%, rgba(139, 41, 79, 0.24), transparent 44%);
+}
+
+.campaign-combo-card {
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.42), 0 0 42px var(--campaign-daily-glow);
+}
+
+.campaign-hero-mobile::after {
+  background: transparent;
+}
+
+.campaign-mobile-bg {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  object-position: center top;
+}
+
+.campaign-mobile-product-card {
+  border-color: color-mix(in srgb, var(--campaign-daily-accent) 34%, transparent);
+  background:
+    linear-gradient(145deg, rgba(117, 25, 57, 0.28), rgba(16, 7, 11, 0.6)),
+    radial-gradient(circle at 50% 45%, var(--campaign-daily-glow), transparent 50%);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.44),
+    0 0 42px var(--campaign-daily-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.campaign-mobile-product-glow {
+  background:
+    radial-gradient(circle at 50% 45%, var(--campaign-daily-glow), transparent 42%),
+    radial-gradient(circle at 70% 60%, rgba(139, 41, 79, 0.2), transparent 44%);
+}
+
+.campaign-navratri-progress {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24), 0 0 24px var(--campaign-daily-glow);
+}
+
+@media (max-width: 640px) {
+  .campaign-navratri-mandala {
+    right: -5rem;
+    top: 35%;
+    width: 17rem;
+    opacity: 0.38;
+  }
+
+  .campaign-mobile-product-card {
+    min-height: 260px;
+    max-height: 36dvh;
+  }
+}
+
+@media (max-width: 360px) {
+  .campaign-mobile-product-card {
+    min-height: 230px;
+  }
+
+  .campaign-navratri-progress {
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+  }
+}

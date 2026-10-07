@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Check } from 'lucide-react';
-import { campaign } from '../../config/campaign';
+import { campaign, getDailyTheme } from '../../config/campaign';
 import CampaignCountdown, { CountdownState } from './CampaignCountdown';
+import NavratriProgress from './NavratriProgress';
 
 type HeroDesktopProps = {
   countdown: CountdownState;
@@ -11,6 +12,7 @@ type HeroDesktopProps = {
 
 const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
   const [heroOffset, setHeroOffset] = useState({ x: 0, y: 0 });
+  const dailyTheme = getDailyTheme();
 
   const handleHeroPointerMove = (event: React.PointerEvent<HTMLElement>) => {
     if (window.matchMedia('(max-width: 1023px)').matches) {
@@ -29,7 +31,7 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
 
   return (
     <section
-      className="campaign-hero relative hidden w-full overflow-hidden text-white md:block"
+      className="campaign-hero relative z-[60] hidden w-full overflow-hidden text-white md:block"
       onPointerMove={handleHeroPointerMove}
       onPointerLeave={handleHeroPointerLeave}
       style={{
@@ -37,27 +39,29 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
         ['--campaign-primary' as string]: campaign.accentColors.primary,
         ['--campaign-secondary' as string]: campaign.accentColors.secondary,
         ['--campaign-accent' as string]: campaign.accentColors.accent,
+        ['--campaign-daily-accent' as string]: dailyTheme.accent,
+        ['--campaign-daily-glow' as string]: dailyTheme.glow,
       }}
     >
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         <img
-          src={campaign.backgroundImage}
+          src={campaign.heroDesktopBackgroundImage}
           alt=""
           className="campaign-hero-background h-full w-full object-cover"
           loading="lazy"
         />
-        {campaign.backgroundEffects.rain && <div className="campaign-rain-layer" />}
         {campaign.backgroundEffects.glow && (
           <>
             <motion.div
               animate={{ x: [0, 22, 0], y: [0, -18, 0], opacity: [0.3, 0.52, 0.3] }}
               transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute left-[-10%] top-12 h-72 w-72 rounded-full bg-emerald-400/30 blur-3xl"
+              className="absolute left-[-10%] top-12 h-72 w-72 rounded-full blur-3xl"
+              style={{ backgroundColor: dailyTheme.glow }}
             />
             <motion.div
               animate={{ x: [0, -18, 0], y: [0, 18, 0], opacity: [0.24, 0.44, 0.24] }}
               transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute bottom-[-12%] right-[-6%] h-80 w-80 rounded-full bg-sky-400/25 blur-3xl"
+              className="absolute bottom-[-12%] right-[-6%] h-80 w-80 rounded-full bg-[#8B294F]/30 blur-3xl"
             />
           </>
         )}
@@ -69,7 +73,7 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
-            className="mb-4 inline-flex items-center rounded-full border border-emerald-200/30 bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.22em] text-emerald-100 shadow-sm backdrop-blur-md"
+            className="mb-4 inline-flex items-center rounded-full border border-amber-200/30 bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.22em] text-amber-100 shadow-sm backdrop-blur-md"
           >
             {campaign.campaignLabel}
           </motion.p>
@@ -87,7 +91,7 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.05 }}
-            className="mb-4 text-2xl font-semibold text-emerald-100"
+            className="mb-4 text-2xl font-semibold text-amber-100"
           >
             {campaign.subHeading}
           </motion.p>
@@ -110,7 +114,7 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
             <button
               type="button"
               onClick={() => window.location.href = campaign.primaryCTA.href}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-bold text-gray-950 shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-100"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-bold text-gray-950 shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-100"
             >
               {campaign.primaryCTA.label}
               <ArrowRight className="h-4 w-4" />
@@ -119,7 +123,7 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
               <button
                 type="button"
                 onClick={() => window.location.href = campaign.secondaryCTA.href}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-7 py-3 text-sm font-bold text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200/60 hover:bg-white/16"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-7 py-3 text-sm font-bold text-white shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-200/60 hover:bg-white/16"
               >
                 {campaign.secondaryCTA.label}
               </button>
@@ -137,13 +141,16 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
                 key={chip}
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/86 shadow-sm backdrop-blur-md"
               >
-                <Check className="h-3.5 w-3.5 text-emerald-200" />
+                  <Check className="h-3.5 w-3.5 text-amber-200" />
                 {chip}
               </span>
             ))}
           </motion.div>
 
-          {campaign.showCountdown && campaign.countdownEnabled && <CampaignCountdown countdown={countdown} />}
+          {campaign.showCountdown && <CampaignCountdown countdown={countdown} />}
+          <div className="mt-3">
+            <NavratriProgress />
+          </div>
         </div>
 
         <div className="relative z-10 flex min-h-[440px] min-w-0 items-center justify-center lg:min-h-[560px]">
@@ -154,9 +161,9 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
               transition={{ duration: 0.55, delay: 0.24 }}
               className="campaign-discount-badge absolute left-4 top-3 z-20 lg:left-0"
             >
-              <span>{campaign.heroBadge.eyebrow}</span>
+              <span>Up to</span>
               <strong>{campaign.offerPercentage}%</strong>
-              <span>{campaign.heroBadge.suffix}</span>
+              <span>Off</span>
             </motion.div>
           )}
 
@@ -165,7 +172,7 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
               initial={{ opacity: 0, y: 18, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.55, delay: 0.32 }}
-              className="campaign-combo-card absolute bottom-2 right-6 z-20 w-60 overflow-hidden rounded-3xl border border-emerald-100/25 bg-slate-950/58 shadow-2xl backdrop-blur-xl"
+              className="campaign-combo-card absolute bottom-2 right-6 z-20 w-60 overflow-hidden rounded-3xl border border-amber-100/25 bg-slate-950/58 shadow-2xl backdrop-blur-xl"
             >
               <img
                 src={campaign.featuredPromoMedia}
@@ -174,16 +181,23 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
                 loading="lazy"
               />
               <div className="p-4">
-                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-100">{campaign.featuredComboName}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-amber-100">{campaign.featuredComboName}</p>
+                  {campaign.featuredComboDiscount !== null && (
+                    <span className="rounded-full border border-amber-200/35 bg-amber-200/10 px-2 py-1 text-[10px] font-black text-amber-100">
+                      {campaign.featuredComboDiscount}% OFF
+                    </span>
+                  )}
+                </div>
                 <div className="mt-2 flex items-end gap-2">
                   <span className="text-2xl font-black text-white">{campaign.featuredComboPrice}</span>
                   <span className="pb-1 text-sm font-semibold text-white/45 line-through">{campaign.featuredComboOriginalPrice}</span>
                 </div>
-                <p className="mt-1 text-sm font-bold text-emerald-200">{campaign.featuredComboSavings}</p>
+                <p className="mt-1 text-sm font-bold text-amber-200">{campaign.featuredComboSavings}</p>
                 <button
                   type="button"
-                  onClick={() => window.location.href = campaign.secondaryCTA.href}
-                  className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-white transition-colors hover:text-emerald-100"
+                  onClick={() => window.location.href = campaign.featuredComboHref}
+                  className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-white transition-colors hover:text-amber-100"
                 >
                   {campaign.featuredComboCtaText}
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -219,7 +233,7 @@ const HeroDesktop: React.FC<HeroDesktopProps> = ({ countdown, heroImage }) => {
             <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-8 gap-y-2">
               {campaign.trustPoints.map((point) => (
                 <span key={point} className="inline-flex items-center gap-2 text-sm font-bold text-white/82">
-                  <Check className="h-4 w-4 text-emerald-200" />
+                  <Check className="h-4 w-4 text-amber-200" />
                   {point}
                 </span>
               ))}

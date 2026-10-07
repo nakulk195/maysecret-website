@@ -1,27 +1,32 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Check, Star } from 'lucide-react';
-import { campaign } from '../../config/campaign';
+import { ArrowRight, Check } from 'lucide-react';
+import { campaign, getDailyTheme } from '../../config/campaign';
 import CampaignCountdown, { CountdownState } from './CampaignCountdown';
+import NavratriProgress from './NavratriProgress';
 
 type HeroMobileProps = {
   countdown: CountdownState;
 };
 
 const HeroMobile: React.FC<HeroMobileProps> = ({ countdown }) => {
+  const dailyTheme = getDailyTheme();
+
   return (
     <section
-      className="campaign-hero-mobile relative overflow-hidden px-4 pb-6 pt-5 text-white md:hidden"
+      className="campaign-hero-mobile relative z-[60] overflow-hidden px-4 pb-6 pt-5 text-white md:hidden"
       style={{
         backgroundImage: campaign.gradientColors.hero,
         ['--campaign-primary' as string]: campaign.accentColors.primary,
         ['--campaign-secondary' as string]: campaign.accentColors.secondary,
         ['--campaign-accent' as string]: campaign.accentColors.accent,
+        ['--campaign-daily-accent' as string]: dailyTheme.accent,
+        ['--campaign-daily-glow' as string]: dailyTheme.glow,
       }}
     >
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         <img
-          src={campaign.backgroundImage}
+          src={campaign.heroMobileBackgroundImage}
           alt=""
           className="campaign-mobile-bg h-full w-full object-cover"
           loading="lazy"
@@ -35,20 +40,15 @@ const HeroMobile: React.FC<HeroMobileProps> = ({ countdown }) => {
           transition={{ duration: 0.35 }}
           className="space-y-2"
         >
-          <p className="inline-flex rounded-full border border-emerald-200/30 bg-white/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-100 shadow-sm backdrop-blur-md">
+          <p className="inline-flex rounded-full border border-amber-200/30 bg-white/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-100 shadow-sm backdrop-blur-md">
             {campaign.campaignLabel}
           </p>
           <div>
             <h1 className="text-[2.25rem] font-black leading-[0.98] text-white min-[390px]:text-[2.55rem]">
               {campaign.heading}
             </h1>
-            <p className="mt-1 text-base font-semibold text-emerald-100">{campaign.subHeading}</p>
+            <p className="mt-1 text-base font-semibold text-amber-100">{campaign.subHeading}</p>
           </div>
-          {campaign.showOfferBadge && (
-            <div className="inline-flex items-center rounded-full border border-amber-200/40 bg-amber-300/14 px-3 py-1.5 text-sm font-black uppercase tracking-[0.08em] text-amber-100">
-              Up to {campaign.offerPercentage}% OFF
-            </div>
-          )}
         </motion.div>
 
         <motion.div
@@ -67,6 +67,12 @@ const HeroMobile: React.FC<HeroMobileProps> = ({ countdown }) => {
           />
         </motion.div>
 
+        {campaign.showOfferBadge && (
+          <div className="inline-flex w-fit items-center rounded-full border border-amber-200/40 bg-amber-300/14 px-3 py-1.5 text-sm font-black uppercase tracking-[0.08em] text-amber-100">
+            Up to {campaign.offerPercentage}% OFF
+          </div>
+        )}
+
         {campaign.showPriceCard && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -76,14 +82,12 @@ const HeroMobile: React.FC<HeroMobileProps> = ({ countdown }) => {
           >
             <div className="mb-3 flex items-center justify-between gap-3">
               <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-100">Combo Offer</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-amber-100">Featured Offer</p>
                 <h2 className="mt-1 text-xl font-black text-white">{campaign.featuredComboName}</h2>
               </div>
-              {campaign.showRating && (
-                <div className="flex items-center rounded-full bg-white/12 px-2.5 py-1 text-amber-100">
-                  {[...Array(5)].map((_, index) => (
-                    <Star key={index} className="h-3 w-3 fill-current" />
-                  ))}
+              {campaign.showRating && campaign.featuredComboDiscount !== null && (
+                <div className="rounded-full border border-amber-200/35 bg-amber-200/10 px-2.5 py-1 text-[10px] font-black text-amber-100">
+                  {campaign.featuredComboDiscount}% OFF
                 </div>
               )}
             </div>
@@ -98,7 +102,7 @@ const HeroMobile: React.FC<HeroMobileProps> = ({ countdown }) => {
             </div>
 
             {campaign.showSavings && (
-              <p className="mt-1 text-sm font-bold text-emerald-200">{campaign.featuredComboSavings}</p>
+              <p className="mt-1 text-sm font-bold text-amber-200">{campaign.featuredComboSavings}</p>
             )}
           </motion.div>
         )}
@@ -128,16 +132,18 @@ const HeroMobile: React.FC<HeroMobileProps> = ({ countdown }) => {
           )}
         </motion.div>
 
-        {campaign.showCountdown && campaign.countdownEnabled && <CampaignCountdown countdown={countdown} variant="mobile" />}
+        {campaign.showCountdown && <CampaignCountdown countdown={countdown} variant="mobile" />}
+
+        <NavratriProgress compact />
 
         {campaign.showTrustStrip && (
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="flex flex-wrap gap-2">
             {campaign.trustPoints.map((point) => (
               <span
                 key={point}
                 className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/86 shadow-sm backdrop-blur-md"
               >
-                <Check className="h-3.5 w-3.5 text-emerald-200" />
+                <Check className="h-3.5 w-3.5 text-amber-200" />
                 {point}
               </span>
             ))}

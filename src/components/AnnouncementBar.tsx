@@ -1,8 +1,18 @@
-import React from 'react';
-import { campaign } from '../config/campaign';
+import React, { useEffect, useState } from 'react';
+import { campaign, isCampaignVisible } from '../config/campaign';
 
 const AnnouncementBar: React.FC = () => {
-  if (!campaign.isCampaignActive || !campaign.showAnnouncementBar) {
+  const [visible, setVisible] = useState(() => isCampaignVisible());
+
+  useEffect(() => {
+    const updateVisibility = () => setVisible(isCampaignVisible());
+    const intervalId = window.setInterval(updateVisibility, 60_000);
+
+    updateVisibility();
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  if (!visible || !campaign.showAnnouncementBar) {
     return null;
   }
 
